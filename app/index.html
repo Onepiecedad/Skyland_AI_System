@@ -20,7 +20,10 @@
       <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">blur_on</span>
       Skyland Ai System
     </div>
-    <button id="lang-toggle" class="lang-toggle" onclick="SkylandI18n.toggle()">SV</button>
+    <div class="lang-switcher">
+      <button id="lang-sv" class="lang-btn active" onclick="SkylandI18n.setLang('sv')">SV</button>
+      <button id="lang-en" class="lang-btn" onclick="SkylandI18n.setLang('en')">EN</button>
+    </div>
   </header>
 
   <!-- Sidebar Navigation -->
@@ -287,6 +290,7 @@
   </main>
 
   <script src="session.js"></script>
+  <script src="lang.js"></script>
   <script src="i18n.js"></script>
   <script src="api.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.4.0/dist/lib.iife.min.js"></script>

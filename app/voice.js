@@ -89,7 +89,7 @@
 
       case STATES.SPEAKING:
         orbWrap.classList.add('voice-speaking');
-        voiceLabelH2.textContent = 'Dana is speaking...';
+        voiceLabelH2.textContent = 'Alex is speaking...';
         voiceLabelP.textContent = 'AGENT RESPONSE';
         linkText.textContent = 'LINK ACTIVE';
         linkDot.classList.add('active');
@@ -127,7 +127,10 @@
     var resp = await fetch(PROXY_BASE + '/voice/signed-url', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_uuid: session.id }),
+      body: JSON.stringify({
+        session_uuid: session.id,
+        agent_id: window.SkylandLang ? window.SkylandLang.getAgentId() : undefined
+      }),
     });
 
     if (!resp.ok) {

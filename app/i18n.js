@@ -103,16 +103,23 @@
   };
 
   function getStoredLang() {
-    return localStorage.getItem('skyland_lang') || 'en';
+    // Delegate to SkylandLang if available, fallback to localStorage
+    if (window.SkylandLang) {
+      return window.SkylandLang.getCurrentLang();
+    }
+    return localStorage.getItem('skyland_lang') || 'sv';
   }
 
   function setLang(lang) {
+    if (window.SkylandLang) {
+      // SkylandLang.setLang reloads the page — translations apply on reload
+      window.SkylandLang.setLang(lang);
+      return;
+    }
     localStorage.setItem('skyland_lang', lang);
     document.documentElement.lang = lang;
     applyTranslations(lang);
-    // Update toggle button
-    const btn = document.getElementById('lang-toggle');
-    if (btn) btn.textContent = lang === 'en' ? 'SV' : 'EN';
+    updateLangButtons(lang);
   }
 
   function applyTranslations(lang) {
@@ -132,6 +139,16 @@
     });
   }
 
+  function updateLangButtons(lang) {
+    var svBtn = document.getElementById('lang-sv');
+    var enBtn = document.getElementById('lang-en');
+    if (svBtn) svBtn.classList.toggle('active', lang === 'sv');
+    if (enBtn) enBtn.classList.toggle('active', lang === 'en');
+    // Legacy single toggle fallback
+    var btn = document.getElementById('lang-toggle');
+    if (btn) btn.textContent = lang === 'en' ? 'SV' : 'EN';
+  }
+
   // Expose globally
   window.SkylandI18n = {
     setLang,
@@ -141,7 +158,10 @@
       setLang(current === 'en' ? 'sv' : 'en');
     },
     init: function () {
-      setLang(getStoredLang());
+      var lang = getStoredLang();
+      document.documentElement.lang = lang;
+      applyTranslations(lang);
+      updateLangButtons(lang);
     },
   };
 })();
