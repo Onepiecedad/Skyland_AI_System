@@ -24,24 +24,22 @@
    */
   var STARTER_RESPONSES = {
     sv: {
-      'Vad kan ni hjälpa mig med?':
-        'Välkommen till Skyland. Jag förstår att du vill veta vad vi kan hjälpa till med. Är det okej om jag ställer ett par korta frågor först, så kan vi ge dig ett bättre svar?',
+      // 'Vad kan ni hjälpa mig med?' → null (Variant 2, no override)
       'Hur mycket kostar det?':
-        'Välkommen till Skyland. Jag förstår att du undrar över våra priser. Är det okej om jag ställer ett par korta frågor först, så kan vi ge dig ett bättre svar?',
+        'Välkommen till Skyland. Jag förstår att du undrar över våra priser. Är det okej om jag ställer ett par korta frågor först, så kan jag ge dig ett mer relevant prisspann?',
       'Hur fungerar processen?':
-        'Välkommen till Skyland. Jag förstår att du vill veta hur vår process ser ut. Är det okej om jag ställer ett par korta frågor först, så kan vi ge dig ett bättre svar?',
+        'Välkommen till Skyland. Jag förstår att du vill veta hur vår process ser ut. Är det okej om jag ställer ett par korta frågor först, så kan jag förklara utifrån just er situation?',
       'Vilka företag har ni jobbat med?':
-        'Välkommen till Skyland. Jag förstår att du vill höra om företagen vi jobbat med. Är det okej om jag ställer ett par korta frågor först, så kan vi ge dig ett bättre svar?'
+        'Välkommen till Skyland. Jag förstår att du vill höra om företagen vi jobbat med. Är det okej om jag ställer ett par korta frågor först, så kan jag ge dig ett mer relevant urval av exempel?'
     },
     en: {
-      'What can you help me with?':
-        'Welcome to Skyland. I understand you want to know what we can help with. Is it okay if I ask a couple of quick questions first, so we can give you a better answer?',
+      // 'What can you help me with?' → null (Variant 2, no override)
       'How much does it cost?':
-        'Welcome to Skyland. I understand you\'re curious about our pricing. Is it okay if I ask a couple of quick questions first, so we can give you a better answer?',
+        'Welcome to Skyland. I understand you\'re curious about our pricing. Is it okay if I ask a couple of quick questions first, so I can give you a more relevant price range?',
       'How does the process work?':
-        'Welcome to Skyland. I understand you want to know how our process works. Is it okay if I ask a couple of quick questions first, so we can give you a better answer?',
+        'Welcome to Skyland. I understand you want to know how our process works. Is it okay if I ask a couple of quick questions first, so I can explain based on your specific situation?',
       'Which companies have you worked with?':
-        'Welcome to Skyland. I understand you want to hear about the companies we\'ve worked with. Is it okay if I ask a couple of quick questions first, so we can give you a better answer?'
+        'Welcome to Skyland. I understand you want to hear about the companies we\'ve worked with. Is it okay if I ask a couple of quick questions first, so I can give you a more relevant selection of examples?'
     }
   };
 
