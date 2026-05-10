@@ -27,6 +27,11 @@
       voice_h2: "Listening...",
       voice_sub: "AWAITING VOICE COMMAND",
       chat_placeholder: "Type technical command...",
+      starter_1: "What can you help me with?",
+      starter_2: "How much does it cost?",
+      starter_3: "How does the process work?",
+      starter_4: "Which companies have you worked with?",
+      starter_open: "Or start a regular conversation \u2192",
 
       // Void
       void_h2: "Incoming Transmission",
@@ -77,6 +82,11 @@
       voice_h2: "Lyssnar...",
       voice_sub: "INVÄNTAR RÖSTKOMMANDO",
       chat_placeholder: "Skriv tekniskt kommando...",
+      starter_1: "Vad kan ni hjälpa mig med?",
+      starter_2: "Hur mycket kostar det?",
+      starter_3: "Hur fungerar processen?",
+      starter_4: "Vilka företag har ni jobbat med?",
+      starter_open: "Eller starta vanlig konversation \u2192",
 
       // Void
       void_h2: "Inkommande Transmission",

@@ -144,21 +144,30 @@
 
   // --- Voice session lifecycle ---
 
-  async function startVoice() {
+  var starterPanel = null;
+
+  function showStarters() {
+    if (starterPanel) starterPanel.classList.remove('hidden');
+  }
+
+  function hideStarters() {
+    if (starterPanel) starterPanel.classList.add('hidden');
+  }
+
+  async function startVoice(starterText) {
     if (currentState === STATES.CONNECTING || currentState === STATES.LISTENING || currentState === STATES.SPEAKING) {
       return; // Already active
     }
 
+    hideStarters();
     setState(STATES.CONNECTING);
 
     try {
       // 1. Get signed URL from proxy
       var signedUrl = await fetchSignedUrl();
 
-      // 2. Start ElevenLabs conversation via SDK
-      var Conversation = window.ElevenLabsClient.Conversation;
-
-      conversation = await Conversation.startSession({
+      // 2. Build session config
+      var sessionConfig = {
         signedUrl: signedUrl,
 
         onConnect: function () {
@@ -170,6 +179,7 @@
           console.log('[VOICE] Disconnected from ElevenLabs');
           conversation = null;
           setState(STATES.DISCONNECTED);
+          showStarters();
         },
 
         onModeChange: function (data) {
@@ -185,13 +195,28 @@
           console.error('[VOICE] SDK error:', error);
           conversation = null;
           setState(STATES.ERROR, 'Voice error — try again');
+          showStarters();
         },
 
         onMessage: function (message) {
           // Transcripts arrive here — log for now, wire to chat panel later
           console.log('[VOICE] Message:', message);
         },
-      });
+      };
+
+      // 3. Add first_message override if starter was clicked
+      if (starterText) {
+        sessionConfig.conversationConfigOverride = {
+          agent: {
+            firstMessage: starterText
+          }
+        };
+        console.log('[VOICE] Starter override:', starterText);
+      }
+
+      // 4. Start ElevenLabs conversation via SDK
+      var Conversation = window.ElevenLabsClient.Conversation;
+      conversation = await Conversation.startSession(sessionConfig);
 
       console.log('[VOICE] Session started, id:', conversation.getId());
 
@@ -199,6 +224,7 @@
       console.error('[VOICE] Start failed:', err);
       conversation = null;
       setState(STATES.ERROR, err.message || 'Connection failed');
+      showStarters();
     }
   }
 
@@ -212,6 +238,7 @@
       conversation = null;
     }
     setState(STATES.DISCONNECTED);
+    showStarters();
   }
 
   // --- Initialization ---
@@ -234,6 +261,7 @@
     linkText = fluxPage.querySelector('.link-text');
     linkDot = fluxPage.querySelector('.link-dot');
     endBtn = fluxPage.querySelector('.end-btn');
+    starterPanel = document.getElementById('starter-panel');
 
     if (!orbWrap || !voiceLabelH2) {
       console.error('[VOICE] Flux DOM elements not found');
@@ -243,11 +271,36 @@
     // Set initial state
     setState(STATES.IDLE);
 
-    // Wire click handlers
+    // Wire starter button click handlers
+    if (starterPanel) {
+      var starterBtns = starterPanel.querySelectorAll('.starter-btn');
+      starterBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var text = btn.textContent.trim();
+          var lang = window.SkylandLang ? window.SkylandLang.getCurrentLang() : 'sv';
+          var agentId = window.SkylandLang ? window.SkylandLang.getAgentId() : null;
+          console.log('[VOICE] Starter clicked:', text, '| lang:', lang, '| agent:', agentId);
+          startVoice(text);
+        });
+      });
+
+      // "Regular conversation" button — start without override
+      var openBtn = document.getElementById('starter-open');
+      if (openBtn) {
+        openBtn.addEventListener('click', function () {
+          var lang = window.SkylandLang ? window.SkylandLang.getCurrentLang() : 'sv';
+          var agentId = window.SkylandLang ? window.SkylandLang.getAgentId() : null;
+          console.log('[VOICE] Regular conversation | lang:', lang, '| agent:', agentId);
+          startVoice(null);
+        });
+      }
+    }
+
+    // Wire orb click (fallback — starts without starter)
     orbWrap.style.cursor = 'pointer';
     orbWrap.addEventListener('click', function () {
       if (currentState === STATES.IDLE || currentState === STATES.DISCONNECTED || currentState === STATES.ERROR) {
-        startVoice();
+        startVoice(null);
       }
     });
 
@@ -258,7 +311,7 @@
       });
     }
 
-    console.log('[VOICE] Module initialized');
+    console.log('[VOICE] Module initialized with conversation starters');
   }
 
   // --- Public API ---
