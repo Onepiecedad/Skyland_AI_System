@@ -208,7 +208,7 @@
       if (starterText && window.SkylandLang) {
         var variant1 = window.SkylandLang.getStarterResponse(starterText);
         if (variant1) {
-          sessionConfig.conversationConfigOverride = {
+          sessionConfig.overrides = {
             agent: {
               firstMessage: variant1
             }
