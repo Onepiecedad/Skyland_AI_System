@@ -2,9 +2,9 @@
  * Skyland Language & Agent Routing
  *
  * Language priority (on page load):
- *   1. localStorage 'skyland_lang' (if set)
- *   2. URL param ?lang=sv or ?lang=en
- *   3. navigator.language (sv/sv-SE → sv, everything else → en)
+ *   1. URL param ?lang=sv or ?lang=en (wins always, syncs to localStorage)
+ *   2. localStorage 'skyland_lang' (if valid)
+ *   3. navigator.language (sv/sv-* → sv, en/en-* → en)
  *   4. Default: sv
  *
  * Exposes: window.SkylandLang
@@ -22,26 +22,32 @@
 
   /**
    * Detect language using priority chain.
-   * Only called on first load (before localStorage is set).
    */
   function detectLang() {
-    // 1. localStorage
+    // 1. URL parameter ?lang= (always wins if present)
+    var params = new URLSearchParams(window.location.search);
+    var urlLang = params.get('lang');
+    if (urlLang && VALID_LANGS.indexOf(urlLang) !== -1) {
+      // Sync to localStorage so the choice persists
+      if (urlLang !== localStorage.getItem(STORAGE_KEY)) {
+        localStorage.setItem(STORAGE_KEY, urlLang);
+      }
+      return urlLang;
+    }
+
+    // 2. localStorage
     var stored = localStorage.getItem(STORAGE_KEY);
     if (stored && VALID_LANGS.indexOf(stored) !== -1) {
       return stored;
     }
 
-    // 2. URL parameter ?lang=
-    var params = new URLSearchParams(window.location.search);
-    var urlLang = params.get('lang');
-    if (urlLang && VALID_LANGS.indexOf(urlLang) !== -1) {
-      return urlLang;
-    }
-
-    // 3. Browser language
+    // 3. Browser language (explicit sv and en detection)
     var browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
     if (browserLang === 'sv' || browserLang.startsWith('sv-')) {
       return 'sv';
+    }
+    if (browserLang === 'en' || browserLang.startsWith('en-')) {
+      return 'en';
     }
 
     // 4. Default
@@ -52,12 +58,12 @@
    * Get current language. Initializes from detection if not yet stored.
    */
   function getCurrentLang() {
-    var stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && VALID_LANGS.indexOf(stored) !== -1) {
-      return stored;
-    }
     var detected = detectLang();
-    localStorage.setItem(STORAGE_KEY, detected);
+    // Ensure localStorage is always in sync
+    var stored = localStorage.getItem(STORAGE_KEY);
+    if (stored !== detected) {
+      localStorage.setItem(STORAGE_KEY, detected);
+    }
     return detected;
   }
 
