@@ -1,0 +1,26 @@
+# Environment & secrets
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Backups — too large for git, kept locally only
+/docs/backups/
+
+# Logs
+*.log
+
+# Supabase temp
+supabase/.temp/
+
+# NOTE: n8n/workflows/*.json contain deployment-specific URLs (e.g. Supabase project URL).
+# This is accepted tech debt — these are workflow exports that break if URLs are placeholder'd.
+# Actual API keys are stored as n8n variables ($vars), not hardcoded.
