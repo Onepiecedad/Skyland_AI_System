@@ -204,14 +204,20 @@
         },
       };
 
-      // 3. Add first_message override if starter was clicked
-      if (starterText) {
-        sessionConfig.conversationConfigOverride = {
-          agent: {
-            firstMessage: starterText
-          }
-        };
-        console.log('[VOICE] Starter override:', starterText);
+      // 3. Add Variant 1 firstMessage override if starter was clicked
+      if (starterText && window.SkylandLang) {
+        var variant1 = window.SkylandLang.getStarterResponse(starterText);
+        if (variant1) {
+          sessionConfig.conversationConfigOverride = {
+            agent: {
+              firstMessage: variant1
+            }
+          };
+          console.log('[VOICE] Variant 1 override for:', starterText);
+          console.log('[VOICE] Alex will say:', variant1.substring(0, 60) + '...');
+        } else {
+          console.warn('[VOICE] No Variant 1 mapping for:', starterText);
+        }
       }
 
       // 4. Start ElevenLabs conversation via SDK

@@ -17,6 +17,34 @@
     en: 'TDgRNcUoUC1GHVKK0bHH'
   };
 
+  /**
+   * Variant 1 firstMessage overrides — keyed by starter button text.
+   * When a visitor clicks a starter, Alex opens with a contextual greeting
+   * instead of the generic Variant 2 ("Vad kan jag hjälpa dig med?").
+   */
+  var STARTER_RESPONSES = {
+    sv: {
+      'Vad kan ni hjälpa mig med?':
+        'Välkommen till Skyland. Jag förstår att du vill veta vad vi kan hjälpa till med. Är det okej om jag ställer ett par korta frågor först, så kan vi ge dig ett bättre svar?',
+      'Hur mycket kostar det?':
+        'Välkommen till Skyland. Jag förstår att du undrar över våra priser. Är det okej om jag ställer ett par korta frågor först, så kan vi ge dig ett bättre svar?',
+      'Hur fungerar processen?':
+        'Välkommen till Skyland. Jag förstår att du vill veta hur vår process ser ut. Är det okej om jag ställer ett par korta frågor först, så kan vi ge dig ett bättre svar?',
+      'Vilka företag har ni jobbat med?':
+        'Välkommen till Skyland. Jag förstår att du vill höra om företagen vi jobbat med. Är det okej om jag ställer ett par korta frågor först, så kan vi ge dig ett bättre svar?'
+    },
+    en: {
+      'What can you help me with?':
+        'Welcome to Skyland. I understand you want to know what we can help with. Is it okay if I ask a couple of quick questions first, so we can give you a better answer?',
+      'How much does it cost?':
+        'Welcome to Skyland. I understand you\'re curious about our pricing. Is it okay if I ask a couple of quick questions first, so we can give you a better answer?',
+      'How does the process work?':
+        'Welcome to Skyland. I understand you want to know how our process works. Is it okay if I ask a couple of quick questions first, so we can give you a better answer?',
+      'Which companies have you worked with?':
+        'Welcome to Skyland. I understand you want to hear about the companies we\'ve worked with. Is it okay if I ask a couple of quick questions first, so we can give you a better answer?'
+    }
+  };
+
   var STORAGE_KEY = 'skyland_lang';
   var VALID_LANGS = ['sv', 'en'];
 
@@ -87,6 +115,19 @@
     return AGENT_IDS[getCurrentLang()];
   }
 
+  /**
+   * Get Variant 1 firstMessage override for a starter button text.
+   * Returns null if starterText is not in the mapping (fallback to default).
+   */
+  function getStarterResponse(starterText) {
+    var lang = getCurrentLang();
+    var responses = STARTER_RESPONSES[lang];
+    if (responses && responses[starterText]) {
+      return responses[starterText];
+    }
+    return null;
+  }
+
   // Initialize on load — set localStorage if not yet set
   getCurrentLang();
 
@@ -95,6 +136,7 @@
     getCurrentLang: getCurrentLang,
     setLang: setLang,
     getAgentId: getAgentId,
+    getStarterResponse: getStarterResponse,
     AGENT_IDS: AGENT_IDS
   };
 })();
