@@ -173,11 +173,15 @@ document.addEventListener('DOMContentLoaded', () => {
       // Clamp to [-1.2, 1.2] for smooth edges
       const clamped = Math.max(-1.2, Math.min(1.2, offset));
 
-      // Transform: slide + opacity (no scale — cards stay static size)
-      const translateY = clamped * 60;
       const opacity = 1 - Math.abs(clamped) * 0.5;
 
-      glass.style.transform = `translateY(${translateY}px)`;
+      // Parallax translateY only on desktop — on mobile it shifts cards into the fixed header
+      if (window.innerWidth > 768) {
+        const translateY = clamped * 60;
+        glass.style.transform = `translateY(${translateY}px)`;
+      } else {
+        glass.style.transform = '';
+      }
       glass.style.opacity = Math.max(opacity, 0.3);
     });
 
