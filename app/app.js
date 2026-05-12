@@ -79,6 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
     history.replaceState(null, '', '#' + pageId);
   }
 
+  // --- Logo click → back to hero ---
+  document.querySelector('.logo').addEventListener('click', () => scrollToPage('core'));
+
   // --- Scroll arrow clicks → next section ---
   document.querySelectorAll('.scroll-arrow').forEach(arrow => {
     arrow.addEventListener('click', () => {
