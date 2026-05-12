@@ -31,6 +31,7 @@ _DEFAULT_ORIGINS: list[str] = [
     "http://localhost:3000",
     "https://skylandai.se",
     "https://www.skylandai.se",
+    "https://skyland-ai-os.netlify.app",
 ]
 
 

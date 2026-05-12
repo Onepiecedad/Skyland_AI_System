@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>AETHERIC OS — Skyland AI System</title>
   <meta name="description" content="Skyland AI Operating System — The Intelligent Nervous System for Service SMBs"/>
   <link rel="stylesheet" href="styles.css"/>
@@ -135,81 +135,52 @@
         </div>
       </div>
 
-      <!-- PAGE: FLUX (Voice + Chat) -->
+      <!-- PAGE: FLUX (Voice Agent) -->
       <div id="flux" class="page">
         <div class="page-glass">
         <div class="flux-inner">
           <div class="voice-panel">
+            <!-- Status badge — centered -->
             <div class="link-badge">
               <div class="link-dot"></div>
               <span class="link-text" data-i18n="link_badge">LINK ACTIVE</span>
             </div>
-            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;width:100%">
-              <!-- Conversation starters (hidden during active session) -->
-              <div class="starter-panel" id="starter-panel">
-                <button class="starter-btn" data-starter="1" data-i18n="starter_1">What can you help me with?</button>
-                <button class="starter-btn" data-starter="2" data-i18n="starter_2">How much does it cost?</button>
-                <button class="starter-btn" data-starter="3" data-i18n="starter_3">How does the process work?</button>
-                <button class="starter-btn" data-starter="4" data-i18n="starter_4">Which companies have you worked with?</button>
-                <button class="starter-open" id="starter-open" data-i18n="starter_open">Or start a regular conversation →</button>
+
+            <!-- Orb — primary focal point -->
+            <div class="orb-wrap">
+              <div class="orb-ring"></div>
+              <div class="orb-ring-2"></div>
+              <div class="orb-core">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">mic</span>
               </div>
-              <div class="orb-wrap">
-                <div class="orb-ring"></div>
-                <div class="orb-ring-2"></div>
-                <div class="orb-core">
-                  <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">mic</span>
-                </div>
-                <div class="wave-bars">
-                  <div style="height:16px"></div>
-                  <div style="height:32px"></div>
-                  <div style="height:48px"></div>
-                  <div style="height:24px"></div>
-                  <div style="height:40px"></div>
-                  <div style="height:16px"></div>
-                </div>
-              </div>
-              <div class="voice-label">
-                <h2 data-i18n="voice_h2">Listening...</h2>
-                <p data-i18n="voice_sub">AWAITING VOICE COMMAND</p>
+              <div class="wave-bars">
+                <div style="height:16px"></div>
+                <div style="height:32px"></div>
+                <div style="height:48px"></div>
+                <div style="height:24px"></div>
+                <div style="height:40px"></div>
+                <div style="height:16px"></div>
               </div>
             </div>
+
+            <!-- Voice label -->
+            <div class="voice-label">
+              <h2 data-i18n="voice_h2">Listening...</h2>
+              <p data-i18n="voice_sub">AWAITING VOICE COMMAND</p>
+            </div>
+
+            <!-- End call button only -->
             <div class="voice-btns">
-              <button><span class="material-symbols-outlined">keyboard</span></button>
               <button class="end-btn"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">call_end</span></button>
             </div>
-          </div>
-          <div class="chat-panel">
-            <div class="chat-messages">
-              <div class="msg ai">
-                <div class="msg-avatar"><span class="material-symbols-outlined" style="font-size:16px;color:var(--primary)">psychology</span></div>
-                <div>
-                  <div class="msg-time">SYSTEM // 09:41:02</div>
-                  <div class="msg-bubble">Diagnostic complete. Node synchronization at 99.8%. Ready for input sequence.</div>
-                </div>
-              </div>
-              <div class="msg user">
-                <div class="msg-avatar" style="background:var(--surface-highest);border-color:var(--outline-var)">
-                  <span class="material-symbols-outlined" style="font-size:16px;color:var(--on-surface-var)">person</span>
-                </div>
-                <div>
-                  <div class="msg-time">OPERATOR_01 // 09:41:15</div>
-                  <div class="msg-bubble">Initialize the Flux protocol on sector alpha.</div>
-                </div>
-              </div>
-              <div class="msg ai">
-                <div class="msg-avatar"><span class="material-symbols-outlined" style="font-size:16px;color:var(--primary)">psychology</span></div>
-                <div>
-                  <div class="msg-time">SYSTEM // 09:41:18</div>
-                  <div class="msg-bubble" style="font-family:'Space Grotesk',monospace">&gt; Executing Flux protocol...<br/>&gt; Sector Alpha identified.<br/><span class="cursor-blink" style="color:var(--primary)">_</span></div>
-                </div>
-              </div>
-            </div>
-            <div class="chat-input">
-              <div class="chat-input-wrap">
-                <span class="material-symbols-outlined">short_text</span>
-                <input type="text" placeholder="Type technical command..." data-i18n-placeholder="chat_placeholder"/>
-                <button><span class="material-symbols-outlined">send</span></button>
-              </div>
+
+            <!-- Conversation starters — below orb (hidden during active session) -->
+            <div class="starter-panel" id="starter-panel">
+              <button class="starter-btn" data-starter="1" data-i18n="starter_1">What can you help me with?</button>
+              <button class="starter-btn" data-starter="2" data-i18n="starter_2">How much does it cost?</button>
+              <button class="starter-btn" data-starter="3" data-i18n="starter_3">How does the process work?</button>
+              <button class="starter-btn" data-starter="4" data-i18n="starter_4">Which companies have you worked with?</button>
+              <button class="starter-open" id="starter-open" data-i18n="starter_open">Or start a regular conversation →</button>
             </div>
           </div>
         </div>
@@ -268,6 +239,11 @@
               </button>
             </form>
           </div>
+          <button class="scan-toggle-mobile" id="scan-toggle" onclick="this.classList.toggle('expanded');document.querySelector('.scan-panel').classList.toggle('mobile-expanded')">
+            <span class="material-symbols-outlined" style="font-size:16px">analytics</span>
+            <span data-i18n="scan_toggle_show">Visa AI-analys</span>
+            <span class="material-symbols-outlined toggle-chevron" style="font-size:16px">expand_more</span>
+          </button>
           <div class="scan-panel">
             <div class="scan-header">
               <div class="scan-title"><span class="dot"></span><span data-i18n="scan_title">LEAD PROFILE SCAN</span></div>

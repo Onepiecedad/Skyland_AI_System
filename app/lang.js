@@ -24,7 +24,8 @@
    */
   var STARTER_RESPONSES = {
     sv: {
-      // 'Vad kan ni hjälpa mig med?' → null (Variant 2, no override)
+      'Vad kan ni hjälpa mig med?':
+        'Välkommen till Skyland. Vi hjälper företag att integrera AI-lösningar — från röstagenter till lead-automation och skräddarsydda dashboards. Är det okej om jag ställer ett par korta frågor först, så kan jag förklara vad som vore mest relevant för er?',
       'Hur mycket kostar det?':
         'Välkommen till Skyland. Jag förstår att du undrar över våra priser. Är det okej om jag ställer ett par korta frågor först, så kan jag ge dig ett mer relevant prisspann?',
       'Hur fungerar processen?':
@@ -33,7 +34,8 @@
         'Välkommen till Skyland. Jag förstår att du vill höra om företagen vi jobbat med. Är det okej om jag ställer ett par korta frågor först, så kan jag ge dig ett mer relevant urval av exempel?'
     },
     en: {
-      // 'What can you help me with?' → null (Variant 2, no override)
+      'What can you help me with?':
+        'Welcome to Skyland. We help businesses integrate AI solutions — from voice agents to lead automation and custom dashboards. Is it okay if I ask a couple of quick questions first, so I can explain what would be most relevant for you?',
       'How much does it cost?':
         'Welcome to Skyland. I understand you\'re curious about our pricing. Is it okay if I ask a couple of quick questions first, so I can give you a more relevant price range?',
       'How does the process work?':
