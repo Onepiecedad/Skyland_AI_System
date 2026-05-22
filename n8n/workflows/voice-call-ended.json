@@ -1,0 +1,240 @@
+{
+  "name": "voice-call-ended",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "voice-call-ended",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-vce-001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "voice-call-ended"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json || {};\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;\nconst sessionUuid = body.session_uuid || body.metadata?.session_uuid || body.raw_payload?.session_uuid || null;\nconst conversationId = body.conversation_id || body.conversationId || body.raw_payload?.conversation_id || body.raw_payload?.conversationId || null;\nconst transcript = typeof body.transcript === 'string' ? body.transcript.trim() : '';\nconst summary = typeof body.summary === 'string' && body.summary.trim()\n  ? body.summary.trim()\n  : (transcript ? transcript.split('\\n').slice(0, 3).join(' ').slice(0, 280) : null);\nconst errors = [];\nif (!sessionUuid) errors.push('session_uuid required');\nif (sessionUuid && !uuidRegex.test(sessionUuid)) errors.push('session_uuid must be valid UUID');\nif (!conversationId) errors.push('conversation_id required');\nif (errors.length) {\n  return [{ json: { validation_failed: true, message: errors.join('; ') } }];\n}\nreturn [{\n  json: {\n    validation_failed: false,\n    session_uuid: sessionUuid,\n    external_call_id: conversationId,\n    provider: 'elevenlabs',\n    call_source: body.source || 'voice_call_ended',\n    agent_id: body.agent_id || body.agentId || null,\n    started_at: body.started_at || body.startedAt || null,\n    ended_at: body.ended_at || body.endedAt || new Date().toISOString(),\n    duration_seconds: body.duration_seconds || body.durationSeconds || null,\n    transcript,\n    summary,\n    recording_url: body.recording_url || body.recordingUrl || null,\n    metadata: body.metadata || {},\n    raw_payload: body.raw_payload || body\n  }\n}];"
+      },
+      "id": "code-vce-002",
+      "name": "Normalize Call Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-invalid-vce",
+              "leftValue": "={{ $json.validation_failed }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-vce-003",
+      "name": "Is Invalid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [760, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'error', message: $json.message }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-error-vce-004",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1010, 430]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/sessions?on_conflict=session_uuid",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation,resolution=merge-duplicates" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ session_uuid: $json.session_uuid }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "upsert-session-vce-005",
+      "name": "Upsert Session",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1010, 200]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/prospects?session_uuid=eq.{{ encodeURIComponent($('Normalize Call Payload').first().json.session_uuid || '') }}&select=id,customer_id&order=created_at.desc&limit=1",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "find-prospect-vce-006",
+      "name": "Find Prospect by Session",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1260, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const normalized = $('Normalize Call Payload').first().json;\nconst rows = $input.first().json;\nconst prospect = Array.isArray(rows) ? rows[0] : null;\nreturn [{\n  json: {\n    ...normalized,\n    prospect_id: prospect?.id || null,\n    customer_id: prospect?.customer_id || null\n  }\n}];"
+      },
+      "id": "code-vce-007",
+      "name": "Attach Prospect Links",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1510, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/voice_calls?on_conflict=provider,external_call_id",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation,resolution=merge-duplicates" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ session_uuid: $json.session_uuid, prospect_id: $json.prospect_id, customer_id: $json.customer_id, provider: $json.provider, external_call_id: $json.external_call_id, call_source: $json.call_source, agent_id: $json.agent_id, started_at: $json.started_at, ended_at: $json.ended_at, duration_seconds: $json.duration_seconds, transcript: $json.transcript, summary: $json.summary, recording_url: $json.recording_url, metadata: $json.metadata, raw_payload: $json.raw_payload }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "insert-voice-call-vce-008",
+      "name": "Upsert Voice Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/interactions",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ session_uuid: $json.session_uuid, type: 'voice', payload: { external_call_id: $json.external_call_id, prospect_id: $json.prospect_id, customer_id: $json.customer_id, source: $json.call_source, summary: $json.summary, transcript: $json.transcript, duration_seconds: $json.duration_seconds, started_at: $json.started_at, ended_at: $json.ended_at } }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "insert-interaction-vce-009",
+      "name": "Insert Voice Interaction",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2010, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'ok', external_call_id: $('Attach Prospect Links').first().json.external_call_id }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-ok-vce-010",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2260, 200]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Normalize Call Payload", "type": "main", "index": 0 }]]
+    },
+    "Normalize Call Payload": {
+      "main": [[{ "node": "Is Invalid?", "type": "main", "index": 0 }]]
+    },
+    "Is Invalid?": {
+      "main": [
+        [{ "node": "Respond Error", "type": "main", "index": 0 }],
+        [{ "node": "Upsert Session", "type": "main", "index": 0 }]
+      ]
+    },
+    "Upsert Session": {
+      "main": [[{ "node": "Find Prospect by Session", "type": "main", "index": 0 }]]
+    },
+    "Find Prospect by Session": {
+      "main": [[{ "node": "Attach Prospect Links", "type": "main", "index": 0 }]]
+    },
+    "Attach Prospect Links": {
+      "main": [[{ "node": "Upsert Voice Call", "type": "main", "index": 0 }]]
+    },
+    "Upsert Voice Call": {
+      "main": [[{ "node": "Insert Voice Interaction", "type": "main", "index": 0 }]]
+    },
+    "Insert Voice Interaction": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "pinData": {}
+}

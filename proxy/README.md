@@ -2,6 +2,8 @@
 
 FastAPI proxy that issues signed ElevenLabs WebSocket URLs. The frontend connects directly to ElevenLabs for voice — no audio passes through this proxy.
 
+It also accepts post-call reports on `/voice/call-ended` and forwards them to n8n for Supabase ingestion.
+
 ## Requirements
 
 - Python 3.12+
@@ -30,6 +32,11 @@ curl -X POST http://localhost:8000/voice/signed-url \
   -H "Content-Type: application/json" \
   -d '{"session_uuid":"550e8400-e29b-41d4-a716-446655440000"}'
 # → {"signed_url":"wss://..."}
+
+curl -X POST http://localhost:8000/voice/call-ended \
+  -H "Content-Type: application/json" \
+  -d '{"session_uuid":"550e8400-e29b-41d4-a716-446655440000","conversation_id":"conv_123","transcript":"Hej","source":"browser_sdk"}'
+# → {"status":"accepted"}
 ```
 
 ## Docker
@@ -88,3 +95,11 @@ The signed URL is valid for ~15 minutes. Frontend must connect promptly.
 4. Receive `signed_url` from response
 5. Connect to ElevenLabs via `@elevenlabs/client` SDK using `signed_url`
 6. Audio flows directly between browser and ElevenLabs (not through this proxy)
+
+### Post-call ingestion
+
+```
+POST /voice/call-ended
+```
+
+Accepts normalized end-call payloads from ElevenLabs webhooks or browser-side SDK fallback reporting. The proxy validates `session_uuid` when present and forwards the payload to `VOICE_CALL_WEBHOOK_URL`.

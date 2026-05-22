@@ -36,6 +36,9 @@
   // --- Internal state ---
   var currentState = STATES.IDLE;
   var conversation = null;
+  var callStartedAt = null;
+  var transcriptBuffer = [];
+  var reportSentForConversationId = null;
 
   // --- DOM refs (resolved on init) ---
   var orbWrap = null;
@@ -124,7 +127,7 @@
       throw new Error('No session — reload the page');
     }
 
-    var resp = await fetch(PROXY_BASE + '/voice/signed-url', {
+    var resp = await window.SkylandAPI.fetch(PROXY_BASE + '/voice/signed-url', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -140,6 +143,63 @@
 
     var data = await resp.json();
     return data.signed_url;
+  }
+
+  function extractMessageText(message) {
+    if (!message) return '';
+    if (typeof message === 'string') return message.trim();
+    if (typeof message.text === 'string') return message.text.trim();
+    if (typeof message.transcript === 'string') return message.transcript.trim();
+    if (typeof message.message === 'string') return message.message.trim();
+    if (message.content && typeof message.content.text === 'string') return message.content.text.trim();
+    return '';
+  }
+
+  function buildTranscript() {
+    return transcriptBuffer
+      .map(function (entry) {
+        return entry.role ? (entry.role + ': ' + entry.text) : entry.text;
+      })
+      .join('\n')
+      .trim();
+  }
+
+  async function reportCallEnded(source) {
+    if (!conversation) return;
+
+    var conversationId = typeof conversation.getId === 'function' ? conversation.getId() : null;
+    if (!conversationId || reportSentForConversationId === conversationId) {
+      return;
+    }
+
+    var session = window.SkylandSession.get();
+    var startedAt = callStartedAt ? new Date(callStartedAt) : null;
+    var endedAt = new Date();
+    var durationSeconds = startedAt ? Math.max(0, Math.round((endedAt.getTime() - startedAt.getTime()) / 1000)) : null;
+
+    reportSentForConversationId = conversationId;
+
+    try {
+      await window.SkylandAPI.fetch(PROXY_BASE + '/voice/call-ended', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_uuid: session ? session.id : null,
+          conversation_id: conversationId,
+          agent_id: window.SkylandLang ? window.SkylandLang.getAgentId() : undefined,
+          started_at: startedAt ? startedAt.toISOString() : null,
+          ended_at: endedAt.toISOString(),
+          duration_seconds: durationSeconds,
+          transcript: buildTranscript(),
+          source: source || 'browser_sdk',
+          metadata: {
+            entry_module: location.hash.replace('#', '') || 'flux'
+          }
+        })
+      });
+    } catch (err) {
+      console.warn('[VOICE] Failed to report call end:', err.message);
+    }
   }
 
   // --- Voice session lifecycle ---
@@ -165,6 +225,9 @@
     try {
       // 1. Get signed URL from proxy
       var signedUrl = await fetchSignedUrl();
+      transcriptBuffer = [];
+      callStartedAt = Date.now();
+      reportSentForConversationId = null;
 
       // 2. Build session config
       var sessionConfig = {
@@ -177,6 +240,7 @@
 
         onDisconnect: function () {
           console.log('[VOICE] Disconnected from ElevenLabs');
+          reportCallEnded('browser_sdk_disconnect');
           conversation = null;
           setState(STATES.DISCONNECTED);
           showStarters();
@@ -199,7 +263,13 @@
         },
 
         onMessage: function (message) {
-          // Transcripts arrive here — log for now, wire to chat panel later
+          var text = extractMessageText(message);
+          if (text) {
+            transcriptBuffer.push({
+              role: message.role || message.source || message.type || 'message',
+              text: text
+            });
+          }
           console.log('[VOICE] Message:', message);
         },
       };
@@ -237,6 +307,7 @@
   async function stopVoice() {
     if (conversation) {
       try {
+        await reportCallEnded('browser_sdk_manual_end');
         await conversation.endSession();
       } catch (err) {
         console.warn('[VOICE] End session error:', err);

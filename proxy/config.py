@@ -21,6 +21,7 @@ load_dotenv(_root_env)            # project root fallback (won't override)
 ELEVENLABS_API_KEY: str = os.getenv("ELEVENLABS_API_KEY", "")
 ELEVENLABS_AGENT_ID: str = os.getenv("ELEVENLABS_AGENT_ID", "")
 N8N_WEBHOOK_URL: str = os.getenv("N8N_WEBHOOK_URL", "")
+VOICE_CALL_WEBHOOK_URL: str = os.getenv("VOICE_CALL_WEBHOOK_URL", N8N_WEBHOOK_URL)
 
 # --- Server settings ---
 PORT: int = int(os.getenv("PORT", "8000"))

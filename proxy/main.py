@@ -7,8 +7,9 @@ directly for voice sessions.  API key never leaves the server.
 
 import logging
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
+from typing import Any, AsyncIterator
 
+import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -17,6 +18,7 @@ from config import (
     ELEVENLABS_AGENT_ID,
     ELEVENLABS_API_KEY,
     ENV,
+    VOICE_CALL_WEBHOOK_URL,
     get_allowed_origins,
 )
 from elevenlabs_client import ElevenLabsAPIError, ElevenLabsClient
@@ -76,6 +78,36 @@ class SignedUrlResponse(BaseModel):
     signed_url: str
 
 
+class VoiceCallEndedRequest(BaseModel):
+    session_uuid: str | None = None
+    conversation_id: str | None = None
+    agent_id: str | None = None
+    started_at: str | None = None
+    ended_at: str | None = None
+    duration_seconds: int | None = None
+    transcript: str | None = None
+    summary: str | None = None
+    recording_url: str | None = None
+    source: str | None = None
+    metadata: dict[str, Any] | None = None
+    raw_payload: dict[str, Any] | None = None
+
+
+def _extract_session_uuid(payload: VoiceCallEndedRequest) -> str | None:
+    if payload.session_uuid:
+        return payload.session_uuid
+
+    metadata = payload.metadata or {}
+    raw_payload = payload.raw_payload or {}
+
+    return (
+        metadata.get("session_uuid")
+        or metadata.get("sessionId")
+        or raw_payload.get("session_uuid")
+        or raw_payload.get("sessionId")
+    )
+
+
 # --- Routes ---
 
 
@@ -122,3 +154,48 @@ async def voice_signed_url(body: SignedUrlRequest):
 
     logger.info("[VOICE] Signed URL issued for session=%s", body.session_uuid)
     return SignedUrlResponse(signed_url=url_data["signed_url"])
+
+
+@app.post("/voice/call-ended")
+async def voice_call_ended(body: VoiceCallEndedRequest):
+    """Forward a normalized voice call report to n8n/Supabase ingestion."""
+    session_uuid = _extract_session_uuid(body)
+
+    if session_uuid and not is_valid_session_uuid(session_uuid):
+        raise HTTPException(status_code=400, detail="invalid session uuid")
+
+    if not VOICE_CALL_WEBHOOK_URL:
+        logger.error("VOICE_CALL_WEBHOOK_URL not configured")
+        raise HTTPException(status_code=503, detail="voice webhook not configured")
+
+    payload = {
+        "session_uuid": session_uuid,
+        "conversation_id": body.conversation_id,
+        "agent_id": body.agent_id,
+        "started_at": body.started_at,
+        "ended_at": body.ended_at,
+        "duration_seconds": body.duration_seconds,
+        "transcript": body.transcript,
+        "summary": body.summary,
+        "recording_url": body.recording_url,
+        "source": body.source or "voice_call_ended",
+        "metadata": body.metadata or {},
+        "raw_payload": body.raw_payload or {},
+    }
+
+    logger.info(
+        "[VOICE] Call ended forwarded: session=%s conversation=%s source=%s",
+        session_uuid or "MISSING",
+        body.conversation_id or "MISSING",
+        payload["source"],
+    )
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(VOICE_CALL_WEBHOOK_URL, json=payload)
+            response.raise_for_status()
+    except httpx.HTTPError as exc:
+        logger.error("[VOICE] Failed to forward call-ended payload: %s", exc)
+        raise HTTPException(status_code=502, detail="voice webhook unavailable")
+
+    return {"status": "accepted"}
