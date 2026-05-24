@@ -109,6 +109,23 @@ When you ask, ask once and ask sharply. "Should we use Cal.com or Google Calenda
 6. When stuck, surface it immediately. Do not silently spin. Do not fabricate progress.
 7. End sessions with a short status: what shipped, what is in progress, what is blocked.
 
+## Known Technical Debt
+
+### Branschkategorier lever på tre ställen (accepterat för v1)
+
+Industri-klassificeringen är synkroniserad manuellt mellan:
+
+1. **LLM-prompten** — `n8n/workflows/voice-call-ended.json`, noden "LLM Extract Call Data", system-promptens industry-instruktion
+2. **Frontend-konstanten** — `skyland-dashboard/frontend/src/lib/constants.js`, `INDUSTRIES`-arrayen (styr dropdown i convert-formuläret i LeadsPage)
+3. **Kunskapsbasens branschsektioner** — `KUNSKAPSBAS-branscher-v3.md` (styr RAG-retrieval per bransch)
+
+**Regel:** Om du lägger till, tar bort eller byter namn på en kategori måste alla tre uppdateras i samma commit. Glömmer du ett ställe går klassificeringen och RAG-retrievalen ur sync.
+
+Kanonisk lista (per 2026-05-24):
+Bygg & Fastighet, Hotell & Besöksnäring, Livsmedel & Restaurang, Skönhet & Välmående, Tjänster & Konsult, Handel & E-handel, Vård & Omsorg, Transport & Logistik, Industri & Tillverkning, Utbildning, Övrigt
+
+---
+
 ## Files You Maintain
 
 - `/src/` – frontend code
