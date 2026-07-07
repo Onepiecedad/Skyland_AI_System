@@ -12,7 +12,10 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [240, 300],
+      "position": [
+        240,
+        300
+      ],
       "webhookId": "voice-call-ended"
     },
     {
@@ -23,7 +26,10 @@
       "name": "Normalize Call Payload",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [500, 300]
+      "position": [
+        500,
+        300
+      ]
     },
     {
       "parameters": {
@@ -51,7 +57,10 @@
       "name": "Is Invalid?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [760, 300]
+      "position": [
+        760,
+        300
+      ]
     },
     {
       "parameters": {
@@ -65,7 +74,10 @@
       "name": "Respond Error",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [1010, 430]
+      "position": [
+        1010,
+        430
+      ]
     },
     {
       "parameters": {
@@ -76,23 +88,40 @@
         "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "return=representation,resolution=merge-duplicates" }
+            {
+              "name": "apikey",
+              "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation,resolution=merge-duplicates"
+            }
           ]
         },
         "sendBody": true,
         "bodyContentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ session_uuid: $json.session_uuid }) }}",
-        "options": { "timeout": 10000 }
+        "options": {
+          "timeout": 10000
+        }
       },
       "id": "upsert-session-vce-005",
       "name": "Upsert Session",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1010, 200]
+      "position": [
+        1010,
+        200
+      ]
     },
     {
       "parameters": {
@@ -103,17 +132,28 @@
         "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" }
+            {
+              "name": "apikey",
+              "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
+            }
           ]
         },
-        "options": { "timeout": 10000 }
+        "options": {
+          "timeout": 10000
+        }
       },
       "id": "find-prospect-vce-006",
       "name": "Find Prospect by Session",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1260, 200]
+      "position": [
+        1260,
+        200
+      ]
     },
     {
       "parameters": {
@@ -123,7 +163,10 @@
       "name": "Attach Prospect Links",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1510, 200]
+      "position": [
+        1510,
+        200
+      ]
     },
     {
       "parameters": {
@@ -134,22 +177,33 @@
         "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "=Bearer {{ $vars.OPENAI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.OPENAI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "bodyContentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o-mini', temperature: 0, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: 'Du är en erfaren sales-assistent. Analysera säljsamtal och extrahera CRM-data som JSON. VIKTIGT: Samtalet är INBOUND — personen ringde själv in via hemsidan och AI-agenten Alex svarade. Skriv aldrig att agenten kontaktade eller att Alex ringde. Börja alltid summary med personens namn och företag. Fälten: person_name (string|null), company_name (string|null), industry (returnera exakt ett av dessa kategorinamn — kopiera stavningen exakt, inga varianter: Bygg & Fastighet [byggföretag, hantverkare, VVS, el, markarbete, mäklare, arkitekt, golvläggare, målare, snickare, fastighetsförvaltning] | Hotell & Besöksnäring [hotell, B&B, vandrarhem, camping, konferensanläggning, turism, resebyrå] | Livsmedel & Restaurang [restaurang, café, bar, catering, bageri, matproduktion, fruktleverantör, livsmedelsgrossist] | Skönhet & Välmående [frisör, salong, hudvård, spa, massage, naglar, tatuerare, yoga, träningsstudio, personlig tränare] | Tjänster & Konsult [revisor, jurist, designer, marknadsföring, rekrytering, IT-konsult, ekonom, copywriter, managementkonsult] | Handel & E-handel [detaljhandel, webshop, grossist, butik, klädhandel, elektronik, inredning, sportaffär] | Vård & Omsorg [tandläkare, naprapat, fysioterapeut, läkare, psykolog, äldreomsorg, barnvård, apotek, optiker] | Transport & Logistik [åkeri, spedition, budtjänst, flytt, taxi, lagerhantering, godstransport, courier] | Industri & Tillverkning [fabrik, verkstad, tillverkning, gjuteri, svetsning, mekanik, fordonsservice] | Utbildning [skola, förskola, kurs, utbildningsföretag, instruktör, folkhögskola] | Övrigt [ENBART om ingen av ovanstående stämmer — inte default] — eller null om branschen inte nämns), email (string|null), pain_points (string-array), pain_points_summary (string|null), current_process (string|null), meeting_requested (boolean), language_detected (sv|en), summary (3-5 meningar för en säljare: vem ringde in, från vilket företag, vilken bransch, vilket problem, nästa steg). Svara ENBART med valid JSON.' }, { role: 'user', content: '<transcript>\\n' + ($json.transcript || '') + '\\n</transcript>' }] }) }}",
-        "options": { "timeout": 30000 }
+        "options": {
+          "timeout": 30000
+        }
       },
       "id": "llm-extract-vce-011",
       "name": "LLM Extract Call Data",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "continueOnFail": true,
-      "position": [1760, 200]
+      "position": [
+        1760,
+        200
+      ]
     },
     {
       "parameters": {
@@ -159,7 +213,10 @@
       "name": "Parse LLM Extraction",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2010, 200]
+      "position": [
+        2010,
+        200
+      ]
     },
     {
       "parameters": {
@@ -170,23 +227,40 @@
         "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "return=representation,resolution=merge-duplicates" }
+            {
+              "name": "apikey",
+              "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation,resolution=merge-duplicates"
+            }
           ]
         },
         "sendBody": true,
         "bodyContentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ session_uuid: $json.session_uuid, prospect_id: $json.prospect_id, customer_id: $json.customer_id, provider: $json.provider, external_call_id: $json.external_call_id, call_source: $json.call_source, agent_id: $json.agent_id, started_at: $json.started_at, ended_at: $json.ended_at, duration_seconds: $json.duration_seconds, transcript: $json.transcript, summary: $json.summary, recording_url: $json.recording_url, extracted_data: $json.extracted_data, metadata: $json.metadata, raw_payload: $json.raw_payload }) }}",
-        "options": { "timeout": 10000 }
+        "options": {
+          "timeout": 10000
+        }
       },
       "id": "insert-voice-call-vce-008",
       "name": "Upsert Voice Call",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2260, 200]
+      "position": [
+        2260,
+        200
+      ]
     },
     {
       "parameters": {
@@ -197,23 +271,40 @@
         "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "return=representation" }
+            {
+              "name": "apikey",
+              "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
           ]
         },
         "sendBody": true,
         "bodyContentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ session_uuid: $json.session_uuid, type: 'voice', payload: { external_call_id: $json.external_call_id, prospect_id: $json.prospect_id, customer_id: $json.customer_id, source: $json.call_source, summary: $json.summary, transcript: $json.transcript, duration_seconds: $json.duration_seconds, started_at: $json.started_at, ended_at: $json.ended_at, extracted_data: $json.extracted_data } }) }}",
-        "options": { "timeout": 10000 }
+        "options": {
+          "timeout": 10000
+        }
       },
       "id": "insert-interaction-vce-009",
       "name": "Insert Voice Interaction",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2510, 200]
+      "position": [
+        2510,
+        200
+      ]
     },
     {
       "parameters": {
@@ -227,42 +318,177 @@
       "name": "Respond OK",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [2760, 200]
+      "position": [
+        2760,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SCC_INTAKE_URL }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SCC_INTAKE_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ source: 'voice_call', session_uuid: $('Parse LLM Extraction').first().json.session_uuid, prospect_id: $('Parse LLM Extraction').first().json.prospect_id, name: $('Parse LLM Extraction').first().json.extracted_data.person_name, email: $('Parse LLM Extraction').first().json.extracted_data.email, company: $('Parse LLM Extraction').first().json.extracted_data.company_name, summary: $('Parse LLM Extraction').first().json.summary, extracted: $('Parse LLM Extraction').first().json.extracted_data }) }}",
+        "options": {
+          "timeout": 8000
+        }
+      },
+      "id": "notify-scc",
+      "name": "Notify SCC",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2980,
+        200
+      ],
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
     "Webhook": {
-      "main": [[{ "node": "Normalize Call Payload", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Normalize Call Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Normalize Call Payload": {
-      "main": [[{ "node": "Is Invalid?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Is Invalid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Is Invalid?": {
       "main": [
-        [{ "node": "Respond Error", "type": "main", "index": 0 }],
-        [{ "node": "Upsert Session", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Respond Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upsert Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Upsert Session": {
-      "main": [[{ "node": "Find Prospect by Session", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Find Prospect by Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Find Prospect by Session": {
-      "main": [[{ "node": "Attach Prospect Links", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Attach Prospect Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Attach Prospect Links": {
-      "main": [[{ "node": "LLM Extract Call Data", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "LLM Extract Call Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "LLM Extract Call Data": {
-      "main": [[{ "node": "Parse LLM Extraction", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Parse LLM Extraction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Parse LLM Extraction": {
-      "main": [[{ "node": "Upsert Voice Call", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Upsert Voice Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Upsert Voice Call": {
-      "main": [[{ "node": "Insert Voice Interaction", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Insert Voice Interaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Insert Voice Interaction": {
-      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond OK": {
+      "main": [
+        [
+          {
+            "node": "Notify SCC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

@@ -356,6 +356,43 @@
         2750,
         200
       ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SCC_INTAKE_URL }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SCC_INTAKE_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ source: 'void_form', session_uuid: $('Calculate Lead Score').first().json.session_uuid, prospect_id: $('Calculate Lead Score').first().json.lead_id, name: $('Calculate Lead Score').first().json.name, email: $('Calculate Lead Score').first().json.email, company: $('Calculate Lead Score').first().json.company, message: $('Calculate Lead Score').first().json.message, score: $('Calculate Lead Score').first().json.score }) }}",
+        "options": {
+          "timeout": 8000
+        }
+      },
+      "id": "notify-scc",
+      "name": "Notify SCC",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2970,
+        200
+      ],
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -481,6 +518,17 @@
         [
           {
             "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond Success": {
+      "main": [
+        [
+          {
+            "node": "Notify SCC",
             "type": "main",
             "index": 0
           }
