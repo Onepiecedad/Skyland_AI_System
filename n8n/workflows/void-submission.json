@@ -6,15 +6,17 @@
         "httpMethod": "POST",
         "path": "void-submission",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
-      "id": "wh-vs-001",
+      "id": "ffdaa3bc-082f-4acd-bc99-b89e8f2ff842",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        250,
-        300
+        912,
+        -80
       ],
       "webhookId": "void-submission"
     },
@@ -22,13 +24,13 @@
       "parameters": {
         "jsCode": "// Validate input fields from form submission\nconst body = $input.first().json.body || {};\nconst errors = [];\n\n// Required fields\nif (!body.session_uuid) errors.push('session_uuid required');\nif (!body.name || body.name.trim().length < 2) errors.push('name required (min 2 chars)');\nif (!body.email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(body.email)) errors.push('valid email required');\nif (!body.message || body.message.trim().length < 10) errors.push('message required (min 10 chars)');\n\n// UUID v4 format\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;\nif (body.session_uuid && !uuidRegex.test(body.session_uuid)) {\n  errors.push('session_uuid must be valid v4 UUID');\n}\n\n// GDPR consent\nif (body.consent_given !== true) {\n  errors.push('consent_given must be true');\n}\n\nif (errors.length > 0) {\n  return [{\n    json: {\n      validation_failed: true,\n      error_code: body.consent_given !== true ? 'MISSING_CONSENT' : 'INVALID_INPUT',\n      message: errors.join('; ')\n    }\n  }];\n}\n\n// Pass through validated data\nreturn [{\n  json: {\n    validation_failed: false,\n    session_uuid: body.session_uuid,\n    name: body.name.trim(),\n    email: body.email.trim().toLowerCase(),\n    company: (body.company || '').trim(),\n    website: (body.website || '').trim(),\n    phone: (body.phone || '').trim(),\n    message: body.message.trim(),\n    consent_given: true\n  }\n}];"
       },
-      "id": "validate-vs-002",
+      "id": "22c78f46-4fd9-47b0-a53a-1369fb7bd162",
       "name": "Validate Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        500,
-        300
+        1136,
+        -80
       ]
     },
     {
@@ -37,7 +39,8 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict"
+            "typeValidation": "strict",
+            "version": 1
           },
           "conditions": [
             {
@@ -51,15 +54,16 @@
             }
           ],
           "combinator": "and"
-        }
+        },
+        "options": {}
       },
-      "id": "if-vs-003",
+      "id": "bda71903-3043-4794-9ea7-e9e5559af65d",
       "name": "Is Valid?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        750,
-        300
+        1360,
+        -80
       ]
     },
     {
@@ -70,32 +74,22 @@
           "responseCode": 400
         }
       },
-      "id": "respond-error-vs-004",
+      "id": "a016fb4b-4b47-4704-8eeb-c2734390a1d7",
       "name": "Respond Error",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        1000,
-        450
+        1584,
+        16
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/sessions?on_conflict=session_uuid",
-        "authentication": "none",
+        "url": "=https://wfwqjxsuvbacvcmpiesl.supabase.co/rest/v1/sessions?on_conflict=session_uuid",
         "sendHeaders": true,
-        "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            {
-              "name": "apikey",
-              "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -107,39 +101,36 @@
           ]
         },
         "sendBody": true,
-        "bodyContentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ session_uuid: $json.session_uuid }) }}",
         "options": {
           "timeout": 10000
-        }
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
       },
-      "id": "upsert-session-vs-004b",
+      "id": "dac25e4f-f06e-4fd2-8a27-fd83526409b2",
       "name": "Upsert Session",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1000,
-        200
-      ]
+        1584,
+        -176
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "7kdnrkoZo776CtE8",
+          "name": "Supabase SCC"
+        }
+      }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/prospects",
-        "authentication": "none",
+        "url": "=https://wfwqjxsuvbacvcmpiesl.supabase.co/rest/v1/prospects",
         "sendHeaders": true,
-        "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            {
-              "name": "apikey",
-              "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -151,52 +142,49 @@
           ]
         },
         "sendBody": true,
-        "bodyContentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ session_uuid: $('Validate Input').first().json.session_uuid, name: $('Validate Input').first().json.name, email: $('Validate Input').first().json.email, company: $('Validate Input').first().json.company, website: $('Validate Input').first().json.website, phone: $('Validate Input').first().json.phone, message: $('Validate Input').first().json.message, consent_given: true, score: 0 }) }}",
         "options": {
           "timeout": 10000
-        }
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
       },
-      "id": "insert-prospect-vs-005",
+      "id": "6ab83f24-f684-4dc9-9131-11982bb943ab",
       "name": "Insert Prospect",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1250,
-        200
-      ]
+        1808,
+        -176
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "7kdnrkoZo776CtE8",
+          "name": "Supabase SCC"
+        }
+      }
     },
     {
       "parameters": {
         "jsCode": "// Regelbaserad lead scoring — transparent och debuggbar\n// OBS: Supabase REST med Prefer: return=representation returnerar\n// varje rad som separat n8n-item. Använd .all().map() för att samla.\nconst prospects = $input.all().map(item => item.json);\nconst prospect = Array.isArray(prospects[0]) ? prospects[0][0] : prospects[0];\nconst original = $('Validate Input').first().json;\n\nlet score = 0;\n\n// Company present\nif (original.company && original.company.length > 1) score += 10;\n\n// Website present\nif (original.website && original.website.length > 4) score += 10;\n\n// Phone present\nif (original.phone && original.phone.length > 5) score += 5;\n\n// Message length signals seriousness\nconst wordCount = original.message.split(/\\s+/).length;\nif (wordCount >= 30) score += 15;\nelse if (wordCount >= 15) score += 10;\nelse if (wordCount >= 10) score += 5;\n\n// Service mentions in message (case-insensitive)\nconst msg = original.message.toLowerCase();\nconst serviceKeywords = ['crm', 'automation', 'voice', 'agent', 'chatbot', 'hemsida', 'integration', 'n8n', 'supabase'];\nconst matches = serviceKeywords.filter(k => msg.includes(k));\nscore += matches.length * 5;\n\n// Cap at 100\nscore = Math.min(score, 100);\n\nreturn [{\n  json: {\n    lead_id: prospect.id,\n    session_uuid: prospect.session_uuid,\n    name: prospect.name,\n    email: prospect.email,\n    company: prospect.company,\n    message: prospect.message,\n    score: score\n  }\n}];"
       },
-      "id": "score-vs-006",
+      "id": "728812b5-ce43-44c2-a025-93b6b317fd18",
       "name": "Calculate Lead Score",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1250,
-        200
+        2032,
+        -176
       ]
     },
     {
       "parameters": {
         "method": "PATCH",
-        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/prospects?id=eq.{{ $json.lead_id }}",
-        "authentication": "none",
+        "url": "=https://wfwqjxsuvbacvcmpiesl.supabase.co/rest/v1/prospects?id=eq.{{ $json.lead_id }}",
         "sendHeaders": true,
-        "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            {
-              "name": "apikey",
-              "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -204,29 +192,34 @@
           ]
         },
         "sendBody": true,
-        "bodyContentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ score: $json.score }) }}",
         "options": {
           "timeout": 10000
-        }
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
       },
-      "id": "update-score-vs-007",
+      "id": "f88a43be-1e28-485d-b922-4b763164242d",
       "name": "Update Prospect Score",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1500,
-        200
-      ]
+        2256,
+        -176
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "7kdnrkoZo776CtE8",
+          "name": "Supabase SCC"
+        }
+      }
     },
     {
       "parameters": {
         "method": "POST",
         "url": "https://onepiecedad.app.n8n.cloud/webhook/rag-query",
-        "authentication": "none",
         "sendHeaders": true,
-        "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
             {
@@ -236,35 +229,28 @@
           ]
         },
         "sendBody": true,
-        "bodyContentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ query: $('Calculate Lead Score').first().json.message }) }}",
         "options": {
           "timeout": 15000
         }
       },
-      "id": "rag-query-vs-008",
+      "id": "ebe758a1-c981-4ec4-8f08-bbbb33f0239e",
       "name": "Query Knowledge Base",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1750,
-        200
+        2480,
+        -176
       ]
     },
     {
       "parameters": {
         "method": "POST",
         "url": "https://api.openai.com/v1/chat/completions",
-        "authentication": "none",
         "sendHeaders": true,
-        "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $vars.OPENAI_API_KEY }}"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -272,39 +258,36 @@
           ]
         },
         "sendBody": true,
-        "bodyContentType": "json",
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o-mini', max_tokens: 1024, messages: [{ role: 'system', content: 'Du är Joakim Landqvist, grundare av Skyland AI Solutions. Du svarar på en första kontakt från en potentiell kund som lämnat ett meddelande via formuläret på skylandai.se. Skriv ett varmt, konkret svar i andra person som refererar till deras specifika situation.\\n\\nTon: rakt, jordnära, ingen marketing-fluff. Svenska om personen skrev svenska, engelska om de skrev engelska. Aldrig \\'Hej och välkommen!\\' eller liknande generiska floskler.\\n\\nDu har tillgång till Skylands kunskapsbas via context nedan. Använd den för att ge KONKRETA svar — referera till specifika tjänster, paket, priser, case studies. Hitta inte på något som inte står i kunskapsbasen.\\n\\nOm best_similarity är under 0.4: var mer försiktig, erbjud att Joakim återkommer med detaljer.\\nOm best_similarity är 0.4-0.5: svara baserat på context men nämn att du gärna går in på detaljer i ett samtal.\\nOm best_similarity är över 0.5: svara konfident och konkret baserat på matchat innehåll.\\n\\nSvar ska vara 100-200 ord. Avsluta alltid med en mjuk uppmaning till nästa steg — antingen ett 15-minuterssamtal eller en specifik fråga som tar dialogen vidare.\\n\\nABSOLUT FÖRBJUDET — om någon av dessa fraser eller liknande variationer förekommer i ditt svar måste du skriva om det helt:\\n- Varianter av \\'ser fram emot\\' (att höra, att höras, ditt svar, ifrån dig, etc)\\n- Varianter av \\'tveka inte att\\' (kontakta, höra av dig, etc)\\n- \\'Tack för ditt meddelande\\' och liknande generiska öppningar\\n- \\'Skräddarsydda lösningar\\' och liknande konsult-buzzwords\\n- \\'Vi värdesätter\\' eller \\'vi uppskattar\\' som öppningar\\n- Direktöversatta engelska säljfraser (\\'Looking forward\\', \\'Reach out\\', \\'Dont hesitate\\')\\n\\nDitt svar ska låta som om Joakim själv skrivit det i ett rakt mejl. Joakim säger \\'Hör av dig\\' eller \\'Säg till om du vill snacka mer\\' eller avslutar med en konkret fråga.\\n\\nOckså förbjudet:\\n1. Inga påhittade priser, tjänster eller case studies. Allt måste komma från context.\\n2. Aldrig påstå att Joakim ringer ett specifikt klockslag eller datum. Bara \\'inom kort\\' eller \\'i nästa samtal\\' är OK.' }, { role: 'user', content: 'Besökarens meddelande:\\n\"' + $('Calculate Lead Score').first().json.message + '\"\\n\\nNamn: ' + $('Calculate Lead Score').first().json.name + '\\nFöretag: ' + ($('Calculate Lead Score').first().json.company || 'Ej angivet') + '\\n\\nKunskapsbas-träffar (best_similarity: ' + ($('Query Knowledge Base').first().json.best_similarity || 0) + '):\\n' + JSON.stringify($('Query Knowledge Base').first().json.matches || []) + '\\n\\nGenerera ett naturligt svar enligt instruktionerna. Returnera ENDAST svartexten, ingen meta-kommentar.' }] }) }}",
+        "jsonBody": "={{ JSON.stringify($('Build OpenAI Payload').first().json.payload) }}",
         "options": {
           "timeout": 30000
-        }
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi"
       },
-      "id": "openai-vs-009",
+      "id": "52145e3c-7352-469c-986c-61c163285d4b",
       "name": "Generate AI Response",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2000,
-        200
-      ]
+        2928,
+        -176
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OvYdngyLNiazRLen",
+          "name": "OpenAI Skyland"
+        }
+      }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/interactions",
-        "authentication": "none",
+        "url": "=https://wfwqjxsuvbacvcmpiesl.supabase.co/rest/v1/interactions",
         "sendHeaders": true,
-        "specifyHeaders": "keypair",
         "headerParameters": {
           "parameters": [
-            {
-              "name": "apikey",
-              "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -312,33 +295,40 @@
           ]
         },
         "sendBody": true,
-        "bodyContentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ session_uuid: $('Calculate Lead Score').first().json.session_uuid, type: 'form', payload: { lead_id: $('Calculate Lead Score').first().json.lead_id, score: $('Calculate Lead Score').first().json.score, best_match_similarity: $('Query Knowledge Base').first().json.best_similarity || 0, ai_response: ($('Generate AI Response').first().json.choices && $('Generate AI Response').first().json.choices[0] ? $('Generate AI Response').first().json.choices[0].message.content : 'Fallback: Joakim återkommer inom 24 timmar.') } }) }}",
         "options": {
           "timeout": 10000
-        }
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
       },
-      "id": "insert-interaction-vs-010",
+      "id": "43e5fa6f-64d2-4840-9610-1e06199bfc1d",
       "name": "Insert Interaction",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2250,
-        200
-      ]
+        3152,
+        -176
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "7kdnrkoZo776CtE8",
+          "name": "Supabase SCC"
+        }
+      }
     },
     {
       "parameters": {
         "jsCode": "// Format final response to webhook caller\nconst aiResponseRaw = $('Generate AI Response').first().json;\nconst ragResult = $('Query Knowledge Base').first().json;\nconst lead = $('Calculate Lead Score').first().json;\n\n// OpenAI returnerar choices[0].message.content\nconst aiText = aiResponseRaw.choices?.[0]?.message?.content || 'Tack för ditt meddelande, ' + lead.name + '. Joakim återkommer personligen inom 24 timmar med ett konkret förslag baserat på det du beskrivit.';\n\nreturn [{\n  json: {\n    status: 'success',\n    lead_id: lead.lead_id,\n    ai_response: aiText,\n    best_match_similarity: ragResult.best_similarity || 0\n  }\n}];"
       },
-      "id": "format-vs-011",
+      "id": "42765a82-236f-4180-92fa-1cd239b79b68",
       "name": "Format Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2500,
-        200
+        3376,
+        -176
       ]
     },
     {
@@ -348,19 +338,32 @@
           "responseCode": 200
         }
       },
-      "id": "respond-success-vs-012",
+      "id": "d646d31a-4431-49d8-b5ab-e6166b5d9a75",
       "name": "Respond Success",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        2750,
-        200
+        3600,
+        -176
       ]
     },
     {
       "parameters": {
+        "jsCode": "// Build OpenAI payload — separat nod för läsbar systemprompt\n// Bevarar svenska tecken och radbrytningar utan escape-helvete\n\nconst leadData = $('Calculate Lead Score').first().json;\nconst ragData = $('Query Knowledge Base').first().json;\n\nconst systemPrompt = `**KRITISK FÖRSTA REGEL — språk:**\nDu MÅSTE svara på det språk som anges i fältet \"Svarsspråk\". Om Svarsspråk är ENGLISH, svara på engelska. Om SWEDISH, svara på svenska. Inga undantag.\n\n---\n\nDu är en pragmatisk AI-arkitekt som snabbt och konkret analyserar ett inkommande lead och föreslår lösningar. Din ton är direkt, professionell och helt utan marketing-fluff.\n\n## 1. Lyssna på det EXAKTA problemet\nLäs noga VAD kunden vill ha hjälp med.\n- Om kunden vill ha \"fler kunder\", prata om lead generation, konvertering och uppföljning.\n- Om kunden pratar om \"tidsbrist\" eller \"missade samtal\", prata om automatiska bokningssystem och kundtjänst.\nDitt svar MÅSTE matcha kundens specifika behov. Prata aldrig om admin/bokningssystem om kunden explicit ber om mer försäljning.\n\n## 2. Format: Två lösningar\nDitt svar ska alltid innehålla exakt 2 olika AI-lösningar/angreppssätt på kundens specifika problem.\n- Extremt kortfattat: Max 3-4 meningar totalt.\n- Skriv i löptext (inga punktlistor, inga rubriker).\n- Inga hälsningsfraser (\"Hej och tack\"). Gå rakt på sak.\n\n## 3. Hur du avslutar (VIKTIGT)\n- Du får INTE skriva att \"vi kommer höra av oss\", \"jag ringer dig\" eller liknande. (Systemet lägger automatiskt till detta efter din text).\n- Du får INTE ställa några frågor (\"Hur låter det?\", \"Vad tar mest tid?\").\n- Avsluta bara texten direkt efter att du presenterat den andra lösningen.\n\n## 4. Komplett exempel (Följ denna längd och struktur exakt!)\n\nINKOMMANDE MEDDELANDE:\n\"Hej, jag driver en massageklinik och behöver fler kunder.\"\n\nDITT SVAR:\n\"Att hitta nya kunder tar tid som du hellre lägger på behandlingar. Vi kan lösa detta på två sätt: antingen sätter vi upp en AI-agent som dygnet runt fångar upp och konverterar hemsidebesökare till bokade tider, eller så automatiserar vi en proaktiv uppföljning via SMS med dina tidigare kunder för att snabbt fylla luckor i din kalender.\"\n\n## Absolut förbjudet\n- Att skriva att du ska höra av dig eller ta kontakt.\n- Att ställa frågor (kunden kan inte svara i detta gränssnitt).\n- Säljiga fraser som \"Föreställ dig...\" eller \"Skräddarsydda lösningar\".\n- Att svara på ett annat problem än det kunden faktiskt tog upp!`;\n\n// Språkdetektering\nconst isEnglish = /\\b(the|and|is|are|we|our|can|you|help|with|have|this|that|from)\\b/i.test(leadData.message) && !/[åäöÅÄÖ]/.test(leadData.message);\nconst svarssprak = isEnglish ? 'ENGLISH' : 'SWEDISH';\nconst userMessage = `Svarsspråk: ${svarssprak}\n\nBesökarens meddelande:\n\"${leadData.message}\"\n\nNamn: ${leadData.name}\nFöretag: ${leadData.company || 'Ej angivet'}\n\nKunskapsbas-träffar:\n${JSON.stringify(ragData.matches || [])}\n\nGenerera de 2 lösningarna i löptext enligt instruktionerna. Max 4 meningar.`;\n\nconst payload = {\n  model: 'gpt-4o-mini',\n  max_tokens: 300,\n  messages: [\n    { role: 'system', content: systemPrompt },\n    { role: 'user', content: userMessage }\n  ]\n};\n\nreturn [{\n  json: {\n    payload: payload,\n    // Behåll lead-data för senare noder\n    lead_id: leadData.lead_id,\n    session_uuid: leadData.session_uuid,\n    name: leadData.name,\n    email: leadData.email,\n    company: leadData.company,\n    message: leadData.message,\n    score: leadData.score\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2704,
+        -176
+      ],
+      "id": "04e8aff6-7caf-49bb-8b2e-1e6e038a2af4",
+      "name": "Build OpenAI Payload"
+    },
+    {
+      "parameters": {
         "method": "POST",
-        "url": "={{ $vars.SCC_INTAKE_URL }}",
+        "url": "https://legged-important-bully.ngrok-free.dev/api/v1/leads/intake",
         "authentication": "none",
         "sendHeaders": true,
         "specifyHeaders": "keypair",
@@ -368,7 +371,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "=Bearer {{ $vars.SCC_INTAKE_TOKEN }}"
+              "value": "Bearer <SCC_INTAKE_TOKEN>"
             },
             {
               "name": "Content-Type",
@@ -384,15 +387,15 @@
           "timeout": 8000
         }
       },
-      "id": "notify-scc",
       "name": "Notify SCC",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2970,
-        200
+        3820,
+        -16
       ],
-      "onError": "continueRegularOutput"
+      "onError": "continueRegularOutput",
+      "id": "3f7bdee7-5148-4f9c-86e8-9319558033da"
     }
   ],
   "connections": {
@@ -484,7 +487,7 @@
       "main": [
         [
           {
-            "node": "Generate AI Response",
+            "node": "Build OpenAI Payload",
             "type": "main",
             "index": 0
           }
@@ -524,6 +527,17 @@
         ]
       ]
     },
+    "Build OpenAI Payload": {
+      "main": [
+        [
+          {
+            "node": "Generate AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Respond Success": {
       "main": [
         [
@@ -537,9 +551,8 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
-  },
-  "meta": {
-    "instanceId": "skyland-void-v03"
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
   }
 }

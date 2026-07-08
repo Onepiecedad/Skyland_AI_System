@@ -6,30 +6,27 @@
         "httpMethod": "POST",
         "path": "session-init",
         "responseMode": "responseNode",
-        "options": {}
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
-      "id": "webhook-001",
+      "id": "f061d2b3-ae6c-4b14-95c4-ca18e3d51483",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [250, 300],
+      "position": [
+        512,
+        272
+      ],
       "webhookId": "session-init"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://ydlpqlrcriayzgtxzmvy.supabase.co/rest/v1/sessions?on_conflict=session_uuid",
+        "url": "https://wfwqjxsuvbacvcmpiesl.supabase.co/rest/v1/sessions?on_conflict=session_uuid",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "apikey",
-              "value": "={{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_ROLE_KEY }}"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -43,24 +40,38 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ session_uuid: $json.body.session_uuid, user_agent: $json.body.user_agent, entry_module: $json.body.entry_module }) }}",
-        "options": {}
+        "options": {},
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
       },
-      "id": "http-002",
+      "id": "14b8866f-d550-48cc-bcc0-32cf13286f1d",
       "name": "Upsert to Supabase",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [500, 300]
+      "position": [
+        768,
+        272
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "7kdnrkoZo776CtE8",
+          "name": "Supabase SCC"
+        }
+      }
     },
     {
       "parameters": {
         "respondWith": "allIncomingItems",
         "options": {}
       },
-      "id": "respond-003",
+      "id": "f4bd5630-7d36-4047-a808-07e9730aadf7",
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [750, 300]
+      "position": [
+        1024,
+        272
+      ]
     }
   ],
   "connections": {
@@ -88,9 +99,8 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
-  },
-  "staticData": null,
-  "tags": [],
-  "pinData": {}
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  }
 }
