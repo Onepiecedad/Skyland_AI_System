@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Validate input and extract fields\nconst body = $input.first().json.body || {};\nconst query = (body.query || '').trim();\nconst language = body.language || 'sv';\n\nif (!query) {\n  return [{ json: { valid: false, error: 'query is required', statusCode: 400 } }];\n}\n\nreturn [{ json: { valid: true, query, language } }];"
+        "jsCode": "// Shared-secret guard — requests must carry X-Skyland-Key\nconst _hdrs = $input.first().json.headers || {};\nconst _key = _hdrs['x-skyland-key'] || _hdrs['X-Skyland-Key'];\nif (_key !== '<RAG_SHARED_SECRET>') {\n  return [{ json: { validation_failed: true, error_code: 'UNAUTHORIZED', message: 'missing or invalid X-Skyland-Key' } }];\n}\n\n// Validate input and extract fields\nconst body = $input.first().json.body || {};\nconst query = (body.query || '').trim();\nconst language = body.language || 'sv';\n\nif (!query) {\n  return [{ json: { valid: false, error: 'query is required', statusCode: 400 } }];\n}\n\nreturn [{ json: { valid: true, query, language } }];"
       },
       "id": "1ec5e2b1-5c92-4e2b-85f9-e4dfe17852f4",
       "name": "Validate Input",
@@ -99,7 +99,10 @@
           "id": "OvYdngyLNiazRLen",
           "name": "OpenAI Skyland"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "parameters": {
@@ -136,7 +139,10 @@
           "id": "7kdnrkoZo776CtE8",
           "name": "Supabase SCC"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "parameters": {
@@ -177,9 +183,9 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ JSON.stringify({ error: $json.error, matches: [], query: '', best_similarity: 0 }) }}",
+        "responseBody": "={{ JSON.stringify({ error: $json.message || $json.error || 'invalid request', error_code: $json.error_code || 'INVALID_INPUT', matches: [], query: '', best_similarity: 0 }) }}",
         "options": {
-          "responseCode": "400",
+          "responseCode": 400,
           "responseHeaders": {
             "entries": [
               {

@@ -26,6 +26,22 @@
       link_badge: "LINK ACTIVE",
       voice_h2: "Listening...",
       voice_sub: "AWAITING VOICE COMMAND",
+      voice_idle_h2: "Start Conversation",
+      voice_idle_sub: "CLICK TO CONNECT",
+      voice_connecting_h2: "Connecting...",
+      voice_connecting_sub: "ESTABLISHING VOICE LINK",
+      voice_speaking_h2: "Alex is speaking...",
+      voice_speaking_sub: "AGENT RESPONSE",
+      voice_ended_h2: "Conversation ended",
+      voice_ended_sub: "CLICK TO RECONNECT",
+      voice_error_h2: "Connection error",
+      voice_error_sub: "CLICK TO RETRY",
+      link_standby: "LINK STANDBY",
+      link_connecting: "CONNECTING",
+      link_closed: "LINK CLOSED",
+      link_error: "LINK ERROR",
+      voice_err_400: "Session error — reload the page",
+      voice_err_unavailable: "Voice link unavailable — try the form instead",
       chat_placeholder: "Type technical command...",
       starter_1: "What can you help me with?",
       starter_2: "How much does it cost?",
@@ -81,6 +97,22 @@
       link_badge: "LÄNK AKTIV",
       voice_h2: "Lyssnar...",
       voice_sub: "INVÄNTAR RÖSTKOMMANDO",
+      voice_idle_h2: "Starta konversation",
+      voice_idle_sub: "KLICKA FÖR ATT ANSLUTA",
+      voice_connecting_h2: "Ansluter...",
+      voice_connecting_sub: "UPPRÄTTAR RÖSTLÄNK",
+      voice_speaking_h2: "Alex pratar...",
+      voice_speaking_sub: "AGENTSVAR",
+      voice_ended_h2: "Konversationen avslutad",
+      voice_ended_sub: "KLICKA FÖR ATT ÅTERANSLUTA",
+      voice_error_h2: "Anslutningsfel",
+      voice_error_sub: "KLICKA FÖR ATT FÖRSÖKA IGEN",
+      link_standby: "LÄNK STANDBY",
+      link_connecting: "ANSLUTER",
+      link_closed: "LÄNK STÄNGD",
+      link_error: "LÄNKFEL",
+      voice_err_400: "Sessionsfel — ladda om sidan",
+      voice_err_unavailable: "Röstlänken är otillgänglig — testa formuläret istället",
       chat_placeholder: "Skriv tekniskt kommando...",
       starter_1: "Vad kan ni hjälpa mig med?",
       starter_2: "Hur mycket kostar det?",
@@ -159,10 +191,23 @@
     if (btn) btn.textContent = lang === 'en' ? 'SV' : 'EN';
   }
 
+  /**
+   * Translate a key in the current language.
+   * Falls back to English, then to the provided fallback string.
+   */
+  function t(key, fallback) {
+    var lang = getStoredLang();
+    var table = translations[lang] || translations.en;
+    if (table[key] !== undefined) return table[key];
+    if (translations.en[key] !== undefined) return translations.en[key];
+    return fallback !== undefined ? fallback : key;
+  }
+
   // Expose globally
   window.SkylandI18n = {
     setLang,
     getLang: getStoredLang,
+    t: t,
     toggle: function () {
       const current = getStoredLang();
       setLang(current === 'en' ? 'sv' : 'en');

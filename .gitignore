@@ -24,3 +24,5 @@ supabase/.temp/
 # NOTE: n8n/workflows/*.json contain deployment-specific URLs (e.g. Supabase project URL).
 # This is accepted tech debt — these are workflow exports that break if URLs are placeholder'd.
 # Actual API keys are stored as n8n variables ($vars), not hardcoded.
+n8n/deploy/
+n8n/credential-deploy/

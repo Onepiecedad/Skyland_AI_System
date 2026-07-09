@@ -57,7 +57,10 @@
           "id": "7kdnrkoZo776CtE8",
           "name": "Supabase SCC"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "parameters": {

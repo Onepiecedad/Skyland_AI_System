@@ -25,23 +25,23 @@
   var STARTER_RESPONSES = {
     sv: {
       'Vad kan ni hjälpa mig med?':
-        'Välkommen till Skyland. Vi hjälper företag att integrera AI-lösningar — från röstagenter till lead-automation och skräddarsydda dashboards. Är det okej om jag ställer ett par korta frågor först, så kan jag förklara vad som vore mest relevant för er?',
+        'Välkommen till Skyland — du pratar med vår AI-assistent och samtalet sparas. Vi hjälper företag att integrera AI-lösningar — från röstagenter till lead-automation och skräddarsydda dashboards. Är det okej om jag ställer ett par korta frågor först, så kan jag förklara vad som vore mest relevant för er?',
       'Hur mycket kostar det?':
-        'Välkommen till Skyland. Jag förstår att du undrar över våra priser. Är det okej om jag ställer ett par korta frågor först, så kan jag ge dig ett mer relevant prisspann?',
+        'Välkommen till Skyland — du pratar med vår AI-assistent och samtalet sparas. Jag förstår att du undrar över våra priser. Är det okej om jag ställer ett par korta frågor först, så kan jag ge dig ett mer relevant prisspann?',
       'Hur fungerar processen?':
-        'Välkommen till Skyland. Jag förstår att du vill veta hur vår process ser ut. Är det okej om jag ställer ett par korta frågor först, så kan jag förklara utifrån just er situation?',
+        'Välkommen till Skyland — du pratar med vår AI-assistent och samtalet sparas. Jag förstår att du vill veta hur vår process ser ut. Är det okej om jag ställer ett par korta frågor först, så kan jag förklara utifrån just er situation?',
       'Vilka företag har ni jobbat med?':
-        'Välkommen till Skyland. Jag förstår att du vill höra om företagen vi jobbat med. Är det okej om jag ställer ett par korta frågor först, så kan jag ge dig ett mer relevant urval av exempel?'
+        'Välkommen till Skyland — du pratar med vår AI-assistent och samtalet sparas. Jag förstår att du vill höra om företagen vi jobbat med. Är det okej om jag ställer ett par korta frågor först, så kan jag ge dig ett mer relevant urval av exempel?'
     },
     en: {
       'What can you help me with?':
-        'Welcome to Skyland. We help businesses integrate AI solutions — from voice agents to lead automation and custom dashboards. Is it okay if I ask a couple of quick questions first, so I can explain what would be most relevant for you?',
+        'Welcome to Skyland — you\'re talking to our AI assistant and this call is recorded. We help businesses integrate AI solutions — from voice agents to lead automation and custom dashboards. Is it okay if I ask a couple of quick questions first, so I can explain what would be most relevant for you?',
       'How much does it cost?':
-        'Welcome to Skyland. I understand you\'re curious about our pricing. Is it okay if I ask a couple of quick questions first, so I can give you a more relevant price range?',
+        'Welcome to Skyland — you\'re talking to our AI assistant and this call is recorded. I understand you\'re curious about our pricing. Is it okay if I ask a couple of quick questions first, so I can give you a more relevant price range?',
       'How does the process work?':
-        'Welcome to Skyland. I understand you want to know how our process works. Is it okay if I ask a couple of quick questions first, so I can explain based on your specific situation?',
+        'Welcome to Skyland — you\'re talking to our AI assistant and this call is recorded. I understand you want to know how our process works. Is it okay if I ask a couple of quick questions first, so I can explain based on your specific situation?',
       'Which companies have you worked with?':
-        'Welcome to Skyland. I understand you want to hear about the companies we\'ve worked with. Is it okay if I ask a couple of quick questions first, so I can give you a more relevant selection of examples?'
+        'Welcome to Skyland — you\'re talking to our AI assistant and this call is recorded. I understand you want to hear about the companies we\'ve worked with. Is it okay if I ask a couple of quick questions first, so I can give you a more relevant selection of examples?'
     }
   };
 

@@ -27,11 +27,20 @@
     ERROR: 'error',
   };
 
-  var ERROR_MESSAGES = {
-    400: 'Session error — reload the page',
-    502: 'Voice link unavailable — try the form instead',
-    503: 'Voice link unavailable — try the form instead',
-  };
+  /**
+   * i18n helper — uses SkylandI18n.t() when available, falls back to English.
+   */
+  function t(key, fallback) {
+    if (window.SkylandI18n && typeof window.SkylandI18n.t === 'function') {
+      return window.SkylandI18n.t(key, fallback);
+    }
+    return fallback;
+  }
+
+  function errorMessage(status) {
+    if (status === 400) return t('voice_err_400', 'Session error — reload the page');
+    return t('voice_err_unavailable', 'Voice link unavailable — try the form instead');
+  }
 
   // --- Internal state ---
   var currentState = STATES.IDLE;
@@ -65,54 +74,54 @@
     switch (state) {
       case STATES.IDLE:
         orbWrap.classList.add('voice-idle');
-        voiceLabelH2.textContent = 'Start Conversation';
-        voiceLabelP.textContent = 'CLICK TO CONNECT';
-        linkText.textContent = 'LINK STANDBY';
+        voiceLabelH2.textContent = t('voice_idle_h2', 'Start Conversation');
+        voiceLabelP.textContent = t('voice_idle_sub', 'CLICK TO CONNECT');
+        linkText.textContent = t('link_standby', 'LINK STANDBY');
         linkDot.classList.remove('active');
         endBtn.style.display = 'none';
         break;
 
       case STATES.CONNECTING:
         orbWrap.classList.add('voice-connecting');
-        voiceLabelH2.textContent = 'Connecting...';
-        voiceLabelP.textContent = 'ESTABLISHING VOICE LINK';
-        linkText.textContent = 'CONNECTING';
+        voiceLabelH2.textContent = t('voice_connecting_h2', 'Connecting...');
+        voiceLabelP.textContent = t('voice_connecting_sub', 'ESTABLISHING VOICE LINK');
+        linkText.textContent = t('link_connecting', 'CONNECTING');
         linkDot.classList.remove('active');
         endBtn.style.display = 'none';
         break;
 
       case STATES.LISTENING:
         orbWrap.classList.add('voice-listening');
-        voiceLabelH2.textContent = 'Listening...';
-        voiceLabelP.textContent = 'AWAITING VOICE COMMAND';
-        linkText.textContent = 'LINK ACTIVE';
+        voiceLabelH2.textContent = t('voice_h2', 'Listening...');
+        voiceLabelP.textContent = t('voice_sub', 'AWAITING VOICE COMMAND');
+        linkText.textContent = t('link_badge', 'LINK ACTIVE');
         linkDot.classList.add('active');
         endBtn.style.display = '';
         break;
 
       case STATES.SPEAKING:
         orbWrap.classList.add('voice-speaking');
-        voiceLabelH2.textContent = 'Alex is speaking...';
-        voiceLabelP.textContent = 'AGENT RESPONSE';
-        linkText.textContent = 'LINK ACTIVE';
+        voiceLabelH2.textContent = t('voice_speaking_h2', 'Alex is speaking...');
+        voiceLabelP.textContent = t('voice_speaking_sub', 'AGENT RESPONSE');
+        linkText.textContent = t('link_badge', 'LINK ACTIVE');
         linkDot.classList.add('active');
         endBtn.style.display = '';
         break;
 
       case STATES.DISCONNECTED:
         orbWrap.classList.add('voice-idle');
-        voiceLabelH2.textContent = 'Conversation ended';
-        voiceLabelP.textContent = 'CLICK TO RECONNECT';
-        linkText.textContent = 'LINK CLOSED';
+        voiceLabelH2.textContent = t('voice_ended_h2', 'Conversation ended');
+        voiceLabelP.textContent = t('voice_ended_sub', 'CLICK TO RECONNECT');
+        linkText.textContent = t('link_closed', 'LINK CLOSED');
         linkDot.classList.remove('active');
         endBtn.style.display = 'none';
         break;
 
       case STATES.ERROR:
         orbWrap.classList.add('voice-error');
-        voiceLabelH2.textContent = detail || 'Connection error';
-        voiceLabelP.textContent = 'CLICK TO RETRY';
-        linkText.textContent = 'LINK ERROR';
+        voiceLabelH2.textContent = detail || t('voice_error_h2', 'Connection error');
+        voiceLabelP.textContent = t('voice_error_sub', 'CLICK TO RETRY');
+        linkText.textContent = t('link_error', 'LINK ERROR');
         linkDot.classList.remove('active');
         endBtn.style.display = 'none';
         break;
@@ -137,7 +146,7 @@
     });
 
     if (!resp.ok) {
-      var msg = ERROR_MESSAGES[resp.status] || 'Voice link unavailable';
+      var msg = errorMessage(resp.status);
       throw new Error(msg);
     }
 

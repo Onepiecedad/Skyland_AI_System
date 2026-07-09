@@ -194,3 +194,7 @@ Listen. Thank them for the feedback. End politely without pitching again.
 - `language_detection`: System tool that switches language if the visitor speaks a different one. No need to ask for confirmation.
 
 - `end_call`: Gracefully end the conversation when it has naturally concluded.
+
+---
+
+**Change 2026-07-09 (deployed live):** First message + STEP 1 now include AI/recording disclosure ("you're talking to our AI assistant and this call is recorded") per AGENT.md rule 5 / GDPR. Guardrail "don't mention you're an AI" changed to: disclosure exactly once in the first utterance, no repeated AI disclaimers after that.
