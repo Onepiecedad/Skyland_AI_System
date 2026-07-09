@@ -74,7 +74,7 @@
       flux_kicker: "LIVE DEMO — VOICE AGENT",
       flux_video_cta: "Watch Alex introduce herself",
       flux_h1: "Meet Alex. She answers when you can't.",
-      flux_desc: "Alex is Skyland's AI voice agent — trained on our knowledge base of services, pricing, processes and customer cases. She answers questions, qualifies your needs and can book a video call straight into our calendar. The same technology can answer your company's phone: no missed calls, no phone queue, no follow-up three days later.",
+      flux_desc: "Alex is Skyland's AI voice agent — trained on our services, pricing and customer cases. She answers questions, qualifies your needs and books a video call straight into our calendar. The same technology can answer your company's phone: no missed calls, no follow-up three days later.",
       flux_how: "Click the orb or pick a question below. Talk to her like you would to a human — end with the red button. Your browser will ask for microphone access.",
 
       // Void intro (smart form copy)
@@ -208,7 +208,7 @@
       flux_kicker: "LIVE DEMO — RÖSTAGENT",
       flux_video_cta: "Se Alex presentera sig",
       flux_h1: "Möt Alex. Hon svarar när du inte kan.",
-      flux_desc: "Alex är Skylands AI-röstagent — tränad på vår kunskapsbas med tjänster, priser, processer och kundcase. Hon svarar på frågor, kvalificerar ditt behov och kan boka ett videosamtal direkt i kalendern. Samma teknik kan svara i ditt företags telefon: inga missade samtal, ingen telefonkö, ingen återkoppling tre dagar senare.",
+      flux_desc: "Alex är Skylands AI-röstagent — tränad på våra tjänster, priser och kundcase. Hon svarar på frågor, kvalificerar ditt behov och bokar videosamtal direkt i kalendern. Samma teknik kan svara i ditt företags telefon: inga missade samtal, ingen återkoppling tre dagar senare.",
       flux_how: "Klicka på orben eller välj en fråga nedan. Prata med henne som med en människa — avsluta med röda knappen. Webbläsaren frågar efter mikrofonåtkomst.",
 
       // Void intro (smart form copy)
