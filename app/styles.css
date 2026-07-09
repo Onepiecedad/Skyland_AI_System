@@ -431,3 +431,13 @@ main::-webkit-scrollbar{display:none}
   .dash-panel{overflow:visible}
   .dash-h1{font-size:22px}
 }
+
+/* ─── Alex intro video ─── */
+.intro-video-btn{display:inline-flex;align-items:center;gap:8px;background:rgba(12,196,129,.12);border:1px solid rgba(12,196,129,.45);color:var(--primary);font-family:'Space Grotesk',monospace;font-size:13px;letter-spacing:.05em;padding:9px 18px;border-radius:8px;cursor:pointer;transition:all .25s ease;margin:2px 0 14px}
+.intro-video-btn:hover{background:rgba(12,196,129,.22);box-shadow:0 0 18px rgba(12,196,129,.3)}
+.video-overlay{position:fixed;inset:0;z-index:200;background:rgba(4,5,5,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px}
+.video-overlay[hidden]{display:none}
+.video-box{position:relative;max-width:min(880px,92vw);max-height:88vh;display:flex}
+.video-box video{max-width:100%;max-height:88vh;border-radius:16px;border:1px solid rgba(12,196,129,.35);box-shadow:0 0 60px rgba(12,196,129,.2),0 24px 80px rgba(0,0,0,.6);background:#000}
+.video-close{position:absolute;top:-14px;right:-14px;z-index:1;width:34px;height:34px;border-radius:50%;border:1px solid rgba(12,196,129,.5);background:rgba(16,20,20,.95);color:var(--primary);font-size:15px;cursor:pointer;transition:all .25s ease}
+.video-close:hover{background:rgba(12,196,129,.2)}
