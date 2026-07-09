@@ -320,51 +320,101 @@
       <div id="dashboard" class="page">
         <div class="page-glass">
         <div class="dash-inner">
-          <div class="page-intro">
+          <div class="dash-head">
             <span class="intro-kicker" data-i18n="dash_kicker">LIVE DEMO — COMMAND CENTER</span>
-            <h2 class="intro-h1" data-i18n="dash_h1">Your journey, seen from our side.</h2>
-            <p class="intro-desc" data-i18n="dash_desc">This is a view from Skyland Command Center — the same dashboard we use to run our customers' systems. When you submitted the form or talked to Alex, a lead card was created automatically. Here is yours, in real time.</p>
+            <h2 class="intro-h1 dash-h1" data-i18n="dash_h1">Your journey, seen from our side.</h2>
+            <p class="intro-desc dash-desc" data-i18n="dash_desc_short">The same dashboard we run our customers' systems with. This is your session — live.</p>
           </div>
 
-          <!-- Empty state -->
-          <div class="dash-empty" id="dash-empty">
-            <p data-i18n="dash_empty">No lead card yet. Try the voice agent or the form and watch the card build itself here — in real time.</p>
-            <div class="dash-empty-btns">
-              <button class="dash-cta" data-target="flux"><span class="material-symbols-outlined" style="font-size:16px">mic</span> <span data-i18n="dash_empty_voice">Talk to Alex</span></button>
-              <button class="dash-cta" data-target="void"><span class="material-symbols-outlined" style="font-size:16px">edit_note</span> <span data-i18n="dash_empty_form">Fill out the form</span></button>
-            </div>
+          <!-- Tab bar -->
+          <div class="dash-tabs" id="dash-tabs">
+            <button class="dash-tab active" data-tab="lead"><span class="material-symbols-outlined" style="font-size:15px">badge</span> <span data-i18n="dash_tab_lead">Your lead</span></button>
+            <button class="dash-tab" data-tab="overview"><span class="material-symbols-outlined" style="font-size:15px">monitoring</span> <span data-i18n="dash_tab_overview">Overview</span></button>
+            <button class="dash-tab" data-tab="agents"><span class="material-symbols-outlined" style="font-size:15px">smart_toy</span> <span data-i18n="dash_tab_agents">Agents</span></button>
+            <button class="dash-tab" data-tab="roi"><span class="material-symbols-outlined" style="font-size:15px">payments</span> <span data-i18n="dash_tab_roi">Your ROI</span></button>
           </div>
 
-          <!-- Live lead card + timeline -->
-          <div class="dash-grid" id="dash-grid" style="display:none">
-            <div class="dash-card" id="dash-card">
-              <div class="dash-card-header">
-                <span class="dash-card-title"><span class="dot"></span><span data-i18n="dash_card_title">YOUR LEAD CARD</span></span>
-                <span class="dash-live">LIVE</span>
+          <!-- Panels -->
+          <div class="dash-panels">
+
+            <!-- TAB 1: Your lead -->
+            <div class="dash-panel active" data-panel="lead">
+              <div class="dash-empty" id="dash-empty">
+                <p data-i18n="dash_empty">No lead card yet. Try the voice agent or the form and watch the card build itself here — in real time.</p>
+                <div class="dash-empty-btns">
+                  <button class="dash-cta" data-target="flux"><span class="material-symbols-outlined" style="font-size:16px">mic</span> <span data-i18n="dash_empty_voice">Talk to Alex</span></button>
+                  <button class="dash-cta" data-target="void"><span class="material-symbols-outlined" style="font-size:16px">edit_note</span> <span data-i18n="dash_empty_form">Fill out the form</span></button>
+                </div>
               </div>
-              <div class="dash-card-body">
-                <div class="profile-row"><span class="pk" data-i18n="label_name">NAME</span><span class="pv" id="dash-name">—</span></div>
-                <div class="profile-row"><span class="pk" data-i18n="label_company">COMPANY</span><span class="pv" id="dash-company">—</span></div>
-                <div class="profile-row"><span class="pk" data-i18n="label_email">EMAIL</span><span class="pv" id="dash-email">—</span></div>
-                <div class="profile-row"><span class="pk" data-i18n="dash_score">LEAD SCORE</span><span class="pv"><span class="dash-score-badge" id="dash-score">—</span></span></div>
+              <div class="dash-grid" id="dash-grid" style="display:none">
+                <div class="dash-card" id="dash-card">
+                  <div class="dash-card-header">
+                    <span class="dash-card-title"><span class="dot"></span><span data-i18n="dash_card_title">YOUR LEAD CARD</span></span>
+                    <span class="dash-live">LIVE</span>
+                  </div>
+                  <div class="dash-card-body">
+                    <div class="profile-row"><span class="pk" data-i18n="label_name">NAME</span><span class="pv" id="dash-name">—</span></div>
+                    <div class="profile-row"><span class="pk" data-i18n="label_company">COMPANY</span><span class="pv" id="dash-company">—</span></div>
+                    <div class="profile-row"><span class="pk" data-i18n="label_email">EMAIL</span><span class="pv" id="dash-email">—</span></div>
+                    <div class="profile-row"><span class="pk" data-i18n="dash_score">LEAD SCORE</span><span class="pv"><span class="dash-score-badge" id="dash-score">—</span></span></div>
+                  </div>
+                </div>
+                <div class="dash-timeline-panel">
+                  <div class="dash-card-header">
+                    <span class="dash-card-title"><span class="dot"></span><span data-i18n="dash_timeline_title">EVENTS</span></span>
+                  </div>
+                  <div class="dash-timeline" id="dash-timeline"></div>
+                </div>
               </div>
             </div>
-            <div class="dash-timeline-panel">
-              <div class="dash-card-header">
-                <span class="dash-card-title"><span class="dot"></span><span data-i18n="dash_timeline_title">EVENTS</span></span>
+
+            <!-- TAB 2: Overview -->
+            <div class="dash-panel" data-panel="overview">
+              <div class="dash-kpis">
+                <div class="dash-kpi"><span class="dash-kpi-v" data-i18n="dash_kpi_1_v">&lt; 30 s</span><span class="dash-kpi-l" data-i18n="dash_kpi_1_l">response time on every inquiry</span></div>
+                <div class="dash-kpi"><span class="dash-kpi-v" data-i18n="dash_kpi_2_v">24/7</span><span class="dash-kpi-l" data-i18n="dash_kpi_2_l">captures leads while you sleep</span></div>
+                <div class="dash-kpi"><span class="dash-kpi-v" data-i18n="dash_kpi_3_v">100%</span><span class="dash-kpi-l" data-i18n="dash_kpi_3_l">logged — nothing gets forgotten</span></div>
+                <div class="dash-kpi"><span class="dash-kpi-v" data-i18n="dash_kpi_4_v">0</span><span class="dash-kpi-l" data-i18n="dash_kpi_4_l">manual steps to a booked meeting</span></div>
               </div>
-              <div class="dash-timeline" id="dash-timeline"></div>
+              <p class="dash-note" data-i18n="dash_overview_note">Everything on this page actually happened in your session. The same engine answers our customers' phones, forms and bookings — every day.</p>
             </div>
+
+            <!-- TAB 3: Agents -->
+            <div class="dash-panel" data-panel="agents">
+              <div class="dash-agents">
+                <div class="dash-agent"><div class="dash-agent-head"><span class="material-symbols-outlined">mic</span><strong data-i18n="dash_ag1_t">Alex — Voice agent</strong><span class="dash-badge live" data-i18n="dash_badge_live">LIVE ON THIS SITE</span></div><p data-i18n="dash_ag1_d">Answers, qualifies and books meetings. Around the clock, no queue.</p></div>
+                <div class="dash-agent"><div class="dash-agent-head"><span class="material-symbols-outlined">edit_note</span><strong data-i18n="dash_ag2_t">Form AI</strong><span class="dash-badge live" data-i18n="dash_badge_live">LIVE ON THIS SITE</span></div><p data-i18n="dash_ag2_d">Reads the message and replies in seconds — with knowledge of your industry.</p></div>
+                <div class="dash-agent"><div class="dash-agent-head"><span class="material-symbols-outlined">insights</span><strong data-i18n="dash_ag3_t">Lead scoring</strong><span class="dash-badge live" data-i18n="dash_badge_live">LIVE ON THIS SITE</span></div><p data-i18n="dash_ag3_d">Prioritizes automatically so you call the right customer first.</p></div>
+                <div class="dash-agent"><div class="dash-agent-head"><span class="material-symbols-outlined">event_repeat</span><strong data-i18n="dash_ag4_t">Follow-up</strong><span class="dash-badge" data-i18n="dash_badge_delivery">IN CUSTOMER DELIVERY</span></div><p data-i18n="dash_ag4_d">Reminders and next steps created automatically — nothing falls through the cracks.</p></div>
+              </div>
+            </div>
+
+            <!-- TAB 4: ROI -->
+            <div class="dash-panel" data-panel="roi">
+              <div class="dash-roi">
+                <div class="dash-roi-controls">
+                  <label class="dash-roi-label"><span data-i18n="dash_roi_hours">Admin hours per week</span><span class="dash-roi-val" id="roi-hours-val">10 h</span>
+                    <input type="range" id="roi-hours" min="2" max="40" step="1" value="10"/>
+                  </label>
+                  <label class="dash-roi-label"><span data-i18n="dash_roi_rate">Your hourly value (SEK)</span><span class="dash-roi-val" id="roi-rate-val">600 kr</span>
+                    <input type="range" id="roi-rate" min="300" max="1500" step="50" value="600"/>
+                  </label>
+                </div>
+                <div class="dash-roi-results">
+                  <div class="dash-roi-big"><span class="dash-roi-num" id="roi-year">312 000 kr</span><span class="dash-roi-cap" data-i18n="dash_roi_result_label">Time you don't invoice, per year</span></div>
+                  <div class="dash-roi-small"><span class="dash-roi-num-sm" id="roi-week">6 000 kr</span><span class="dash-roi-cap" data-i18n="dash_roi_week_label">Every week without a system</span></div>
+                </div>
+                <p class="dash-note" data-i18n="dash_roi_note">A system like this often pays for itself in the first month. We build in weeks — not months. You own everything from day one.</p>
+              </div>
+            </div>
+
           </div>
 
-          <!-- What you get -->
-          <div class="dash-what">
-            <p class="dash-what-title" data-i18n="dash_what_title">As a customer, you get the same thing:</p>
-            <ul>
-              <li data-i18n="dash_what_1">Every lead in one place — forms, voice calls, email</li>
-              <li data-i18n="dash_what_2">AI responses and call summaries logged per customer</li>
-              <li data-i18n="dash_what_3">Automatic scoring and prioritization, no manual triage</li>
-            </ul>
+          <!-- Always-visible CTA row -->
+          <div class="dash-ctas">
+            <a class="dash-book" href="https://calendly.com/joakim-skylandai/30min" target="_blank" rel="noreferrer"><span class="material-symbols-outlined" style="font-size:17px">calendar_month</span> <span data-i18n="dash_cta_book">Book 15 min with Joakim</span></a>
+            <button class="dash-talk dash-cta" data-target="flux" data-i18n="dash_cta_talk">or talk to Alex →</button>
+            <span class="dash-cta-note" data-i18n="dash_cta_free">Free · honest assessment · no strings</span>
           </div>
         </div>
         </div>

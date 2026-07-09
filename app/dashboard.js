@@ -140,6 +140,50 @@
     }
   }
 
+  // ─── Tabs ───
+  function initTabs(page) {
+    var tabs = page.querySelectorAll('.dash-tab');
+    var panels = page.querySelectorAll('.dash-panel');
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) { t.classList.toggle('active', t === tab); });
+        panels.forEach(function (p) {
+          p.classList.toggle('active', p.getAttribute('data-panel') === tab.getAttribute('data-tab'));
+        });
+      });
+    });
+  }
+
+  // ─── ROI calculator ───
+  function initRoi(page) {
+    var hours = page.querySelector('#roi-hours');
+    var rate = page.querySelector('#roi-rate');
+    if (!hours || !rate) return;
+
+    function fmt(n) {
+      return Math.round(n).toLocaleString('sv-SE') + ' kr';
+    }
+
+    function update() {
+      var h = Number(hours.value);
+      var r = Number(rate.value);
+      var weekly = h * r;
+      var yearly = weekly * 52;
+      var hv = page.querySelector('#roi-hours-val');
+      var rv = page.querySelector('#roi-rate-val');
+      var yv = page.querySelector('#roi-year');
+      var wv = page.querySelector('#roi-week');
+      if (hv) hv.textContent = h + ' h';
+      if (rv) rv.textContent = fmt(r);
+      if (yv) yv.textContent = fmt(yearly);
+      if (wv) wv.textContent = fmt(weekly);
+    }
+
+    hours.addEventListener('input', update);
+    rate.addEventListener('input', update);
+    update();
+  }
+
   function init() {
     var page = document.getElementById('dashboard');
     if (!page) return;
@@ -147,6 +191,9 @@
     elEmpty = document.getElementById('dash-empty');
     elGrid = document.getElementById('dash-grid');
     elTimeline = document.getElementById('dash-timeline');
+
+    initTabs(page);
+    initRoi(page);
 
     // CTA buttons scroll to the referenced page
     page.querySelectorAll('.dash-cta').forEach(function (btn) {
