@@ -1,6 +1,7 @@
 /**
- * Alex intro video — plays the HeyGen presentation in an overlay.
- * Picks the video matching the active site language (sv/en).
+ * Alex intro video — plays inline in the media card on the Flux page.
+ * Poster image shows until the visitor clicks play; the video then runs
+ * in place (no popup). Language (sv/en) picks the matching file.
  */
 
 (function () {
@@ -12,17 +13,16 @@
   };
 
   function init() {
-    var btn = document.getElementById('alex-video-btn');
-    var overlay = document.getElementById('video-overlay');
+    var card = document.getElementById('alex-media-card');
     var video = document.getElementById('alex-intro-video');
-    var closeBtn = document.getElementById('video-close');
-    if (!btn || !overlay || !video) return;
+    var playBtn = document.getElementById('alex-video-btn');
+    if (!card || !video || !playBtn) return;
 
-    function open() {
+    function start() {
       var lang = window.SkylandLang ? window.SkylandLang.getCurrentLang() : 'sv';
       var src = VIDEO_SRC[lang] || VIDEO_SRC.sv;
 
-      // Stop any active voice call before playing the intro
+      // Stop any active voice call so audio doesn't overlap
       if (window.SkylandVoice && typeof window.SkylandVoice.stop === 'function') {
         window.SkylandVoice.stop();
       }
@@ -30,32 +30,31 @@
       if (video.getAttribute('src') !== src) {
         video.setAttribute('src', src);
       }
-      overlay.hidden = false;
-      document.body.style.overflow = 'hidden';
+      video.controls = true;
+      card.classList.add('playing');
       var p = video.play();
-      if (p && typeof p.catch === 'function') p.catch(function () { /* user gesture edge case */ });
+      if (p && typeof p.catch === 'function') p.catch(function () { /* autoplay edge case */ });
     }
 
-    function close() {
-      video.pause();
-      overlay.hidden = true;
-      document.body.style.overflow = '';
+    function reset() {
+      video.controls = false;
+      card.classList.remove('playing');
+      video.removeAttribute('src');
+      video.load(); // back to poster
     }
 
-    btn.addEventListener('click', open);
-    if (closeBtn) closeBtn.addEventListener('click', close);
-    overlay.addEventListener('click', function (e) {
-      if (e.target === overlay) close();
+    playBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      start();
     });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !overlay.hidden) close();
+    card.addEventListener('click', function () {
+      if (!card.classList.contains('playing')) start();
     });
-    video.addEventListener('ended', close);
+    video.addEventListener('ended', reset);
   }
 
   window.SkylandIntroVideo = { init: init };
 
-  // Self-init on DOM ready (independent of app.js)
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

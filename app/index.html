@@ -175,12 +175,15 @@
               <p class="intro-desc" data-i18n="flux_desc">Alex is Skyland's AI voice agent — trained on our knowledge base of services, pricing, processes and customer cases. She answers questions, qualifies your needs and can book a video call straight into our calendar. The same technology can answer your company's phone: no missed calls, no phone queue, no follow-up three days later.</p>
               <p class="intro-how"><span class="material-symbols-outlined" style="font-size:15px">touch_app</span> <span data-i18n="flux_how">Click the orb or pick a question below. Talk to her like you would to a human — end with the red button. Your browser will ask for microphone access.</span></p>
             </div>
-            <button class="alex-avatar-card" id="alex-video-btn" aria-label="Play Alex introduction">
-              <span class="alex-avatar-ring"></span>
-              <img src="media/alex-avatar.jpg" alt="Alex — Skyland AI agent" loading="lazy"/>
-              <span class="alex-avatar-play"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span></span>
-              <span class="alex-avatar-caption" data-i18n="flux_video_cta">Watch Alex introduce herself</span>
-            </button>
+            <div class="alex-media-card" id="alex-media-card">
+              <div class="alex-media-frame">
+                <video id="alex-intro-video" playsinline preload="metadata" poster="media/alex-avatar.jpg"></video>
+                <button class="alex-media-play" id="alex-video-btn" aria-label="Play Alex introduction">
+                  <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
+                </button>
+              </div>
+              <span class="alex-media-caption" data-i18n="flux_video_cta">Watch Alex introduce herself</span>
+            </div>
           </div>
           <div class="voice-panel">
             <!-- Status badge — centered -->
@@ -429,14 +432,6 @@
       </div>
 
   </main>
-
-  <!-- Alex intro video overlay -->
-  <div class="video-overlay" id="video-overlay" hidden>
-    <div class="video-box">
-      <button class="video-close" id="video-close" aria-label="Stäng">✕</button>
-      <video id="alex-intro-video" controls playsinline preload="none"></video>
-    </div>
-  </div>
 
   <script src="session.js"></script>
   <script src="lang.js"></script>
