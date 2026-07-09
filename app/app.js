@@ -18,10 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window.SkylandVoid.init();
   }
 
+  // Initialize dashboard module (visitor-facing lead card demo)
+  if (window.SkylandDashboard) {
+    window.SkylandDashboard.init();
+  }
+
   const navItems = document.querySelectorAll('.nav-item');
   const pages = document.querySelectorAll('.page');
   const mainEl = document.querySelector('main');
-  const pageIds = ['core', 'neural', 'flux', 'void'];
+  const pageIds = ['core', 'neural', 'flux', 'void', 'dashboard'];
 
   // --- Build scroll indicator dots ---
   const indicatorEl = document.getElementById('scroll-indicator');

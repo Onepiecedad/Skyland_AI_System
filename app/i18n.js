@@ -50,9 +50,7 @@
       starter_open: "Or start a regular conversation \u2192",
 
       // Void
-      void_h2: "Incoming Transmission",
-      void_sub: "Initialize secure communication channel.",
-      label_name: "NAME",
+                  label_name: "NAME",
       label_email: "EMAIL",
       label_company: "COMPANY",
       label_website: "WEBSITE",
@@ -65,11 +63,43 @@
       placeholder_phone: "Enter Phone",
       placeholder_message: "Transmit data block...",
       transmit_btn: "TRANSMIT",
+      scan_toggle_show: "Show AI analysis",
       scan_title: "LEAD PROFILE SCAN",
       scan_status: "NODE_ACTIVE",
       ai_response_title: "AUTOMATED AI RESPONSE",
       ai_response_body: "Hello Alex, thanks for reaching out. Based on your profile at TechFlow, we recommend starting with the Neural module for your automated fleet integration...",
-      sector_value: "AI Automation",
+            sector_value: "AI Automation",
+
+      // Flux intro (live demo copy)
+      flux_kicker: "LIVE DEMO — VOICE AGENT",
+      flux_h1: "Meet Alex. She answers when you can't.",
+      flux_desc: "Alex is Skyland's AI voice agent — trained on our knowledge base of services, pricing, processes and customer cases. She answers questions, qualifies your needs and can book a video call straight into our calendar. The same technology can answer your company's phone: no missed calls, no phone queue, no follow-up three days later.",
+      flux_how: "Click the orb or pick a question below. Talk to her like you would to a human — end with the red button. Your browser will ask for microphone access.",
+
+      // Void intro (smart form copy)
+      void_kicker: "LIVE DEMO — SMART FORM",
+      void_h2: "A form that answers immediately.",
+      void_sub: "Standard contact forms are black holes — a reply arrives days later, if at all. This form is read by an AI connected to our knowledge base: you get a relevant answer in seconds, tailored to what you write. At the same time a lead card is created in our dashboard — see the next page.",
+      void_hint: "Describe your business and what eats your time. Hit send — the AI response appears in the panel within seconds.",
+
+      // Dashboard (visitor-facing SCC view)
+      dash_kicker: "LIVE DEMO — COMMAND CENTER",
+      dash_h1: "Your journey, seen from our side.",
+      dash_desc: "This is a view from Skyland Command Center — the same dashboard we use to run our customers' systems. When you submitted the form or talked to Alex, a lead card was created automatically. Here is yours, in real time.",
+      dash_card_title: "YOUR LEAD CARD",
+      dash_timeline_title: "EVENTS",
+      dash_empty: "No lead card yet. Try the voice agent or the form and watch the card build itself here — in real time.",
+      dash_empty_voice: "Talk to Alex",
+      dash_empty_form: "Fill out the form",
+      dash_ev_form: "Form received — AI answered instantly",
+      dash_ev_voice: "Voice conversation with Alex",
+      dash_score: "LEAD SCORE",
+      dash_what_title: "As a customer, you get the same thing:",
+      dash_what_1: "Every lead in one place — forms, voice calls, email",
+      dash_what_2: "AI responses and call summaries logged per customer",
+      dash_what_3: "Automatic scoring and prioritization, no manual triage",
+      dash_ai_label: "AI RESPONSE SENT",
+      dash_summary_label: "CALL SUMMARY",
     },
 
     sv: {
@@ -121,9 +151,7 @@
       starter_open: "Eller starta vanlig konversation \u2192",
 
       // Void
-      void_h2: "Inkommande Transmission",
-      void_sub: "Initiera säker kommunikationskanal.",
-      label_name: "NAMN",
+                  label_name: "NAMN",
       label_email: "E-POST",
       label_company: "FÖRETAG",
       label_website: "WEBBPLATS",
@@ -136,11 +164,43 @@
       placeholder_phone: "Ange telefon",
       placeholder_message: "Skriv ditt meddelande...",
       transmit_btn: "SKICKA",
+      scan_toggle_show: "Visa AI-analys",
       scan_title: "LEAD-PROFILSKANNING",
       scan_status: "NOD_AKTIV",
       ai_response_title: "AUTOMATISKT AI-SVAR",
       ai_response_body: "Hej Alex, tack för att du hörde av dig. Baserat på din profil på TechFlow rekommenderar vi att börja med Neural-modulen för er automatiserade flotteintegration...",
-      sector_value: "AI-automatisering",
+            sector_value: "AI-automatisering",
+
+      // Flux intro (live demo copy)
+      flux_kicker: "LIVE DEMO — RÖSTAGENT",
+      flux_h1: "Möt Alex. Hon svarar när du inte kan.",
+      flux_desc: "Alex är Skylands AI-röstagent — tränad på vår kunskapsbas med tjänster, priser, processer och kundcase. Hon svarar på frågor, kvalificerar ditt behov och kan boka ett videosamtal direkt i kalendern. Samma teknik kan svara i ditt företags telefon: inga missade samtal, ingen telefonkö, ingen återkoppling tre dagar senare.",
+      flux_how: "Klicka på orben eller välj en fråga nedan. Prata med henne som med en människa — avsluta med röda knappen. Webbläsaren frågar efter mikrofonåtkomst.",
+
+      // Void intro (smart form copy)
+      void_kicker: "LIVE DEMO — SMART FORMULÄR",
+      void_h2: "Ett formulär som svarar direkt.",
+      void_sub: "Vanliga kontaktformulär är svarta hål — svaret kommer efter dagar, om alls. Det här formuläret läses av en AI kopplad till vår kunskapsbas: du får ett relevant svar på sekunder, anpassat efter det du skriver. Samtidigt skapas ett lead-kort i vår dashboard — se nästa sida.",
+      void_hint: "Beskriv din verksamhet och vad som tar mest tid. Skicka — AI-svaret dyker upp i panelen inom några sekunder.",
+
+      // Dashboard (visitor-facing SCC view)
+      dash_kicker: "LIVE DEMO — COMMAND CENTER",
+      dash_h1: "Din resa, sedd från vår sida.",
+      dash_desc: "Det här är en vy ur Skyland Command Center — samma dashboard vi använder för att driva våra kunders system. När du skickade formuläret eller pratade med Alex skapades ett lead-kort automatiskt. Här är ditt, i realtid.",
+      dash_card_title: "DITT LEAD-KORT",
+      dash_timeline_title: "HÄNDELSER",
+      dash_empty: "Inget lead-kort än. Testa röstagenten eller formuläret och se kortet byggas här — i realtid.",
+      dash_empty_voice: "Prata med Alex",
+      dash_empty_form: "Fyll i formuläret",
+      dash_ev_form: "Formulär mottaget — AI svarade direkt",
+      dash_ev_voice: "Röstsamtal med Alex",
+      dash_score: "LEAD SCORE",
+      dash_what_title: "Som kund får du samma sak:",
+      dash_what_1: "Alla leads på ett ställe — formulär, röstsamtal, mejl",
+      dash_what_2: "AI-svar och samtalssammanfattningar loggade per kund",
+      dash_what_3: "Automatisk score och prioritering, ingen manuell sortering",
+      dash_ai_label: "AI-SVAR SKICKAT",
+      dash_summary_label: "SAMTALSSAMMANFATTNING",
     },
   };
 

@@ -334,3 +334,46 @@ main::-webkit-scrollbar{display:none}
   .starter-btn{padding:9px 14px;font-size:13px}
   .starter-open{padding:4px 0}
 }
+
+/* ─── Page intro (Flux/Void/Dashboard live-demo copy) ─── */
+.page-intro{max-width:640px;text-align:center;margin-bottom:28px}
+.intro-kicker{display:inline-block;font-family:'Space Grotesk',monospace;font-size:11px;letter-spacing:.25em;color:var(--primary-c);border:1px solid rgba(12,196,129,.3);border-radius:4px;padding:4px 10px;margin-bottom:14px}
+.intro-h1{font-family:'Manrope',sans-serif;font-size:30px;font-weight:800;color:var(--on-bg);margin:0 0 12px;letter-spacing:-.02em}
+.intro-desc{font-size:15px;line-height:1.65;color:var(--on-surface-var);margin:0 0 14px}
+.intro-how{display:flex;align-items:flex-start;justify-content:center;gap:8px;font-size:13px;color:var(--primary);opacity:.85;margin:0}
+.form-panel .intro-kicker{align-self:flex-start}
+.form-panel .intro-how{justify-content:flex-start;text-align:left}
+
+/* ─── Dashboard page ─── */
+.dash-inner{display:flex;flex-direction:column;align-items:center;width:100%;padding:48px 32px 32px;min-height:calc(100vh - 250px);overflow-y:auto}
+.dash-empty{max-width:520px;text-align:center;border:1px dashed rgba(12,196,129,.3);border-radius:14px;padding:32px 28px;color:var(--on-surface-var);font-size:14px;line-height:1.6}
+.dash-empty-btns{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.dash-cta{display:inline-flex;align-items:center;gap:8px;background:rgba(12,196,129,.12);border:1px solid rgba(12,196,129,.4);color:var(--primary);font-family:'Space Grotesk',monospace;font-size:13px;letter-spacing:.05em;padding:10px 18px;border-radius:8px;cursor:pointer;transition:all .3s ease}
+.dash-cta:hover{background:rgba(12,196,129,.22);box-shadow:0 0 16px rgba(12,196,129,.25)}
+.dash-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;width:100%;max-width:900px}
+.dash-card,.dash-timeline-panel{background:rgba(28,32,32,.55);border:1px solid rgba(60,74,65,.4);border-radius:14px;backdrop-filter:blur(16px);overflow:hidden}
+.dash-card-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(60,74,65,.35)}
+.dash-card-title{display:flex;align-items:center;gap:8px;font-family:'Space Grotesk',monospace;font-size:11px;letter-spacing:.2em;color:var(--on-surface-var)}
+.dash-card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--primary-c);box-shadow:0 0 8px var(--primary-c);animation:pulse 2s infinite}
+.dash-live{font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.2em;color:var(--primary-c);border:1px solid rgba(12,196,129,.4);border-radius:4px;padding:2px 8px}
+.dash-card-body{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.dash-score-badge{display:inline-block;font-family:'Space Grotesk',monospace;font-size:13px;padding:2px 10px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(60,74,65,.5)}
+.dash-score-badge.high{background:rgba(12,196,129,.15);border-color:rgba(12,196,129,.5);color:var(--primary)}
+.dash-timeline{padding:16px 18px;display:flex;flex-direction:column;gap:14px;max-height:420px;overflow-y:auto}
+.dash-event{border-left:2px solid rgba(12,196,129,.4);padding-left:14px}
+.dash-event-head{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--on-bg)}
+.dash-event-label{font-weight:600}
+.dash-event-time{margin-left:auto;font-size:11px;color:var(--on-surface-var);opacity:.7}
+.dash-event-detail{margin-top:8px;background:rgba(255,255,255,.04);border:1px solid rgba(60,74,65,.3);border-radius:8px;padding:10px 12px}
+.dash-event-detail-label{display:block;font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.2em;color:var(--primary-c);margin-bottom:6px}
+.dash-event-detail p{font-size:13px;line-height:1.55;color:var(--on-surface-var);margin:0;white-space:pre-wrap}
+.dash-what{margin-top:28px;max-width:640px;text-align:center}
+.dash-what-title{font-size:14px;font-weight:600;color:var(--on-bg);margin:0 0 10px}
+.dash-what ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.dash-what li{font-size:13px;color:var(--on-surface-var)}
+.dash-what li::before{content:'—';color:var(--primary-c);margin-right:8px}
+@media (max-width:820px){
+  .dash-grid{grid-template-columns:1fr}
+  .dash-inner{padding:24px 18px}
+  .intro-h1{font-size:24px}
+}

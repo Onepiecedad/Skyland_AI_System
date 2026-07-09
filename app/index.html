@@ -73,6 +73,10 @@
       <span class="material-symbols-outlined">filter_tilt_shift</span>
       <span class="label">Void</span>
     </div>
+    <div class="nav-item" data-page="dashboard">
+      <span class="material-symbols-outlined">monitoring</span>
+      <span class="label">Dashboard</span>
+    </div>
   </nav>
 
   <!-- Scroll indicator dots -->
@@ -164,6 +168,12 @@
       <div id="flux" class="page">
         <div class="page-glass">
         <div class="flux-inner">
+          <div class="page-intro">
+            <span class="intro-kicker" data-i18n="flux_kicker">LIVE DEMO — VOICE AGENT</span>
+            <h2 class="intro-h1" data-i18n="flux_h1">Meet Alex. She answers when you can't.</h2>
+            <p class="intro-desc" data-i18n="flux_desc">Alex is Skyland's AI voice agent — trained on our knowledge base of services, pricing, processes and customer cases. She answers questions, qualifies your needs and can book a video call straight into our calendar. The same technology can answer your company's phone: no missed calls, no phone queue, no follow-up three days later.</p>
+            <p class="intro-how"><span class="material-symbols-outlined" style="font-size:15px">touch_app</span> <span data-i18n="flux_how">Click the orb or pick a question below. Talk to her like you would to a human — end with the red button. Your browser will ask for microphone access.</span></p>
+          </div>
           <div class="voice-panel">
             <!-- Status badge — centered -->
             <div class="link-badge">
@@ -225,8 +235,10 @@
         <div class="page-glass">
         <div class="void-inner">
           <div class="form-panel">
-            <h2 data-i18n="void_h2">Incoming Transmission</h2>
-            <p data-i18n="void_sub">Initialize secure communication channel.</p>
+            <span class="intro-kicker" data-i18n="void_kicker">LIVE DEMO — SMART FORM</span>
+            <h2 data-i18n="void_h2">A form that answers immediately.</h2>
+            <p data-i18n="void_sub">Standard contact forms are black holes — a reply arrives days later, if at all. This form is read by an AI connected to our knowledge base: you get a relevant answer in seconds, tailored to what you write. At the same time a lead card is created in our dashboard — see the next page.</p>
+            <p class="intro-how" style="margin-bottom:24px"><span class="material-symbols-outlined" style="font-size:15px">edit_note</span> <span data-i18n="void_hint">Describe your business and what eats your time. Hit send — the AI response appears in the panel within seconds.</span></p>
             <form id="contact-form">
               <div class="form-grid">
                 <div class="form-group">
@@ -293,6 +305,68 @@
             </div>
           </div>
         </div>
+        <div class="scroll-arrow" data-target="dashboard">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+        </div>
+      </div>
+
+      <!-- PAGE: DASHBOARD (Visitor-facing Command Center demo) -->
+      <div id="dashboard" class="page">
+        <div class="page-glass">
+        <div class="dash-inner">
+          <div class="page-intro">
+            <span class="intro-kicker" data-i18n="dash_kicker">LIVE DEMO — COMMAND CENTER</span>
+            <h2 class="intro-h1" data-i18n="dash_h1">Your journey, seen from our side.</h2>
+            <p class="intro-desc" data-i18n="dash_desc">This is a view from Skyland Command Center — the same dashboard we use to run our customers' systems. When you submitted the form or talked to Alex, a lead card was created automatically. Here is yours, in real time.</p>
+          </div>
+
+          <!-- Empty state -->
+          <div class="dash-empty" id="dash-empty">
+            <p data-i18n="dash_empty">No lead card yet. Try the voice agent or the form and watch the card build itself here — in real time.</p>
+            <div class="dash-empty-btns">
+              <button class="dash-cta" data-target="flux"><span class="material-symbols-outlined" style="font-size:16px">mic</span> <span data-i18n="dash_empty_voice">Talk to Alex</span></button>
+              <button class="dash-cta" data-target="void"><span class="material-symbols-outlined" style="font-size:16px">edit_note</span> <span data-i18n="dash_empty_form">Fill out the form</span></button>
+            </div>
+          </div>
+
+          <!-- Live lead card + timeline -->
+          <div class="dash-grid" id="dash-grid" style="display:none">
+            <div class="dash-card" id="dash-card">
+              <div class="dash-card-header">
+                <span class="dash-card-title"><span class="dot"></span><span data-i18n="dash_card_title">YOUR LEAD CARD</span></span>
+                <span class="dash-live">LIVE</span>
+              </div>
+              <div class="dash-card-body">
+                <div class="profile-row"><span class="pk" data-i18n="label_name">NAME</span><span class="pv" id="dash-name">—</span></div>
+                <div class="profile-row"><span class="pk" data-i18n="label_company">COMPANY</span><span class="pv" id="dash-company">—</span></div>
+                <div class="profile-row"><span class="pk" data-i18n="label_email">EMAIL</span><span class="pv" id="dash-email">—</span></div>
+                <div class="profile-row"><span class="pk" data-i18n="dash_score">LEAD SCORE</span><span class="pv"><span class="dash-score-badge" id="dash-score">—</span></span></div>
+              </div>
+            </div>
+            <div class="dash-timeline-panel">
+              <div class="dash-card-header">
+                <span class="dash-card-title"><span class="dot"></span><span data-i18n="dash_timeline_title">EVENTS</span></span>
+              </div>
+              <div class="dash-timeline" id="dash-timeline"></div>
+            </div>
+          </div>
+
+          <!-- What you get -->
+          <div class="dash-what">
+            <p class="dash-what-title" data-i18n="dash_what_title">As a customer, you get the same thing:</p>
+            <ul>
+              <li data-i18n="dash_what_1">Every lead in one place — forms, voice calls, email</li>
+              <li data-i18n="dash_what_2">AI responses and call summaries logged per customer</li>
+              <li data-i18n="dash_what_3">Automatic scoring and prioritization, no manual triage</li>
+            </ul>
+          </div>
+        </div>
         </div>
       </div>
 
@@ -305,6 +379,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.4.0/dist/lib.iife.min.js"></script>
   <script src="voice.js"></script>
   <script src="void.js"></script>
+  <script src="dashboard.js"></script>
   <script type="module" src="bg-shader.js?v=12"></script>
   <script src="app.js"></script>
 </body>
