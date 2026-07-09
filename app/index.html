@@ -168,15 +168,19 @@
       <div id="flux" class="page">
         <div class="page-glass">
         <div class="flux-inner">
-          <div class="page-intro">
-            <span class="intro-kicker" data-i18n="flux_kicker">LIVE DEMO — VOICE AGENT</span>
-            <h2 class="intro-h1" data-i18n="flux_h1">Meet Alex. She answers when you can't.</h2>
-            <p class="intro-desc" data-i18n="flux_desc">Alex is Skyland's AI voice agent — trained on our knowledge base of services, pricing, processes and customer cases. She answers questions, qualifies your needs and can book a video call straight into our calendar. The same technology can answer your company's phone: no missed calls, no phone queue, no follow-up three days later.</p>
-            <button class="intro-video-btn" id="alex-video-btn">
-              <span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'FILL' 1">play_circle</span>
-              <span data-i18n="flux_video_cta">Watch Alex introduce herself</span>
+          <div class="page-intro flux-intro-grid">
+            <div class="flux-intro-text">
+              <span class="intro-kicker" data-i18n="flux_kicker">LIVE DEMO — VOICE AGENT</span>
+              <h2 class="intro-h1" data-i18n="flux_h1">Meet Alex. She answers when you can't.</h2>
+              <p class="intro-desc" data-i18n="flux_desc">Alex is Skyland's AI voice agent — trained on our knowledge base of services, pricing, processes and customer cases. She answers questions, qualifies your needs and can book a video call straight into our calendar. The same technology can answer your company's phone: no missed calls, no phone queue, no follow-up three days later.</p>
+              <p class="intro-how"><span class="material-symbols-outlined" style="font-size:15px">touch_app</span> <span data-i18n="flux_how">Click the orb or pick a question below. Talk to her like you would to a human — end with the red button. Your browser will ask for microphone access.</span></p>
+            </div>
+            <button class="alex-avatar-card" id="alex-video-btn" aria-label="Play Alex introduction">
+              <span class="alex-avatar-ring"></span>
+              <img src="media/alex-avatar.jpg" alt="Alex — Skyland AI agent" loading="lazy"/>
+              <span class="alex-avatar-play"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span></span>
+              <span class="alex-avatar-caption" data-i18n="flux_video_cta">Watch Alex introduce herself</span>
             </button>
-            <p class="intro-how"><span class="material-symbols-outlined" style="font-size:15px">touch_app</span> <span data-i18n="flux_how">Click the orb or pick a question below. Talk to her like you would to a human — end with the red button. Your browser will ask for microphone access.</span></p>
           </div>
           <div class="voice-panel">
             <!-- Status badge — centered -->
