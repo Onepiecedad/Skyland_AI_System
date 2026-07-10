@@ -1,54 +1,42 @@
 /**
- * Alex intro video — plays inline in the media card on the Flux page.
- * Poster image shows until the visitor clicks play; the video then runs
- * in place (no popup). Language (sv/en) picks the matching file.
+ * Alex intro — frameless "floating face" video on the Flux page.
+ * The poster (first video frame) blends into the background via a CSS mask.
+ * Click the face to make her talk; click again (or video end) resets.
+ * Currently the English video is used for both languages.
  */
 
 (function () {
   'use strict';
 
-  var VIDEO_SRC = {
-    sv: 'media/alex-intro-sv.mp4',
-    en: 'media/alex-intro-en.mp4'
-  };
+  var VIDEO_SRC = 'media/alex-intro-en.mp4';
 
   function init() {
     var card = document.getElementById('alex-media-card');
     var video = document.getElementById('alex-intro-video');
-    var playBtn = document.getElementById('alex-video-btn');
-    if (!card || !video || !playBtn) return;
+    if (!card || !video) return;
 
     function start() {
-      var lang = window.SkylandLang ? window.SkylandLang.getCurrentLang() : 'sv';
-      var src = VIDEO_SRC[lang] || VIDEO_SRC.sv;
-
-      // Stop any active voice call so audio doesn't overlap
       if (window.SkylandVoice && typeof window.SkylandVoice.stop === 'function') {
         window.SkylandVoice.stop();
       }
-
-      if (video.getAttribute('src') !== src) {
-        video.setAttribute('src', src);
+      if (video.getAttribute('src') !== VIDEO_SRC) {
+        video.setAttribute('src', VIDEO_SRC);
       }
-      video.controls = true;
       card.classList.add('playing');
       var p = video.play();
-      if (p && typeof p.catch === 'function') p.catch(function () { /* autoplay edge case */ });
+      if (p && typeof p.catch === 'function') p.catch(function () { /* ignore */ });
     }
 
     function reset() {
-      video.controls = false;
+      video.pause();
       card.classList.remove('playing');
       video.removeAttribute('src');
       video.load(); // back to poster
     }
 
-    playBtn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      start();
-    });
     card.addEventListener('click', function () {
-      if (!card.classList.contains('playing')) start();
+      if (card.classList.contains('playing')) reset();
+      else start();
     });
     video.addEventListener('ended', reset);
   }
