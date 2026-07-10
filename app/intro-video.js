@@ -30,6 +30,12 @@
     var src = card.getAttribute('data-video');
     if (!video || !src) return;
 
+    // Preload the whole clip up front so playback starts instantly
+    // and audio/video stay in sync (no mid-play buffering).
+    video.preload = 'auto';
+    video.setAttribute('src', src);
+    video.load();
+
     function start() {
       // One face talking at a time
       if (activeCard && activeCard !== card && activeCard.__reset) {
@@ -39,21 +45,19 @@
       if (window.SkylandVoice && typeof window.SkylandVoice.stop === 'function') {
         window.SkylandVoice.stop();
       }
-      if (video.getAttribute('src') !== src) {
-        video.setAttribute('src', src);
-      }
       card.classList.add('playing');
       activeCard = card;
       pauseBg();
+      video.currentTime = 0;
       var p = video.play();
       if (p && typeof p.catch === 'function') p.catch(function () { /* ignore */ });
     }
 
     function reset() {
       video.pause();
+      // Keep the buffered source — first frame == poster, so just rewind.
+      try { video.currentTime = 0; } catch (e) { /* not seekable yet */ }
       card.classList.remove('playing');
-      video.removeAttribute('src');
-      video.load(); // back to poster
       if (activeCard === card) {
         activeCard = null;
         resumeBg();
