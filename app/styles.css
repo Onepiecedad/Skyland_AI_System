@@ -534,3 +534,17 @@ main::-webkit-scrollbar{display:none}
   .alex-face{width:240px}
   .flux-right{order:-1}
 }
+
+/* ─── Alex-face v2: tydligare play + liten variant för formulärsidan ─── */
+.alex-face-play{width:66px;height:66px;background:rgba(12,196,129,.92);border:2px solid rgba(255,255,255,.25);color:#04110b;box-shadow:0 0 34px rgba(12,196,129,.75),0 4px 16px rgba(0,0,0,.4);backdrop-filter:none;animation:playPulse 2.4s ease-in-out infinite}
+.alex-face-play .material-symbols-outlined{font-size:34px}
+@keyframes playPulse{0%,100%{box-shadow:0 0 34px rgba(12,196,129,.75),0 4px 16px rgba(0,0,0,.4)}50%{box-shadow:0 0 52px rgba(12,196,129,1),0 4px 16px rgba(0,0,0,.4)}}
+.alex-face:hover .alex-face-play{transform:translate(-50%,-50%) scale(1.14);background:var(--primary)}
+/* Liten variant i scan-panelen (Void) */
+.alex-face--sm{width:200px;margin:0 auto 4px;flex-shrink:0}
+.alex-face--sm .alex-face-play{width:52px;height:52px}
+.alex-face--sm .alex-face-play .material-symbols-outlined{font-size:26px}
+.alex-face--sm .alex-face-caption{font-size:10.5px;bottom:4%}
+@media (max-width:820px){
+  .alex-face--sm{width:170px}
+}

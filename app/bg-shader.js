@@ -40,4 +40,14 @@
     0.3,        // speed (slow flowing)
     0           // starting frame
   );
+
+  // Expose pause/resume so video playback can free up the GPU
+  window.SkylandBG = {
+    pause() {
+      if (typeof shaderMount.setSpeed === 'function') shaderMount.setSpeed(0);
+    },
+    resume() {
+      if (typeof shaderMount.setSpeed === 'function') shaderMount.setSpeed(0.3);
+    }
+  };
 })();

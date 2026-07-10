@@ -79,6 +79,7 @@
 
       // Void intro (smart form copy)
       void_kicker: "LIVE DEMO — SMART FORM",
+      void_video_cta: "Watch Alex explain the form",
       void_h2: "A form that answers immediately.",
       void_sub: "Standard contact forms are black holes — a reply arrives days later, if at all. This form is read by an AI connected to our knowledge base: you get a relevant answer in seconds, tailored to what you write. At the same time a lead card is created in our dashboard — see the next page.",
       void_hint: "Describe your business and what eats your time. Hit send — the AI response appears in the panel within seconds.",
@@ -213,6 +214,7 @@
 
       // Void intro (smart form copy)
       void_kicker: "LIVE DEMO — SMART FORMULÄR",
+      void_video_cta: "Se Alex förklara formuläret",
       void_h2: "Ett formulär som svarar direkt.",
       void_sub: "Vanliga kontaktformulär är svarta hål — svaret kommer efter dagar, om alls. Det här formuläret läses av en AI kopplad till vår kunskapsbas: du får ett relevant svar på sekunder, anpassat efter det du skriver. Samtidigt skapas ett lead-kort i vår dashboard — se nästa sida.",
       void_hint: "Beskriv din verksamhet och vad som tar mest tid. Skicka — AI-svaret dyker upp i panelen inom några sekunder.",
