@@ -560,3 +560,7 @@ main::-webkit-scrollbar{display:none}
   .alex-face{width:260px}
   .alex-face--sm{width:220px}
 }
+
+/* ─── Släck den dyra bluren medan video spelar (shadern är pausad ändå) ─── */
+.page-glass.video-active{backdrop-filter:none;-webkit-backdrop-filter:none;background:linear-gradient(135deg,rgba(10,16,13,.92),rgba(6,10,8,.9))}
+.alex-face{contain:layout paint}

@@ -46,6 +46,8 @@
         window.SkylandVoice.stop();
       }
       card.classList.add('playing');
+      var glass = card.closest('.page-glass');
+      if (glass) glass.classList.add('video-active');
       activeCard = card;
       pauseBg();
       video.currentTime = 0;
@@ -58,6 +60,8 @@
       // Keep the buffered source — first frame == poster, so just rewind.
       try { video.currentTime = 0; } catch (e) { /* not seekable yet */ }
       card.classList.remove('playing');
+      var glassEl = card.closest('.page-glass');
+      if (glassEl) glassEl.classList.remove('video-active');
       if (activeCard === card) {
         activeCard = null;
         resumeBg();
