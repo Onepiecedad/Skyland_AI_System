@@ -75,14 +75,14 @@
       flux_video_cta: "Watch Alex introduce herself",
       flux_h1: "Meet Alex. She answers when you can't.",
       flux_desc: "Alex is Skyland's AI voice agent — trained on our services, pricing and customer cases. She answers questions, qualifies your needs and books a video call straight into our calendar. The same technology can answer your company's phone: no missed calls, no follow-up three days later.",
-      flux_how: "Click the orb or pick a question below. Talk to her like you would to a human — end with the red button. Your browser will ask for microphone access.",
+      flux_how: "Click the orb or pick a question below. Your browser will ask for microphone access.",
 
       // Void intro (smart form copy)
       void_kicker: "LIVE DEMO — SMART FORM",
       void_video_cta: "Watch Alex explain the form",
       void_h2: "A form that answers immediately.",
-      void_sub: "Standard contact forms are black holes — a reply arrives days later, if at all. This form is read by an AI connected to our knowledge base: you get a relevant answer in seconds, tailored to what you write. At the same time a lead card is created in our dashboard — see the next page.",
-      void_hint: "Describe your business and what eats your time. Hit send — the AI response appears in the panel within seconds.",
+      void_sub: "Standard contact forms are black holes — a reply arrives days later. This one is read by an AI connected to our knowledge base and answers in seconds. At the same time, a lead card is created in our dashboard — see the next page.",
+      void_hint: "Describe your business and what eats your time.",
 
       // Dashboard (visitor-facing SCC view)
       dash_kicker: "LIVE DEMO — COMMAND CENTER",
@@ -210,14 +210,14 @@
       flux_video_cta: "Se Alex presentera sig",
       flux_h1: "Möt Alex. Hon svarar när du inte kan.",
       flux_desc: "Alex är Skylands AI-röstagent — tränad på våra tjänster, priser och kundcase. Hon svarar på frågor, kvalificerar ditt behov och bokar videosamtal direkt i kalendern. Samma teknik kan svara i ditt företags telefon: inga missade samtal, ingen återkoppling tre dagar senare.",
-      flux_how: "Klicka på orben eller välj en fråga nedan. Prata med henne som med en människa — avsluta med röda knappen. Webbläsaren frågar efter mikrofonåtkomst.",
+      flux_how: "Klicka på orben eller välj en fråga nedan. Webbläsaren ber om mikrofonåtkomst.",
 
       // Void intro (smart form copy)
       void_kicker: "LIVE DEMO — SMART FORMULÄR",
       void_video_cta: "Se Alex förklara formuläret",
       void_h2: "Ett formulär som svarar direkt.",
-      void_sub: "Vanliga kontaktformulär är svarta hål — svaret kommer efter dagar, om alls. Det här formuläret läses av en AI kopplad till vår kunskapsbas: du får ett relevant svar på sekunder, anpassat efter det du skriver. Samtidigt skapas ett lead-kort i vår dashboard — se nästa sida.",
-      void_hint: "Beskriv din verksamhet och vad som tar mest tid. Skicka — AI-svaret dyker upp i panelen inom några sekunder.",
+      void_sub: "Vanliga kontaktformulär är svarta hål — svaret kommer efter dagar. Det här läses av en AI kopplad till vår kunskapsbas och svarar på sekunder. Samtidigt skapas ett lead-kort i vår dashboard — se nästa sida.",
+      void_hint: "Beskriv din verksamhet och vad som tar mest tid.",
 
       // Dashboard (visitor-facing SCC view)
       dash_kicker: "LIVE DEMO — COMMAND CENTER",
