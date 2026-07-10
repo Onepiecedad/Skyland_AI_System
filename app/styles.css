@@ -586,3 +586,6 @@ main::-webkit-scrollbar{display:none}
 /* ─── Play-knappen under ansiktet, i den nedtonade zonen ─── */
 .alex-face-play{top:auto;bottom:9%;transform:translate(-50%,0)}
 .alex-face:hover .alex-face-play{transform:translate(-50%,0) scale(1.12)}
+
+/* ─── Play-knappen snett till vänster under ansiktet ─── */
+.alex-face-play{left:30%}
