@@ -250,6 +250,19 @@
         onDisconnect: function () {
           console.log('[VOICE] Disconnected from ElevenLabs');
           reportCallEnded('browser_sdk_disconnect');
+          // Telemetry: fire voice_end from the real disconnect event with the
+          // call duration, so the SCC funnel and Hemsida dashboard reflect
+          // completed voice conversations. Replaces the fragile .end-btn click
+          // listener, which never fired when the call ended any other way.
+          if (window.SkylandTracker) {
+            var durationSeconds = callStartedAt
+              ? Math.round((Date.now() - callStartedAt) / 1000)
+              : null;
+            // Field name is `seconds` to match the n8n track-event whitelist
+            // (Validate & Sanitize only passes through d.seconds). Any other
+            // key would be silently stripped before reaching the events table.
+            window.SkylandTracker.track('voice_end', { seconds: durationSeconds });
+          }
           conversation = null;
           setState(STATES.DISCONNECTED);
           showStarters();
@@ -304,6 +317,14 @@
       conversation = await Conversation.startSession(sessionConfig);
 
       console.log('[VOICE] Session started, id:', conversation.getId());
+
+      // Telemetry: fire voice_start from the real SDK lifecycle, not a DOM
+      // click. The old .orb-wrap click listener in tracker.js was unreliable
+      // and left the SCC funnel showing zero voice engagement. This fires
+      // exactly once, only when a session actually connected.
+      if (window.SkylandTracker) {
+        window.SkylandTracker.track('voice_start', {});
+      }
 
     } catch (err) {
       console.error('[VOICE] Start failed:', err);

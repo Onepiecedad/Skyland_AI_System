@@ -99,11 +99,12 @@
       });
     });
 
-    // Voice: orb click = start attempt, end button = end
-    var orb = document.querySelector('.orb-wrap');
-    if (orb) orb.addEventListener('click', function () { track('voice_start', {}); });
-    var endBtn = document.querySelector('.end-btn');
-    if (endBtn) endBtn.addEventListener('click', function () { track('voice_end', {}); });
+    // Voice: voice_start / voice_end are fired from voice.js on the real
+    // ElevenLabs SDK lifecycle (onConnect / onDisconnect), not from DOM clicks.
+    // The old orb/end-btn click listeners were unreliable — clicking the orb
+    // doesn't guarantee a session connects, and the call can end without the
+    // end button (hang-up, tab close, SDK disconnect), so those events were
+    // routinely missed. See app/voice.js.
 
     // Form: first interaction + submit
     var form = document.getElementById('contact-form');
@@ -129,8 +130,10 @@
       roiRate.addEventListener('input', sendRoi);
     }
 
-    // Calendly click — highest intent on the site
-    document.querySelectorAll('a[href*="calendly"]').forEach(function (a) {
+    // Booking CTA click — highest intent on the site. Matches both Calendly
+    // and Cal.com links (the site is migrating to Cal.com), so the booking
+    // funnel step fires regardless of which provider the link points to.
+    document.querySelectorAll('a[href*="calendly"], a[href*="cal.com"]').forEach(function (a) {
       a.addEventListener('click', function () { track('cta_book_click', {}); });
     });
 
