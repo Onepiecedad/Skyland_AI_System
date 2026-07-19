@@ -33,16 +33,17 @@
     var batch = queue.splice(0, MAX_BATCH);
     var payload = JSON.stringify({ session_uuid: sid, events: batch });
 
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(TRACK_URL, new Blob([payload], { type: 'application/json' }));
-    } else {
-      fetch(TRACK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload,
-        keepalive: true
-      }).catch(function () { /* telemetry must never break the site */ });
-    }
+    // OBS: ALDRIG navigator.sendBeacon här — den skickar alltid cookies
+    // (credentials: include, går ej att stänga av) och n8n:s webhook svarar
+    // inte med Access-Control-Allow-Credentials → CORS blockerar allt.
+    // fetch med keepalive ger samma överlevnad vid sidbyte, utan cookies.
+    fetch(TRACK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      credentials: 'omit',
+      keepalive: true
+    }).catch(function () { /* telemetry must never break the site */ });
     if (queue.length > 0) scheduleFlush();
   }
 
