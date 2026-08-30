@@ -4,7 +4,7 @@
  * Shows the visitor their own lead card, built in real time from their
  * session: form submission (with AI response) and voice calls with Alex.
  *
- * Data source: n8n webhook /session-status (POST { session_uuid }).
+ * Data source: SCC webhook /session-status (POST { session_uuid }).
  * Only returns data for the caller's own session UUID — no keys in frontend.
  * Polls every 6s while the dashboard page is in view.
  */
@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var STATUS_WEBHOOK_URL = 'https://onepiecedad.app.n8n.cloud/webhook/session-status';
+  var STATUS_WEBHOOK_URL = 'https://scc.skylandai.se/api/v1/webhooks/site/session-status';
   var POLL_MS = 6000;
 
   var pollTimer = null;

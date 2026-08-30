@@ -70,11 +70,11 @@
     var session = _writeSession(generateSessionId());
     console.log('[SESSION] Created: ' + session.id);
 
-    // Register new session in backend via n8n webhook (fire-and-forget).
+    // Register new session in backend via SCC webhook (fire-and-forget).
     // Only fires for NEW sessions, not resumed ones — the early return
     // on line 66 handles that case. Failure must never block the frontend.
     if (window.SkylandAPI && window.SkylandAPI.fetch) {
-      SkylandAPI.fetch('https://onepiecedad.app.n8n.cloud/webhook/session-init', {
+      SkylandAPI.fetch('https://scc.skylandai.se/api/v1/webhooks/site/session-init', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -84,7 +84,7 @@
         })
       }).catch(function (err) {
         // Webhook failure is a warning, not an error.
-        // The frontend operates independently of n8n availability.
+        // The frontend operates independently of SCC availability.
         console.warn('[SESSION] Failed to register session:', err.message);
       });
     }

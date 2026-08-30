@@ -6,13 +6,13 @@
  * (the same UUID that already binds form/voice/CRM).
  *
  * Events are queued and flushed in batches via sendBeacon/fetch to the
- * n8n track-event webhook, which whitelists types and data fields.
+ * SCC track-event webhook, which whitelists types and data fields.
  */
 
 (function () {
   'use strict';
 
-  var TRACK_URL = 'https://onepiecedad.app.n8n.cloud/webhook/track-event';
+  var TRACK_URL = 'https://scc.skylandai.se/api/v1/webhooks/site/track-event';
   var FLUSH_MS = 5000;
   var MAX_BATCH = 20;
 
@@ -34,7 +34,7 @@
     var payload = JSON.stringify({ session_uuid: sid, events: batch });
 
     // OBS: ALDRIG navigator.sendBeacon här — den skickar alltid cookies
-    // (credentials: include, går ej att stänga av) och n8n:s webhook svarar
+    // (credentials: include, går ej att stänga av) och webhooken svarar
     // inte med Access-Control-Allow-Credentials → CORS blockerar allt.
     // fetch med keepalive ger samma överlevnad vid sidbyte, utan cookies.
     fetch(TRACK_URL, {

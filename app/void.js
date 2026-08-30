@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var VOID_WEBHOOK_URL = 'https://onepiecedad.app.n8n.cloud/webhook/void-submission';
+  var VOID_WEBHOOK_URL = 'https://scc.skylandai.se/api/v1/webhooks/site/void-submission';
 
   var STATES = {
     IDLE: 'idle',
@@ -131,7 +131,7 @@
       return response.json();
     })
     .then(function (data) {
-      // n8n respondWith:allIncomingItems wraps response in array
+      // SCC svarar med ett objekt; n8n svarade med array — båda hanteras
       var result = Array.isArray(data) ? data[0] : data;
       if (result && result.status === 'success') {
         setState(STATES.SUCCESS, result.ai_response);
