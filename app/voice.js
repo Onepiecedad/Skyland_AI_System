@@ -296,13 +296,8 @@
         },
       };
 
-      // 3. Språk-override: en agent, två språk (lang.js). Krävs för engelska sajten.
-      var currentLang = window.SkylandLang ? window.SkylandLang.getCurrentLang() : 'sv';
-      if (currentLang && currentLang !== 'sv') {
-        sessionConfig.overrides = { agent: { language: currentLang } };
-      }
-
-      // 3b. Add Variant 1 firstMessage override if starter was clicked
+      // 3. Add Variant 1 firstMessage override if starter was clicked
+      //    (språket styrs av vilken agent lang.js valde — egen agent per språk)
       if (starterText && window.SkylandLang) {
         var variant1 = window.SkylandLang.getStarterResponse(starterText);
         if (variant1) {
