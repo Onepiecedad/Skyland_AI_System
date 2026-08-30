@@ -13,8 +13,10 @@
   'use strict';
 
   var AGENT_IDS = {
-    sv: 'agent_8701kr69134ge7gvh3a6tcmkhq95',
-    en: 'TDgRNcUoUC1GHVKK0bHH'
+    // Samma agent för båda språken (ligger i SCC:s ElevenLabs-konto); voice.js
+    // skickar language-override så engelska sajten får engelska.
+    sv: 'agent_8301m19fffmqfcv96zgryg5ey3k5',
+    en: 'agent_8301m19fffmqfcv96zgryg5ey3k5'
   };
 
   /**

@@ -16,7 +16,7 @@
 
   var PROXY_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost:8000'
-    : 'https://skyland-voice-proxy.fly.dev';
+    : 'https://scc.skylandai.se/api/v1/webhooks/site';
 
   var STATES = {
     IDLE: 'idle',
@@ -296,15 +296,18 @@
         },
       };
 
-      // 3. Add Variant 1 firstMessage override if starter was clicked
+      // 3. Språk-override: en agent, två språk (lang.js). Krävs för engelska sajten.
+      var currentLang = window.SkylandLang ? window.SkylandLang.getCurrentLang() : 'sv';
+      if (currentLang && currentLang !== 'sv') {
+        sessionConfig.overrides = { agent: { language: currentLang } };
+      }
+
+      // 3b. Add Variant 1 firstMessage override if starter was clicked
       if (starterText && window.SkylandLang) {
         var variant1 = window.SkylandLang.getStarterResponse(starterText);
         if (variant1) {
-          sessionConfig.overrides = {
-            agent: {
-              firstMessage: variant1
-            }
-          };
+          sessionConfig.overrides = sessionConfig.overrides || { agent: {} };
+          sessionConfig.overrides.agent.firstMessage = variant1;
           console.log('[VOICE] Variant 1 override for:', starterText);
           console.log('[VOICE] Alex will say:', variant1.substring(0, 60) + '...');
         } else {
