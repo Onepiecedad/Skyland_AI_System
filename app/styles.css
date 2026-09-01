@@ -771,3 +771,12 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
 /* De roterande orden centreras i boxen — längdskillnaden mellan "Webbyrå"
    och "Marknadsföringsbyrå" gjorde vänsterställningen ojämn. */
 .spin-inner div{justify-content:center}
+
+/* Rubriken på EN rad även med det längsta ordet. Skalad till 42px så
+   "Vi är inte en:" + "Marknadsföringsbyrå" ryms i hero-ytan (uppmätt: 478px
+   ord i en 505px-box, 27px marginal). Scopad till desktop så mobilens
+   viewport-skalning ovan inte överskuggas. */
+@media (min-width:821px){
+  .hero-title{font-size:42px;gap:18px}
+  .spin-box{width:505px;max-width:min(505px,86vw)}
+}
