@@ -19,6 +19,44 @@
     ERROR: 'error'
   };
 
+  // Panelen skrev tidigare sina egna strängar rakt in i DOM:en: knappen sa
+  // TRANSMIT oavsett språk (kvar från mallen) och allt annat var svenska även
+  // med EN valt. Här ligger båda språken, och tr() slår upp vid varje rendering
+  // så att ett språkbyte följer med.
+  var T = {
+    sv: {
+      ai_title: 'AUTOMATISKT AI-SVAR',
+      waiting: 'Väntar på ditt meddelande…',
+      analyzing: 'Analyserar...',
+      step_profile: 'Skapar lead-profil',
+      step_kb: 'Söker i kunskapsbas',
+      step_answer: 'Genererar svar',
+      registered: 'Ärendet är registrerat. Joakim återkommer personligen inom kort.',
+      btn_send: 'SKICKA',
+      btn_sending: 'SKICKAR...',
+      btn_sent: 'SKICKAT',
+    },
+    en: {
+      ai_title: 'AUTOMATED AI RESPONSE',
+      waiting: 'Waiting for your message…',
+      analyzing: 'Analysing...',
+      step_profile: 'Building lead profile',
+      step_kb: 'Searching the knowledge base',
+      step_answer: 'Writing the answer',
+      registered: 'Your message is logged. Joakim will get back to you personally shortly.',
+      btn_send: 'SEND',
+      btn_sending: 'SENDING...',
+      btn_sent: 'SENT',
+    }
+  };
+  function lang() {
+    try {
+      if (window.SkylandLang && window.SkylandLang.getCurrentLang) return window.SkylandLang.getCurrentLang();
+      return localStorage.getItem('skyland_lang') || 'sv';
+    } catch (e) { return 'sv'; }
+  }
+  function tr(key) { return (T[lang()] || T.sv)[key]; }
+
   var ERROR_MESSAGES = {
     INVALID_INPUT: 'Något i formuläret behöver justeras. Kolla att alla fält är ifyllda korrekt.',
     MISSING_CONSENT: 'Du behöver godkänna att vi behandlar dina uppgifter innan vi kan ta emot meddelandet.',
@@ -164,14 +202,14 @@
         responseContainer.innerHTML =
           '<div class="ai-response-title">' +
             '<span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span>' +
-            '<span>AUTOMATED AI RESPONSE</span>' +
+            '<span>' + tr('ai_title') + '</span>' +
           '</div>' +
           '<div class="ai-response-body">' +
-            '<p class="void-placeholder">Inväntar inkommande transmission...</p>' +
+            '<p class="void-placeholder">' + tr('waiting') + '</p>' +
           '</div>';
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span>TRANSMIT</span><span class="material-symbols-outlined" style="font-size:16px">send</span>';
+          submitBtn.innerHTML = '<span>' + tr('btn_send') + '</span><span class="material-symbols-outlined" style="font-size:16px">send</span>';
           // Re-check consent state
           var cb = document.getElementById('void-consent');
           if (cb) submitBtn.disabled = !cb.checked;
@@ -182,20 +220,20 @@
         responseContainer.innerHTML =
           '<div class="ai-response-title">' +
             '<span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span>' +
-            '<span>AUTOMATED AI RESPONSE</span>' +
+            '<span>' + tr('ai_title') + '</span>' +
           '</div>' +
           '<div class="ai-response-body">' +
             '<div class="void-processing">' +
               '<div class="void-pulse"></div>' +
-              '<p>Analyserar...</p>' +
-              '<p class="void-substep">Skapar lead-profil</p>' +
-              '<p class="void-substep">Söker i kunskapsbas</p>' +
-              '<p class="void-substep">Genererar svar</p>' +
+              '<p>' + tr('analyzing') + '</p>' +
+              '<p class="void-substep">' + tr('step_profile') + '</p>' +
+              '<p class="void-substep">' + tr('step_kb') + '</p>' +
+              '<p class="void-substep">' + tr('step_answer') + '</p>' +
             '</div>' +
           '</div>';
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.innerHTML = '<span>PROCESSING...</span>';
+          submitBtn.innerHTML = '<span>' + tr('btn_sending') + '</span>';
         }
         animateSubsteps();
         break;
@@ -204,15 +242,15 @@
         responseContainer.innerHTML =
           '<div class="ai-response-title">' +
             '<span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span>' +
-            '<span>AUTOMATED AI RESPONSE</span>' +
+            '<span>' + tr('ai_title') + '</span>' +
           '</div>' +
           '<div class="ai-response-body void-success-body">' +
             '<p class="void-response-text">' + escapeHtml(content) + '</p>' +
-            '<div class="void-response-meta">Ärendet är registrerat. Joakim återkommer personligen inom kort.</div>' +
+            '<div class="void-response-meta">' + tr('registered') + '</div>' +
           '</div>';
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.innerHTML = '<span>TRANSMITTED</span><span class="material-symbols-outlined" style="font-size:16px">check</span>';
+          submitBtn.innerHTML = '<span>' + tr('btn_sent') + '</span><span class="material-symbols-outlined" style="font-size:16px">check</span>';
         }
         break;
 
@@ -220,14 +258,14 @@
         responseContainer.innerHTML =
           '<div class="ai-response-title">' +
             '<span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span>' +
-            '<span>AUTOMATED AI RESPONSE</span>' +
+            '<span>' + tr('ai_title') + '</span>' +
           '</div>' +
           '<div class="ai-response-body">' +
             '<p class="void-error-text">' + escapeHtml(content) + '</p>' +
           '</div>';
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span>TRANSMIT</span><span class="material-symbols-outlined" style="font-size:16px">send</span>';
+          submitBtn.innerHTML = '<span>' + tr('btn_send') + '</span><span class="material-symbols-outlined" style="font-size:16px">send</span>';
           var cb2 = document.getElementById('void-consent');
           if (cb2) submitBtn.disabled = !cb2.checked;
         }
