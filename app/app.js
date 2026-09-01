@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cooldown = now;
     if (layout.center === 'flux' && window.SkylandVoice) window.SkylandVoice.stop();
     const incoming = layout[dir];
+    markLearned(dir);
     beginSwapPerf();
     // Nollställ scrollen INNAN panelen börjar röra sig — görs den efteråt
     // hoppar innehållet synligt medan skivan glider in.
@@ -163,6 +164,23 @@ document.addEventListener('DOMContentLoaded', () => {
   minimap.querySelector('.fnav-alex').addEventListener('click', () => focusPane('flux'));
   minimap.querySelector('.fnav-collapse').addEventListener('click', () => { minimap.hidden = true; collapsedBtn.hidden = false; });
   collapsedBtn.addEventListener('click', () => { collapsedBtn.hidden = true; minimap.hidden = false; });
+
+  // Kantpilarna lär ut svepet på mobil. När en riktning väl använts slutar den
+  // pulsa och blir en svag vilogöd — fyra saker som blinkar i evighet är brus
+  // för den som redan kan sajten. Sparas per webbläsare.
+  const LEARNED_KEY = 'skyland_swipe_learned';
+  let learned = new Set();
+  try { learned = new Set(JSON.parse(localStorage.getItem(LEARNED_KEY) || '[]')); } catch (e) { /* ignore */ }
+  function applyLearned() {
+    DIRECTIONS.forEach(d => edges[d].classList.toggle('is-learned', learned.has(d)));
+  }
+  function markLearned(dir) {
+    if (learned.has(dir)) return;
+    learned.add(dir);
+    try { localStorage.setItem(LEARNED_KEY, JSON.stringify([...learned])); } catch (e) { /* ignore */ }
+    applyLearned();
+  }
+  applyLearned();
 
   function updateWidget() {
     DIRECTIONS.forEach(dir => {
