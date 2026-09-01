@@ -79,11 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // med. Därför pausas båda under swappen och återställs när den är klar.
   let swapTimer = null;
   function beginSwapPerf() {
-    document.body.classList.add('is-swapping');
+    // Bara WebGL-bakgrunden pausas. Att även slå av glasets backdrop-filter
+    // gav ~4 fps till men syntes som ett ryck i första bildrutan (glaset bytte
+    // utseende precis när rörelsen startade), så det är borttaget.
     if (window.SkylandBG && typeof window.SkylandBG.pause === 'function') window.SkylandBG.pause();
     clearTimeout(swapTimer);
     swapTimer = setTimeout(() => {
-      document.body.classList.remove('is-swapping');
       if (window.SkylandBG && typeof window.SkylandBG.resume === 'function') window.SkylandBG.resume();
     }, 880);
   }
@@ -95,9 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (layout.center === 'flux' && window.SkylandVoice) window.SkylandVoice.stop();
     const incoming = layout[dir];
     beginSwapPerf();
+    // Nollställ scrollen INNAN panelen börjar röra sig — görs den efteråt
+    // hoppar innehållet synligt medan skivan glider in.
+    pages[incoming].scrollTop = 0;
     layout = { ...layout, center: incoming, [dir]: layout.center };
     applyLayout();
-    pages[incoming].scrollTop = 0;
   }
 
   function focusPane(id) {
