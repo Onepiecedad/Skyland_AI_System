@@ -746,3 +746,10 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
    med högre specificitet — därför blev den STÖRRE på den mindre avataren. */
 .alex-face--sm .alex-face-play{width:40px;height:40px;bottom:4%}
 .alex-face--sm .alex-face-play .material-symbols-outlined{font-size:20px}
+
+/* Kantpilarna indragna från ytterkanten — 34px runt om ger balans mot
+   sidramen i stället för att nudda den (prototypat live). */
+.fnav-edge--left{left:34px}
+.fnav-edge--right{right:34px}
+.fnav-edge--up{top:78px}
+.fnav-edge--down{bottom:26px}
