@@ -9,7 +9,7 @@
       hero_spin_3: "Software developer",
       hero_spin_4: "Marketing agency",
       hero_spin_5: "Web agency",
-      hero_desc: "We're all four — but that's not what you're buying. You're getting rid of problems that cost time and money: missed customers, evening admin and leads that never become business. You get the result. We handle the rest.",
+      hero_desc: "We're all four — but what you're buying is getting rid of problems: missed customers, evening admin and leads that never become business. You get the result. We handle the rest.",
       hero_tag: "FEWER MISSED CUSTOMERS · LESS ADMIN · MORE BUSINESS FROM WHAT YOU ALREADY HAVE",
 
       // Neural
@@ -168,7 +168,7 @@
       hero_spin_3: "Mjukvaruutvecklare",
       hero_spin_4: "Marknadsföringsbyrå",
       hero_spin_5: "Webbyrå",
-      hero_desc: "Vi är alla fyra — men det är inte det du köper. Du köper bort problem som kostar tid och pengar: missade kunder, kvällsadmin och leads som aldrig blir affär. Du får resultatet. Vi sköter resten.",
+      hero_desc: "Vi är alla fyra — men det du köper är att bli av med problem: missade kunder, kvällsadmin och leads som aldrig blir affär. Du får resultatet. Vi sköter resten.",
       hero_tag: "FÄRRE MISSADE KUNDER · MINDRE ADMIN · MER AFFÄR UR DET DU REDAN HAR",
 
       // Neural
