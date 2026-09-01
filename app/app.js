@@ -73,12 +73,28 @@ document.addEventListener('DOMContentLoaded', () => {
     window.dispatchEvent(new CustomEvent('skyland:page', { detail: { page: layout.center } }));
   }
 
+  // Glidningen kostar: varje panel i rörelse tvingar omräkning av
+  // page-glass backdrop-filter, och WebGL-shadern ritar samtidigt. Uppmätt i
+  // preview: 17 fps / värsta bildruta 252 ms utan avlastning, 36 fps / 100 ms
+  // med. Därför pausas båda under swappen och återställs när den är klar.
+  let swapTimer = null;
+  function beginSwapPerf() {
+    document.body.classList.add('is-swapping');
+    if (window.SkylandBG && typeof window.SkylandBG.pause === 'function') window.SkylandBG.pause();
+    clearTimeout(swapTimer);
+    swapTimer = setTimeout(() => {
+      document.body.classList.remove('is-swapping');
+      if (window.SkylandBG && typeof window.SkylandBG.resume === 'function') window.SkylandBG.resume();
+    }, 620);
+  }
+
   function navigate(dir) {
     const now = Date.now();
     if (now - cooldown < 450) return;
     cooldown = now;
     if (layout.center === 'flux' && window.SkylandVoice) window.SkylandVoice.stop();
     const incoming = layout[dir];
+    beginSwapPerf();
     layout = { ...layout, center: incoming, [dir]: layout.center };
     applyLayout();
     pages[incoming].scrollTop = 0;

@@ -780,3 +780,8 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
   .hero-title{font-size:42px;gap:18px}
   .spin-box{width:505px;max-width:min(505px,86vw)}
 }
+
+/* Under sidbytet stängs det dyra glaset av — backdrop-filter måste annars
+   räknas om per bildruta för varje panel i rörelse. Skillnaden är mätbar
+   (värsta bildruta 252 ms -> 100 ms tillsammans med pausad WebGL-bakgrund). */
+body.is-swapping .page-glass{backdrop-filter:none;-webkit-backdrop-filter:none}
