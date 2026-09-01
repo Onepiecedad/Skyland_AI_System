@@ -740,3 +740,9 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
 .alex-face:hover .alex-face-play{transform:translate(-50%,0) scale(1.1);background:rgba(12,196,129,.28)}
 .alex-face-play .material-symbols-outlined{font-size:27px}
 @media (prefers-reduced-motion:reduce){.alex-face-play{animation:none}}
+
+/* Kontaktsidans mindre avatar: knappen skalas ned till samma andel av
+   ansiktets bredd som demosidan (~18%). Ett äldre lager satte den till 62px
+   med högre specificitet — därför blev den STÖRRE på den mindre avataren. */
+.alex-face--sm .alex-face-play{width:40px;height:40px;bottom:4%}
+.alex-face--sm .alex-face-play .material-symbols-outlined{font-size:20px}
