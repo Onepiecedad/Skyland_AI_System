@@ -162,8 +162,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (b.dataset.dir !== 'center') b.addEventListener('click', () => navigate(b.dataset.dir));
   });
   minimap.querySelector('.fnav-alex').addEventListener('click', () => focusPane('flux'));
-  minimap.querySelector('.fnav-collapse').addEventListener('click', () => { minimap.hidden = true; collapsedBtn.hidden = false; });
-  collapsedBtn.addEventListener('click', () => { collapsedBtn.hidden = true; minimap.hidden = false; });
+  // Sidorna reserverar en remsa i underkant åt navigationskorset. Är korset
+  // ihopfällt behövs bara plats för den lilla knappen, och kortet får växa in
+  // i resten — annars står 45 px oanvända på varje sida. Läget sparas så att
+  // det överlever en omladdning.
+  const COLLAPSE_KEY = 'skyland_cross_collapsed';
+  function setCollapsed(on, persist) {
+    minimap.hidden = on;
+    collapsedBtn.hidden = !on;
+    document.body.classList.toggle('fnav-is-collapsed', on);
+    if (persist) { try { localStorage.setItem(COLLAPSE_KEY, on ? '1' : '0'); } catch (e) { /* ignore */ } }
+  }
+  minimap.querySelector('.fnav-collapse').addEventListener('click', () => setCollapsed(true, true));
+  collapsedBtn.addEventListener('click', () => setCollapsed(false, true));
+  try { if (localStorage.getItem(COLLAPSE_KEY) === '1') setCollapsed(true, false); } catch (e) { /* ignore */ }
 
   // Kantpilarna lär ut svepet på mobil. När en riktning väl använts slutar den
   // pulsa och blir en svag vilogöd — fyra saker som blinkar i evighet är brus

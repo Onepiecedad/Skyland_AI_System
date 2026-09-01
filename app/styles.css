@@ -1251,11 +1251,17 @@ main { overscroll-behavior: none; }
   #flux .intro-desc { -webkit-line-clamp: 6; }
 }
 
-/* På låga skärmar räcker inte utrymmet till hela hero-texten när den sätts i
-   Inter/Manrope — mätt i fallback-typsnitt såg det ut att gå ihop, vilket var
-   fel. Sammanfattningen kortas till tre rader; hela resonemanget står ändå på
-   Tjänster. Över 720 px höjd visas den i sin helhet. */
-@media (max-width: 820px) and (max-height: 730px) {
+/* Nödutgången för låga skärmar. Med mindre rubrik och brödtext ryms hela
+   hero-texten så fort navigationskorset är ihopfällt — då är kortet 41 px
+   högre. Är korset utfällt och skärmen låg klipps sammanfattningen till tre
+   rader; hela resonemanget står ändå på Tjänster. Tröskeln låg först på 730 px
+   oavsett kors, vilket klippte texten i onödan på de flesta telefoner. */
+@media (max-width: 820px) and (max-height: 780px) {
+  body:not(.fnav-is-collapsed) #core .hero-desc {
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+}
+@media (max-width: 820px) and (max-height: 660px) {
   #core .hero-desc {
     display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   }
@@ -1263,4 +1269,36 @@ main { overscroll-behavior: none; }
   #core .path-card { padding: calc(6 * var(--k) * 1px) 14px; }
   #core .path-card p { font-size: calc(12 * var(--k) * 1px); line-height: 1.35; }
   #core .hero-title { gap: 2px; }
+}
+
+/* ── Underkanten var död yta (2026-09-01) ──────────────────────────────────
+   .page reserverar 91 px + safe-area i botten åt navigationskorset. Är korset
+   ihopfällt står bara en 42 px knapp där, och resten — omkring 45 px på varje
+   sida — är tom skärm under kortet. Jag mätte innehåll mot KORTET och såg
+   noll tomrum; felet var att kortet självt inte gick ner till skärmen.
+   ─────────────────────────────────────────────────────────────────────── */
+@media (max-width: 820px) {
+  body.fnav-is-collapsed .page { padding-bottom: calc(50px + env(safe-area-inset-bottom)); }
+  body.fnav-is-collapsed .fnav-edge--down { bottom: calc(54px + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 820px) {
+  /* Tomrutan på Systemet fyllde hela panelytan och blev en 400 px hög låda med
+     tre rader i mitten. Den får ta den plats den behöver; resten fördelas
+     mellan blocken i stället. */
+  #dashboard .dash-panels { align-items: center; }
+  #dashboard .dash-panel.active { max-height: 100%; }
+  #dashboard .dash-empty { height: auto; max-height: 100%; }
+  #dashboard .dash-inner { justify-content: space-between; }
+
+  /* Demo: space-between sköt röstpanelen ända ner och lämnade ett hål under
+     texten. Raderna får ligga i mitten med en jämn lucka i stället. */
+  #flux .flux-columns { align-content: center; row-gap: clamp(14px, 3vh, 40px); }
+}
+
+@media (max-width: 820px) {
+  /* Tomrutan ska vara så stor som sitt innehåll och sitta mitt i panelytan —
+     inte sträckas till en 280 px hög låda med hundra px luft i botten. */
+  #dashboard .dash-panel.active { display: flex; align-items: center; justify-content: center; }
+  #dashboard .dash-empty { width: 100%; }
 }
