@@ -730,3 +730,13 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
 /* Playknappen centrerad under ansiktet (sent lager hade satt den på left:30%) */
 .alex-face-play{left:50%;transform:translate(-50%,0)}
 .alex-face:hover .alex-face-play{transform:translate(-50%,0) scale(1.12)}
+
+/* ─── Playknappen: glas i hologrammet (2026-09-01) ───
+   Ersätter den solida gröna pucken: halvtransparent, backdrop-blur, tunn
+   grön ram och mjukt pulserande glöd. Lägre (bottom 3%) och lätt högerjusterad
+   (left 52%) så den centrerar under ansiktet i videon. Prototypad live. */
+.alex-face-play{left:52%;top:auto;bottom:3%;transform:translate(-50%,0);width:54px;height:54px;background:rgba(12,196,129,.14);border:1px solid rgba(67,225,155,.5);color:var(--primary);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 0 22px rgba(12,196,129,.35),inset 0 0 12px rgba(12,196,129,.15);animation:playGlow 2.6s ease-in-out infinite}
+@keyframes playGlow{0%,100%{box-shadow:0 0 16px rgba(12,196,129,.25),inset 0 0 10px rgba(12,196,129,.12)}50%{box-shadow:0 0 30px rgba(12,196,129,.55),inset 0 0 16px rgba(12,196,129,.25)}}
+.alex-face:hover .alex-face-play{transform:translate(-50%,0) scale(1.1);background:rgba(12,196,129,.28)}
+.alex-face-play .material-symbols-outlined{font-size:27px}
+@media (prefers-reduced-motion:reduce){.alex-face-play{animation:none}}
