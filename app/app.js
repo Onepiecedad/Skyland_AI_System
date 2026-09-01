@@ -4,7 +4,7 @@
  * (synlig), fyra grannar parkerade utanför skärmen åt sina håll. En
  * navigation = mitten byter plats med vald granne; båda glider. Dragbart
  * navigationskors (minimap), kantpilar med grannens namn på desktop,
- * piltangenter, kant-swipe med trackpad, touch-swipe i sidled på mobil.
+ * piltangenter, kant-swipe med trackpad, touch-swipe i fyra riktningar på mobil.
  * Sid-id:n oförändrade (core/neural/dashboard/flux/void) så session-, void-,
  * voice-, dashboard- och tracker-modulerna fungerar orörda.
  */
@@ -192,6 +192,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Klick på data-target (kundvägskorten, dash-cta) ──
+  // Ett svep som råkar starta på ett kort ska byta sida — inte också trycka på
+  // kortet. Vakten ligger först i capture-fasen och äter den klicken.
+  let swipeGuardUntil = 0;
+  document.addEventListener('click', (e) => {
+    if (Date.now() < swipeGuardUntil) { e.stopPropagation(); e.preventDefault(); }
+  }, true);
+
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-target]');
     if (btn && PAGE_IDS.includes(btn.getAttribute('data-target'))) focusPane(btn.getAttribute('data-target'));
@@ -218,6 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function canScroll(el, dir) {
     if (!el) return false;
+    // Ett element med overflow:hidden har högt scrollHeight men rör sig aldrig.
+    // Utan den här kontrollen blockerar det vertikal navigation för alltid.
+    const oy = getComputedStyle(el).overflowY;
+    if (oy !== 'auto' && oy !== 'scroll' && oy !== 'overlay') return false;
     if (dir === 'down') return el.scrollHeight - el.clientHeight - el.scrollTop > SCROLL_EPS;
     if (dir === 'up') return el.scrollTop > SCROLL_EPS;
     return false;
@@ -253,17 +264,71 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, { passive: false });
 
-  // ── Touch-swipe i sidled (mobil) — vertikalt lämnas åt inre scroll ──
+  // ── Touch-swipe (mobil) — samma kors som allt annat, alla fyra riktningar ──
+  // Tre saker gör gesten stabil i stället för svajig:
+  //  1. Axellås: den dominerande riktningen måste vara TOUCH_AXIS gånger den
+  //     andra, annars händer ingenting. En diagonal ska inte gissa åt ett håll.
+  //  2. Sträcka ELLER fart: en lugn svep måste gå TOUCH_MIN px, men en snärt
+  //     räcker på TOUCH_FLICK px om farten är över TOUCH_FLICK_V px/ms.
+  //  3. Scrolläget läses vid touchstart, inte vid touchend. Läses det efteråt
+  //     har fingret redan scrollat panelen till kanten, och samma svep som
+  //     scrollade skulle också byta sida — det var det som kändes ryckigt.
+  const TOUCH_MIN = 56;
+  const TOUCH_FLICK = 30;
+  const TOUCH_FLICK_V = 0.45;
+  const TOUCH_AXIS = 1.25;
+  const TOUCH_MAX_MS = 800;
+  // Fält och länkar äger sina egna gester; korset håller sig undan där.
+  const OWN_GESTURE = 'input,textarea,select,a[href],.fnav-minimap,.lang-switch';
+
   let touch = null;
+
+  function scrollerFor(target) {
+    const inner = target && target.closest ? target.closest('.page-glass, textarea') : null;
+    return (inner && inner.scrollHeight > inner.clientHeight) ? inner : pages[layout.center];
+  }
+  function tourIsOpen() {
+    const o = document.getElementById('tour-overlay');
+    return !!o && !o.hidden;
+  }
+
   document.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1) touch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    if (e.touches.length !== 1 || tourIsOpen()) { touch = null; return; }
+    const t = e.touches[0];
+    const scroller = scrollerFor(e.target);
+    touch = {
+      x: t.clientX, y: t.clientY, at: Date.now(),
+      free: !(e.target.closest && e.target.closest(OWN_GESTURE)),
+      canUp: canScroll(scroller, 'up'), canDown: canScroll(scroller, 'down'),
+    };
   }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 1) touch = null;      // nyp/zoom är inte navigation
+  }, { passive: true });
+  document.addEventListener('touchcancel', () => { touch = null; }, { passive: true });
+
   document.addEventListener('touchend', (e) => {
-    if (!touch) return;
-    const dx = e.changedTouches[0].clientX - touch.x;
-    const dy = e.changedTouches[0].clientY - touch.y;
+    const t = touch;
     touch = null;
-    if (Math.abs(dx) > 70 && Math.abs(dx) > 2.2 * Math.abs(dy)) navigate(dx < 0 ? 'right' : 'left');
+    if (!t || !t.free) return;
+    const dx = e.changedTouches[0].clientX - t.x;
+    const dy = e.changedTouches[0].clientY - t.y;
+    const dt = Math.max(1, Date.now() - t.at);
+    if (dt > TOUCH_MAX_MS) return;               // långsamt drag är ingen svep
+
+    const ax = Math.abs(dx), ay = Math.abs(dy);
+    const horiz = ax >= ay;
+    const main = horiz ? ax : ay;
+    const cross = horiz ? ay : ax;
+    if (main < cross * TOUCH_AXIS) return;       // för diagonal — gissa inte
+    if (main < TOUCH_MIN && !(main >= TOUCH_FLICK && main / dt >= TOUCH_FLICK_V)) return;
+
+    const dir = horiz ? (dx < 0 ? 'right' : 'left') : (dy < 0 ? 'down' : 'up');
+    // Vertikalt: panelen får scrolla färdigt först.
+    if (!horiz && (dir === 'down' ? t.canDown : t.canUp)) return;
+    swipeGuardUntil = Date.now() + 450;          // svepet ska inte också klicka
+    navigate(dir);
   }, { passive: true });
 
   // ── Start: hash-djuplänk vinner över sparat läge ──
