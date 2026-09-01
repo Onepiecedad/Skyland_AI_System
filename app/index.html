@@ -42,7 +42,7 @@
   <!-- Header -->
   <header>
     <div class="logo">
-      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">blur_on</span>
+      <img class="logo-mark" src="media/logo.png" alt=""/>
       Skyland Ai System
     </div>
     <div class="lang-switcher">
@@ -50,30 +50,6 @@
       <button id="lang-en" class="lang-btn" onclick="SkylandI18n.setLang('en')">EN</button>
     </div>
   </header>
-
-  <!-- Tabbnavigering (SCC-stil, 2026-09-01) -->
-  <nav class="site-nav" id="site-nav" aria-label="Huvudnavigering">
-    <button class="site-nav-btn active" data-page="core">
-      <span class="material-symbols-outlined">grid_view</span>
-      <span class="label" data-i18n="nav_hem">Hem</span>
-    </button>
-    <button class="site-nav-btn" data-page="neural">
-      <span class="material-symbols-outlined">handshake</span>
-      <span class="label" data-i18n="nav_tjanster">Tjänster</span>
-    </button>
-    <button class="site-nav-btn" data-page="dashboard">
-      <span class="material-symbols-outlined">monitoring</span>
-      <span class="label" data-i18n="nav_system">Systemet</span>
-    </button>
-    <button class="site-nav-btn" data-page="flux">
-      <span class="material-symbols-outlined">mic</span>
-      <span class="label" data-i18n="nav_demo">Demo</span>
-    </button>
-    <button class="site-nav-btn" data-page="void">
-      <span class="material-symbols-outlined">calendar_month</span>
-      <span class="label" data-i18n="nav_kontakt">Kontakt</span>
-    </button>
-  </nav>
 
   <main>
 
@@ -232,7 +208,7 @@
               <span class="dash-cta-note" data-i18n="dash_cta_free">Free · honest assessment · no strings</span>
             </div>
             <h2 data-i18n="void_h2">A form that answers immediately.</h2>
-            <p data-i18n="void_sub">Standard contact forms are black holes — a reply arrives days later, if at all. This form is read by an AI connected to our knowledge base: you get a relevant answer in seconds, tailored to what you write. At the same time a lead card is created in our dashboard — see the next page.</p>
+            <p data-i18n="void_sub">Vanliga kontaktformulär är svarta hål — svaret kommer dagar senare, om alls. Det här läses av en AI kopplad till vår kunskapsbas: du får ett relevant svar på sekunder. Samtidigt skapas ett lead-kort i vårt command center — se sidan Systemet.</p>
             <p class="intro-how" style="margin-bottom:24px"><span class="material-symbols-outlined" style="font-size:15px">edit_note</span> <span data-i18n="void_hint">Describe your business and what eats your time. Hit send — the AI response appears in the panel within seconds.</span></p>
             <form id="contact-form">
               <div class="form-grid">
@@ -283,17 +259,7 @@
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
               </button>
             </div>
-            <div class="scan-header">
-              <div class="scan-title"><span class="dot"></span><span data-i18n="scan_title">LEAD PROFILE SCAN</span></div>
-              <span class="scan-status" data-i18n="scan_status">NODE_ACTIVE</span>
-            </div>
             <div style="display:flex;flex-direction:column;gap:24px;flex:1">
-              <div class="profile-card">
-                <div class="profile-row"><span class="pk">NAME</span><span class="pv" id="scan-name">—</span></div>
-                <div class="profile-row"><span class="pk">EMAIL</span><span class="pv" id="scan-email">—</span></div>
-                <div class="profile-row"><span class="pk">COMPANY</span><span class="pv" id="scan-company">—</span></div>
-                <div class="profile-row"><span class="pk">PHONE</span><span class="pv" id="scan-phone">—</span></div>
-              </div>
               <div class="ai-response" id="void-ai-response" data-state="idle">
                 <div class="ai-response-title">
                   <span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span>
@@ -303,6 +269,10 @@
                   <p class="void-placeholder">Inväntar inkommande transmission...</p>
                 </div>
               </div>
+              <button class="dash-cta kontakt-to-system" data-target="dashboard">
+                <span class="material-symbols-outlined" style="font-size:16px">monitoring</span>
+                <span data-i18n="kontakt_to_system">Se ditt lead-kort byggas på Systemet →</span>
+              </button>
             </div>
           </div>
         </div>

@@ -63,6 +63,7 @@
       placeholder_phone: "Enter Phone",
       placeholder_message: "Transmit data block...",
       transmit_btn: "TRANSMIT",
+      kontakt_to_system: "Watch your lead card build on The System →",
       nav_hem: "Home",
       nav_tjanster: "Services",
       nav_system: "The System",
@@ -104,7 +105,7 @@
       void_kicker: "CONTACT & BOOKING",
       void_video_cta: "Watch Alex explain the form",
       void_h2: "A form that answers immediately.",
-      void_sub: "Standard contact forms are black holes — a reply arrives days later. This one is read by an AI connected to our knowledge base and answers in seconds. At the same time, a lead card is created in our dashboard — see the next page.",
+      void_sub: "Standard contact forms are black holes — a reply arrives days later, if at all. This form is read by an AI connected to our knowledge base: you get a relevant answer in seconds. At the same time a lead card is created in our command center — see The System page.",
       void_hint: "Describe your business and what eats your time.",
 
       // Dashboard (visitor-facing SCC view)
@@ -221,6 +222,7 @@
       placeholder_phone: "Ange telefon",
       placeholder_message: "Skriv ditt meddelande...",
       transmit_btn: "SKICKA",
+      kontakt_to_system: "Se ditt lead-kort byggas på Systemet →",
       nav_hem: "Hem",
       nav_tjanster: "Tjänster",
       nav_system: "Systemet",
@@ -262,7 +264,7 @@
       void_kicker: "KONTAKT & BOKA",
       void_video_cta: "Se Alex förklara formuläret",
       void_h2: "Ett formulär som svarar direkt.",
-      void_sub: "Vanliga kontaktformulär är svarta hål — svaret kommer efter dagar. Det här läses av en AI kopplad till vår kunskapsbas och svarar på sekunder. Samtidigt skapas ett lead-kort i vår dashboard — se nästa sida.",
+      void_sub: "Vanliga kontaktformulär är svarta hål — svaret kommer dagar senare, om alls. Det här läses av en AI kopplad till vår kunskapsbas: du får ett relevant svar på sekunder. Samtidigt skapas ett lead-kort i vårt command center — se sidan Systemet.",
       void_hint: "Beskriv din verksamhet och vad som tar mest tid.",
 
       // Dashboard (visitor-facing SCC view)

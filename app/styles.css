@@ -604,27 +604,42 @@ main::-webkit-scrollbar{display:none}
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Femsidor + tabbnavigering + rundtur (2026-09-01)
-   SCC-stil segmented control ersätter scroll-snap. Ligger sist i
-   kaskaden med avsikt — det här lagret äger sidvisningslogiken.
+   Femsidor + Cross Swap Navigation + rundtur (2026-09-01)
+   Porterad från SCC:s FocusNavigator: fem alltid-monterade paneler,
+   mitten synlig, grannarna parkerade utanför skärmen. En navigation =
+   swap; båda panelerna glider. Ligger sist i kaskaden med avsikt.
    ══════════════════════════════════════════════════════════════════ */
 
 /* Gammal navigering bort */
-.sidebar,.scroll-indicator,.scroll-progress,.scroll-arrow{display:none!important}
+.sidebar,.scroll-indicator,.scroll-progress,.scroll-arrow,.site-nav{display:none!important}
 
-/* Tabbnav — pillerknappar som i Command Center */
-.site-nav{position:fixed;top:62px;left:50%;transform:translateX(-50%);z-index:60;display:flex;gap:4px;padding:5px;background:rgba(8,18,14,.78);border:1px solid rgba(67,225,155,.22);border-radius:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-.site-nav-btn{display:flex;align-items:center;gap:7px;padding:8px 15px;border:none;background:transparent;color:var(--on-surface-var);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;letter-spacing:.03em;border-radius:10px;cursor:pointer;transition:background .18s ease,color .18s ease;white-space:nowrap}
-.site-nav-btn .material-symbols-outlined{font-size:18px}
-.site-nav-btn:hover{color:var(--on-bg)}
-.site-nav-btn.active{background:rgba(67,225,155,.16);color:var(--primary);box-shadow:inset 0 0 0 1px rgba(67,225,155,.45)}
-
-/* Sidvisning: en åt gången, egen inre scroll */
-main{height:auto;min-height:100dvh;overflow:visible;scroll-snap-type:none;scroll-behavior:auto}
-.page{display:none;min-height:100dvh;height:100dvh;overflow-y:auto;scroll-snap-align:none;scroll-snap-stop:normal;padding:124px 32px 32px;scrollbar-width:thin;scrollbar-color:rgba(67,225,155,.35) transparent}
-.page.active{display:flex;align-items:center;justify-content:center;animation:pageIn .28s ease}
-@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* Viewport + paneler */
+main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-behavior:auto}
+.page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;min-height:0;height:auto;overflow-y:auto;overflow-x:hidden;padding:96px 32px 32px;will-change:transform;scroll-snap-align:none;scroll-snap-stop:normal;scrollbar-width:thin;scrollbar-color:rgba(67,225,155,.35) transparent;visibility:hidden;pointer-events:none;transition:transform .55s cubic-bezier(.22,.9,.28,1),visibility 0s linear .55s}
+.page.active{visibility:visible;pointer-events:auto;z-index:2;transition:transform .55s cubic-bezier(.22,.9,.28,1),visibility 0s linear 0s}
 .page-glass{opacity:1!important;transform:none!important}
+
+/* ── Kantpilar med grannens namn (desktop — mobilen har korset) ── */
+.fnav-edge{position:fixed;z-index:60;display:flex;align-items:center;gap:4px;padding:6px 11px;border-radius:10px;border:1px solid rgba(67,225,155,.18);background:rgba(6,20,14,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:rgba(67,225,155,.6);font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;cursor:pointer;opacity:.5;transition:opacity .15s ease,color .15s ease,border-color .15s ease}
+.fnav-edge:hover{opacity:1;color:var(--primary);border-color:rgba(67,225,155,.45)}
+.fnav-edge--up{top:64px;left:50%;transform:translateX(-50%)}
+.fnav-edge--down{bottom:10px;left:50%;transform:translateX(-50%)}
+.fnav-edge--left{left:10px;top:50%;transform:translateY(-50%)}
+.fnav-edge--right{right:10px;top:50%;transform:translateY(-50%);flex-direction:row-reverse}
+
+/* ── Navigationskorset ── */
+.fnav-minimap{position:fixed;z-index:70;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,auto);gap:3px;padding:8px;border-radius:14px;border:1px solid rgba(67,225,155,.15);background:rgba(4,14,10,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);opacity:.65;transition:opacity .15s ease}
+.fnav-minimap:hover{opacity:1}
+.fnav-mini{min-width:64px;padding:5px 8px;border-radius:8px;border:1px solid rgba(67,225,155,.14);background:rgba(67,225,155,.05);color:rgba(67,225,155,.65);font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:.02em;cursor:pointer;transition:background .12s ease,color .12s ease;white-space:nowrap}
+.fnav-mini:hover{background:rgba(67,225,155,.16);color:#eafff5}
+.fnav-mini--center{background:rgba(67,225,155,.22);border-color:rgba(67,225,155,.5);color:#eafff5;cursor:default}
+.fnav-alex{min-width:0;padding:4px 8px;border-radius:8px;border:1px solid rgba(67,225,155,.45);background:linear-gradient(135deg,rgba(67,225,155,.3),rgba(12,196,129,.2));color:#eafff5;font-size:13px;line-height:1;cursor:pointer;transition:filter .12s ease}
+.fnav-alex:hover{filter:brightness(1.25)}
+.fnav-drag{min-width:0;padding:4px 7px;border-radius:8px;border:1px solid rgba(67,225,155,.14);background:rgba(67,225,155,.05);color:rgba(67,225,155,.5);font-size:11px;cursor:grab;touch-action:none}
+.fnav-drag:active{cursor:grabbing}
+.fnav-collapse{min-width:0;padding:4px 7px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);font-size:13px;line-height:1;cursor:pointer}
+.fnav-collapse:hover{color:#fff}
+.fnav-collapsed-btn{position:fixed;z-index:70;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:42px;height:42px;border-radius:12px;border:1px solid rgba(67,225,155,.3);background:rgba(4,14,10,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:var(--primary);font-size:16px;cursor:pointer}
 
 /* Kundvägskorten på Hem */
 .path-cards{display:flex;gap:16px;margin:36px auto 0;justify-content:center;max-width:760px}
@@ -661,14 +676,218 @@ main{height:auto;min-height:100dvh;overflow:visible;scroll-snap-type:none;scroll
 
 /* Mobil: navbar i botten som app-tabbar, kompaktare kort */
 @media (max-width:820px){
-  .site-nav{top:auto;bottom:calc(10px + env(safe-area-inset-bottom));width:calc(100% - 20px);max-width:480px;justify-content:space-between;gap:2px;padding:4px}
-  .site-nav-btn{flex:1;flex-direction:column;gap:2px;padding:7px 2px;font-size:10px;letter-spacing:.02em}
-  .site-nav-btn .material-symbols-outlined{font-size:20px}
-  .page{padding:76px 14px calc(84px + env(safe-area-inset-bottom));height:100dvh;overflow-y:auto}
+  .fnav-edge{display:none!important}
+  .fnav-minimap{left:8px;bottom:calc(8px + env(safe-area-inset-bottom));opacity:.94}
+  .fnav-mini{min-width:46px;font-size:9px;padding:5px 7px}
+  .fnav-drag,.fnav-collapse{padding:5px}
+  .page{padding:72px 14px calc(96px + env(safe-area-inset-bottom))}
   .page.active{align-items:flex-start}
   .path-cards{flex-direction:column;gap:10px;margin-top:22px}
   .svc-grid{grid-template-columns:1fr;gap:10px;margin:18px auto}
   .svc-card{padding:14px 16px}
   .tour-bubble{bottom:calc(88px + env(safe-area-inset-bottom))}
   #void .page-glass{overflow-y:visible}
+}
+
+/* ─── Finputs 2026-09-01 kväll ─── */
+
+/* 1. Kantpilarna pulserar grönt och bjuder in till klick */
+@keyframes edgePulse{0%,100%{box-shadow:0 0 0 0 rgba(67,225,155,0);border-color:rgba(67,225,155,.2);color:rgba(67,225,155,.65)}50%{box-shadow:0 0 16px 2px rgba(67,225,155,.38);border-color:rgba(67,225,155,.6);color:var(--primary)}}
+.fnav-edge{opacity:.85;animation:edgePulse 2.8s ease-in-out infinite}
+.fnav-edge--right{animation-delay:.7s}
+.fnav-edge--down{animation-delay:1.4s}
+.fnav-edge--left{animation-delay:2.1s}
+.fnav-edge:hover{animation:none;opacity:1;box-shadow:0 0 16px 2px rgba(67,225,155,.38)}
+@media (prefers-reduced-motion:reduce){.fnav-edge{animation:none}}
+
+/* 2. Kontakt: kortet växer med innehållet i stället för att klippa det;
+      sidan scrollar och safe center hindrar toppklipp vid högt innehåll */
+.page{align-items:safe center;justify-content:safe center}
+#void .void-inner{max-height:none}
+
+/* Kontakt → Systemet-genväg under AI-svaret */
+.kontakt-to-system{margin-top:14px;align-self:flex-start;display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;border:1px solid rgba(67,225,155,.35);background:rgba(67,225,155,.08);color:var(--primary);font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:background .15s ease}
+.kontakt-to-system:hover{background:rgba(67,225,155,.18)}
+
+/* ─── Kontakt komprimerad: allt i EN vy, ingen inre scroll (2026-09-01) ───
+   Värdena är uppmätta live mot deploy-preview vid 1440x900: glass 702px < vy. */
+#void .form-panel{padding:20px 32px 16px}
+#void .form-panel h2{font-size:23px;margin-bottom:4px}
+#void .form-panel>p{font-size:12.5px;line-height:1.5;margin-bottom:8px}
+#void .intro-how{margin-bottom:10px!important;font-size:12.5px}
+#void .kontakt-book{margin:6px 0 10px}
+#void .form-group input{min-height:36px;padding:8px 12px;font-size:13.5px}
+#void .form-group textarea{min-height:54px;padding:8px 12px}
+#void .form-grid{gap:7px}
+#void .form-group label{font-size:10px;margin-bottom:2px}
+#void .void-consent{margin:8px 0;font-size:11.5px}
+#void .transmit-btn{padding:10px 18px}
+#void .scan-panel{padding:20px 28px;gap:10px}
+#void .alex-face--sm{width:220px}
+#void .ai-response{min-height:110px}
+#void .kontakt-to-system{margin-top:10px;padding:8px 12px;font-size:12px}
+
+/* Playknappen centrerad under ansiktet (sent lager hade satt den på left:30%) */
+.alex-face-play{left:50%;transform:translate(-50%,0)}
+.alex-face:hover .alex-face-play{transform:translate(-50%,0) scale(1.12)}
+
+/* ─── Playknappen: glas i hologrammet (2026-09-01) ───
+   Ersätter den solida gröna pucken: halvtransparent, backdrop-blur, tunn
+   grön ram och mjukt pulserande glöd. Lägre (bottom 3%) och lätt högerjusterad
+   (left 52%) så den centrerar under ansiktet i videon. Prototypad live. */
+.alex-face-play{left:52%;top:auto;bottom:3%;transform:translate(-50%,0);width:54px;height:54px;background:rgba(12,196,129,.14);border:1px solid rgba(67,225,155,.5);color:var(--primary);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 0 22px rgba(12,196,129,.35),inset 0 0 12px rgba(12,196,129,.15);animation:playGlow 2.6s ease-in-out infinite}
+@keyframes playGlow{0%,100%{box-shadow:0 0 16px rgba(12,196,129,.25),inset 0 0 10px rgba(12,196,129,.12)}50%{box-shadow:0 0 30px rgba(12,196,129,.55),inset 0 0 16px rgba(12,196,129,.25)}}
+.alex-face:hover .alex-face-play{transform:translate(-50%,0) scale(1.1);background:rgba(12,196,129,.28)}
+.alex-face-play .material-symbols-outlined{font-size:27px}
+@media (prefers-reduced-motion:reduce){.alex-face-play{animation:none}}
+
+/* Kontaktsidans mindre avatar: knappen skalas ned till samma andel av
+   ansiktets bredd som demosidan (~18%). Ett äldre lager satte den till 62px
+   med högre specificitet — därför blev den STÖRRE på den mindre avataren. */
+.alex-face--sm .alex-face-play{width:40px;height:40px;bottom:4%}
+.alex-face--sm .alex-face-play .material-symbols-outlined{font-size:20px}
+
+/* Kantpilarna indragna från ytterkanten — 34px runt om ger balans mot
+   sidramen i stället för att nudda den (prototypat live). */
+.fnav-edge--left{left:34px}
+.fnav-edge--right{right:34px}
+.fnav-edge--up{top:78px}
+.fnav-edge--down{bottom:26px}
+
+/* Skyland-märket i headern — samma logotyp och behandling som Command Center
+   (beskuren till symbolen, screen-blend mot den mörka bakgrunden). */
+.logo-mark{height:32px;width:32px;object-fit:cover;object-position:50% 30%;mix-blend-mode:screen;filter:drop-shadow(0 0 8px rgba(16,185,129,.5)) brightness(1.2)}
+@media (max-width:820px){.logo-mark{height:26px;width:26px}}
+
+/* ─── Hero-orden får plats i sin helhet (2026-09-01) ───
+   Boxen var 500px men "Marknadsföringsbyrå" mäter 546px vid 48px — svenskan
+   klipptes. 570px rymmer alla ord på båda språken; på mobil skalar fonten med
+   skärmbredden så även 320px-telefoner visar hela ordet. Uppmätt live. */
+.spin-box{width:570px;max-width:min(570px,86vw)}
+@media(max-width:820px){
+  .spin-box{width:calc(100vw - 40px);max-width:calc(100vw - 40px);font-size:min(26px,6.8vw)}
+}
+
+/* De roterande orden centreras i boxen — längdskillnaden mellan "Webbyrå"
+   och "Marknadsföringsbyrå" gjorde vänsterställningen ojämn. */
+.spin-inner div{justify-content:center}
+
+/* Rubriken på EN rad även med det längsta ordet. Skalad till 42px så
+   "Vi är inte en:" + "Marknadsföringsbyrå" ryms i hero-ytan (uppmätt: 478px
+   ord i en 505px-box, 27px marginal). Scopad till desktop så mobilens
+   viewport-skalning ovan inte överskuggas. */
+@media (min-width:821px){
+  .hero-title{font-size:42px;gap:18px}
+  .spin-box{width:505px;max-width:min(505px,86vw)}
+}
+
+/* OBS: här stängdes backdrop-filter av under swappen. Det gav bara ~4 fps
+   men syntes som ett ryck i första bildrutan — glaset bytte utseende i exakt
+   det ögonblick rörelsen startade. Borttaget; shader-pausen i app.js står för
+   nästan hela vinsten (+15 fps) utan att synas. Återinför inte. */
+
+/* Glidningen fick mer tid — .55s läste som ett hopp snarare än en rörelse.
+   .82s med mjukare utgång gör att glasskivan syns färdas åt sitt håll. */
+.page{transition:transform .82s cubic-bezier(.3,.85,.35,1),visibility 0s linear .82s}
+.page.active{transition:transform .82s cubic-bezier(.3,.85,.35,1),visibility 0s linear 0s}
+
+/* Kontaktsidans avatar större (220 -> 275px). 9:16-formatet gör att bredden
+   slår igenom med nästan dubbel höjd, så panelen strammades åt i motsvarande
+   grad — kortet ryms fortfarande i en vy utan intern scroll (uppmätt).
+   Knappen följer proportionerligt: 50px ~ 18% av bredden, samma andel som
+   demosidan. */
+.alex-face--sm{width:275px}
+.alex-face--sm .alex-face-play{width:50px;height:50px}
+.alex-face--sm .alex-face-play .material-symbols-outlined{font-size:25px}
+#void .scan-panel{padding:14px 26px;gap:8px}
+#void .ai-response{min-height:92px}
+#void .kontakt-to-system{margin-top:8px}
+
+/* hidden-attributet måste slå display:grid — utan detta gick korset inte att
+   fälla ihop: [hidden] ger display:none från UA-stylesheet, men den egna
+   display-regeln vinner på specificitet. Gäller även den kollapsade knappen. */
+.fnav-minimap[hidden],.fnav-collapsed-btn[hidden]{display:none!important}
+
+/* ══════════════════════════════════════════════════════════════════
+   MOBIL (2026-09-01) — läsbart först, en vy där innehållet räcker till
+   Två geometriska fel låg i botten och är rättade: page-glass låstes till
+   100dvh-88px fast .page bara hade 644px ledigt efter sin padding, och
+   navigationskorset (97px) överlappade glasets nederkant med 29px.
+   Ett tredje fel gav avklippta avatarer: innehållet centrerades vertikalt
+   även när det var högre än ytan, så toppen hamnade utanför overflow:hidden
+   — därför flex-start överallt här.
+   Hem, Tjänster och Systemet ryms i en vy. Demo och Kontakt bär mer innehåll
+   (avatar + orb + fyra frågor resp. avatar + helt formulär) och scrollar
+   inuti glaset i stället för att pressas ihop till oläslighet.
+   ══════════════════════════════════════════════════════════════════ */
+@media(max-width:820px){
+  /* Geometri */
+  .page{padding:60px 12px calc(91px + env(safe-area-inset-bottom))}
+  .page.active{align-items:flex-start}
+  .page-glass{min-height:0;max-height:100%;height:100%;overflow-y:auto;justify-content:flex-start}
+  .flux-inner,.phil-inner,.hero-inner,.void-inner,.dash-inner{justify-content:flex-start;min-height:0;max-height:none}
+  .flux-columns{align-items:start}
+  .fnav-minimap{padding:5px;gap:2px;left:6px;bottom:calc(6px + env(safe-area-inset-bottom))}
+  .fnav-mini{min-width:42px;font-size:8.5px;padding:4px 5px}
+  .fnav-drag,.fnav-collapse,.fnav-alex{padding:3px 5px;font-size:10px}
+
+  /* Hem */
+  .hero-inner{padding:22px 18px}
+  .hero-title{font-size:28px;gap:6px}
+  .spin-box{font-size:min(24px,6.4vw)}
+  .hero-desc{font-size:14.5px;line-height:1.5;margin:16px auto 0}
+  .hero-tag{font-size:9px;margin-top:10px}
+  .path-cards{margin-top:14px;gap:8px}
+  .path-card{padding:14px 16px;gap:4px}
+  .path-card strong{font-size:16px}
+  .path-card p{font-size:12.5px;line-height:1.45}
+  .path-card .material-symbols-outlined{font-size:20px}
+  .path-card .path-cta{font-size:11.5px}
+
+  /* Tjänster */
+  .phil-inner{padding:22px 16px}
+  .phil-h1{font-size:22px;margin-bottom:6px}
+  .phil-sub{font-size:13.5px;margin:8px auto 0}
+  .svc-grid{gap:7px;margin:12px auto}
+  .svc-card{padding:12px 14px;gap:3px}
+  .svc-card strong{font-size:14.5px}
+  .svc-card p{font-size:12px;line-height:1.45}
+  .svc-card .material-symbols-outlined{font-size:19px}
+
+  /* Demo */
+  .flux-inner{padding:14px 14px 10px}
+  .flux-intro-left .intro-kicker{font-size:9px;margin-bottom:4px}
+  .flux-intro-left .intro-h1{font-size:19px;margin-bottom:6px}
+  .flux-intro-left .intro-desc{font-size:12px;line-height:1.45;margin-bottom:6px}
+  .flux-intro-left .intro-how{font-size:11.5px}
+  .alex-face{width:132px}
+  .orb-wrap{transform:scale(.66);margin:-22px 0}
+  .link-badge{font-size:9px}
+  .voice-label h2{font-size:18px}
+  .voice-label p{font-size:9.5px}
+  .starter-panel{gap:5px}
+  .starter-btn{padding:7px 10px;font-size:11.5px}
+
+  /* Kontakt — avataren var display:none på mobil och syntes aldrig.
+     Nu visas den överst; profilspegel och AI-svar hör hemma på Systemet. */
+  #void .void-inner{flex-direction:column}
+  #void .scan-panel{display:flex;order:-1;padding:8px 14px 0;background:transparent;flex:0 0 auto}
+  #void .scan-panel .scan-header,#void .scan-panel .profile-card,
+  #void .scan-panel .ai-response,#void .kontakt-to-system{display:none}
+  #void .alex-face--sm{width:112px;margin:0 auto}
+  #void .alex-face--sm .alex-face-play{width:24px;height:24px}
+  #void .alex-face--sm .alex-face-play .material-symbols-outlined{font-size:13px}
+  .form-panel{padding:6px 14px 8px}
+  .form-panel h2{font-size:18px;margin-bottom:3px}
+  .form-panel>p{font-size:11.5px;line-height:1.45;margin-bottom:5px}
+  #void .intro-how{font-size:10.5px;margin-bottom:6px}
+  #void .kontakt-book{margin:4px 0 7px}
+  .dash-book{padding:8px 13px;font-size:12px}
+  #void .form-grid{gap:5px}
+  #void .form-group label{font-size:8.5px;margin-bottom:1px}
+  #void .form-group input{min-height:32px;padding:5px 9px;font-size:13px}
+  #void .form-group textarea{min-height:34px;padding:5px 9px}
+  #void .void-consent{margin:5px 0;font-size:9.5px;line-height:1.35}
+  #void .transmit-btn{padding:7px 13px;font-size:11px}
+  #void .scan-toggle-mobile{padding:6px 10px;font-size:10.5px}
 }

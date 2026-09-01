@@ -48,7 +48,10 @@
   }
 
   function positionSpotlight(step) {
-    var target = document.querySelector('.site-nav-btn[data-page="' + step.page + '"]');
+    // Spotlighta sidans cell i navigationskorset (den är mitten efter bytet).
+    var mm = document.getElementById('fnav-minimap');
+    if (mm && mm.hidden) { mm.hidden = false; } // fäll ut korset under turen
+    var target = document.querySelector('.fnav-mini[data-page="' + step.page + '"]');
     if (!target || stepIdx === 0) { spotlight.style.display = 'none'; return; }
     var r = target.getBoundingClientRect();
     spotlight.style.display = 'block';

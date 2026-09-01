@@ -57,8 +57,16 @@
 
     function reset() {
       video.pause();
-      // Keep the buffered source — first frame == poster, so just rewind.
-      try { video.currentTime = 0; } catch (e) { /* not seekable yet */ }
+      // Tillbaka till POSTERBILDEN, inte videons första bildruta. Tidigare
+      // spolades bara currentTime till 0 med antagandet "first frame ==
+      // poster" — det gäller inte längre sedan postrarna byttes till bildrutor
+      // ur mitten av filmerna (öppen blick). load() försätter elementet i
+      // utgångsläget så poster-attributet visas igen; filen är cachad så
+      // nästa uppspelning startar direkt ändå.
+      try {
+        video.currentTime = 0;
+        video.load();
+      } catch (e) { /* not seekable yet */ }
       card.classList.remove('playing');
       var glassEl = card.closest('.page-glass');
       if (glassEl) glassEl.classList.remove('video-active');
