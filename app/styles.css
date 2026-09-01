@@ -802,3 +802,8 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
 #void .scan-panel{padding:14px 26px;gap:8px}
 #void .ai-response{min-height:92px}
 #void .kontakt-to-system{margin-top:8px}
+
+/* hidden-attributet måste slå display:grid — utan detta gick korset inte att
+   fälla ihop: [hidden] ger display:none från UA-stylesheet, men den egna
+   display-regeln vinner på specificitet. Gäller även den kollapsade knappen. */
+.fnav-minimap[hidden],.fnav-collapsed-btn[hidden]{display:none!important}
