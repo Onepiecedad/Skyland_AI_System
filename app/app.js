@@ -292,8 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Piltangenter ──
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    const tourOpen = document.getElementById('tour-overlay') && !document.getElementById('tour-overlay').hidden;
-    if (tourOpen) return;
     const map = { ArrowUp: 'up', ArrowRight: 'right', ArrowDown: 'down', ArrowLeft: 'left' };
     if (map[e.key]) { e.preventDefault(); navigate(map[e.key]); }
   });
@@ -372,13 +370,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const inner = target && target.closest ? target.closest('.page-glass, textarea') : null;
     return (inner && inner.scrollHeight > inner.clientHeight) ? inner : pages[layout.center];
   }
-  function tourIsOpen() {
-    const o = document.getElementById('tour-overlay');
-    return !!o && !o.hidden;
-  }
-
   document.addEventListener('touchstart', (e) => {
-    if (e.touches.length !== 1 || tourIsOpen()) { touch = null; return; }
+    if (e.touches.length !== 1) { touch = null; return; }
     const t = e.touches[0];
     const scroller = scrollerFor(e.target);
     touch = {
@@ -458,7 +451,64 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-
-  // ── Rundturen ──
-  if (window.SkylandTour) window.SkylandTour.maybeStart();
 });
+
+/* ── Swipehint vid första besöket (2026-09-01) ────────────────────────────
+   Ersätter den gamla guidade rundturen. Ett jobb: knuffa igång första
+   gesten. Visas en gång, i ren CSS-animation utan ljud, och försvinner på
+   första beröringen eller efter fem sekunder. Kantpilarna och headerkorset
+   är den permanenta påminnelsen. Bara på pekskärm — på desktop swipar man
+   inte. */
+(function () {
+  var KEY = 'skyland_hint_v1';
+  try {
+    localStorage.removeItem('skyland_tour_done'); // gamla rundturens flagga
+    if (localStorage.getItem(KEY)) return;
+  } catch (e) { return; }
+  var coarse = ('ontouchstart' in window) ||
+    (window.matchMedia && matchMedia('(pointer: coarse)').matches);
+  if (!coarse) return;
+
+  var el = null;
+  function dismiss() {
+    try { localStorage.setItem(KEY, '1'); } catch (e) {}
+    window.removeEventListener('touchstart', dismiss, true);
+    window.removeEventListener('pointerdown', dismiss, true);
+    window.removeEventListener('keydown', dismiss, true);
+    if (el) {
+      el.classList.remove('is-on');
+      var gone = el;
+      el = null;
+      setTimeout(function () { if (gone.parentNode) gone.parentNode.removeChild(gone); }, 600);
+    }
+  }
+
+  setTimeout(function () {
+    var lang = (document.documentElement.lang || 'sv').slice(0, 2);
+    var txt = lang === 'en' ? 'Swipe to navigate' : 'Swipa för att navigera';
+    var CH = {
+      up: '<polyline points="18 15 12 9 6 15"/>', down: '<polyline points="6 9 12 15 18 9"/>',
+      left: '<polyline points="15 18 9 12 15 6"/>', right: '<polyline points="9 18 15 12 9 6"/>'
+    };
+    function chev(dir) {
+      return '<span class="shc shc--' + dir + '"><svg viewBox="0 0 24 24" fill="none" ' +
+        'stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        CH[dir] + '</svg></span>';
+    }
+    el = document.createElement('div');
+    el.className = 'swipe-hint';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<div class="swipe-hint-box">' +
+      '<div class="swipe-hint-cross">' + chev('up') + chev('right') + chev('down') + chev('left') +
+      '<span class="shc-dot"></span></div>' +
+      '<div class="swipe-hint-text">' + txt + '</div></div>';
+    document.body.appendChild(el);
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      if (el) el.classList.add('is-on');
+    }); });
+    window.addEventListener('touchstart', dismiss, true);
+    window.addEventListener('pointerdown', dismiss, true);
+    window.addEventListener('keydown', dismiss, true);
+    setTimeout(dismiss, 5500);
+  }, 1000);
+})();
