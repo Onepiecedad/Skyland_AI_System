@@ -89,6 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 880);
   }
 
+  // Panelen är inte alltid den som scrollar — på mobil är det .page-glass.
+  // Nollställs bara panelen kommer man tillbaka till en sida som ligger kvar
+  // halvvägs nerskrollad, med toppen av innehållet gömt under headern.
+  function resetScroll(page) {
+    page.scrollTop = 0;
+    const glass = page.querySelector('.page-glass');
+    if (glass) glass.scrollTop = 0;
+  }
+
   function navigate(dir) {
     const now = Date.now();
     if (now - cooldown < 620) return;
@@ -98,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     beginSwapPerf();
     // Nollställ scrollen INNAN panelen börjar röra sig — görs den efteråt
     // hoppar innehållet synligt medan skivan glider in.
-    pages[incoming].scrollTop = 0;
+    resetScroll(pages[incoming]);
     layout = { ...layout, center: incoming, [dir]: layout.center };
     applyLayout();
   }

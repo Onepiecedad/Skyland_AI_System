@@ -1048,3 +1048,24 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
   #void .form-group.full { grid-column: auto; }
   #void #contact-form textarea { min-height: 40px; height: 44px; }
 }
+
+/* ── Dokumentet ska aldrig scrolla (2026-09-01) ────────────────────────────
+   body hade min-height:100vh medan main är 100dvh. På iOS är 100vh den STORA
+   viewporten — den med verktygsfältet dolt — alltså 60–90 px högre än det som
+   faktiskt syns. Dokumentet blev därför högre än skärmen och gick att scrolla,
+   och eftersom headern är position:fixed gled kortet in under den och blev
+   liggande där. Det såg ut som en intern scroll men var hela dokumentet.
+   Korset äger all navigation; ingenting på dokumentnivå ska röra sig.
+   ─────────────────────────────────────────────────────────────────────── */
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body { min-height: 100dvh; }
+main { overscroll-behavior: none; }
+.page, .page-glass { overscroll-behavior: contain; }
+
+/* Meddelandefältet är ett flexbarn och sträcktes till rows="4" oavsett höjd.
+   flex:0 0 auto + min-height:0 gör att höjden faktiskt gäller — det är de
+   sista raderna Kontakt behöver för att slippa scroll på en iPhone med
+   hemknappsremsa (safe-area-inset-bottom ≈ 34 px). */
+@media (max-width: 820px) {
+  #void #contact-form textarea { flex: 0 0 auto; min-height: 0; height: 50px; }
+}
