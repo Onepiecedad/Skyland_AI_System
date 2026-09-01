@@ -1090,7 +1090,7 @@ main { overscroll-behavior: none; }
 /* Dubbelblink — två snabba slag och sedan vila. En långsam in- och uttoning
    läste som bakgrundsbrus; två slag läser som en signal. */
 @keyframes swipeHint{
-  0%,62%,100%{opacity:.38;filter:drop-shadow(0 0 2px rgba(67,225,155,.3))}
+  0%,62%,100%{opacity:.45;filter:drop-shadow(0 0 3px rgba(67,225,155,.4))}
   16%{opacity:1;filter:drop-shadow(0 0 14px rgba(67,225,155,.95)) drop-shadow(0 0 4px rgba(255,255,255,.55))}
   30%{opacity:.55;filter:drop-shadow(0 0 5px rgba(67,225,155,.5))}
   44%{opacity:1;filter:drop-shadow(0 0 14px rgba(67,225,155,.95)) drop-shadow(0 0 4px rgba(255,255,255,.55))}
@@ -1099,7 +1099,7 @@ main { overscroll-behavior: none; }
    versionen satte animation:none, och för den som redan svept åt alla fyra
    håll blev alla fyra permanent mörka. Det var precis den som skulle se dem. */
 @keyframes swipeHintCalm{
-  0%,68%,100%{opacity:.4;filter:drop-shadow(0 0 2px rgba(67,225,155,.25))}
+  0%,68%,100%{opacity:.48;filter:drop-shadow(0 0 3px rgba(67,225,155,.3))}
   34%{opacity:.85;filter:drop-shadow(0 0 9px rgba(67,225,155,.6))}
 }
 
@@ -1109,7 +1109,7 @@ main { overscroll-behavior: none; }
     align-items:center;justify-content:center;
     border:none;background:none;box-shadow:none;border-radius:0;
     -webkit-backdrop-filter:none;backdrop-filter:none;
-    color:var(--primary);opacity:.38;
+    color:var(--primary);opacity:.45;
     pointer-events:none;
     animation:swipeHint 4s ease-in-out infinite;
   }
@@ -1117,9 +1117,9 @@ main { overscroll-behavior: none; }
   .fnav-edge svg{width:26px;height:26px;stroke-width:2.9}
 
   .fnav-edge--up   {top:62px;bottom:auto;left:50%;right:auto;transform:translateX(-50%);animation-delay:0s}
-  .fnav-edge--right{right:10px;left:auto;top:calc(50% - 14px);bottom:auto;transform:translateY(-50%);animation-delay:.85s}
+  .fnav-edge--right{right:1px;left:auto;top:calc(50% - 14px);bottom:auto;transform:translateY(-50%);animation-delay:.85s}
   .fnav-edge--down {bottom:calc(95px + env(safe-area-inset-bottom));top:auto;left:50%;right:auto;transform:translateX(-50%);animation-delay:1.7s}
-  .fnav-edge--left {left:10px;right:auto;top:calc(50% - 14px);bottom:auto;transform:translateY(-50%);animation-delay:2.55s}
+  .fnav-edge--left {left:1px;right:auto;top:calc(50% - 14px);bottom:auto;transform:translateY(-50%);animation-delay:2.55s}
 
   /* Inlärd riktning slutar tigga och blir en svag vilogöd. */
   .fnav-edge.is-learned{animation:swipeHintCalm 5.4s ease-in-out infinite}
@@ -1128,7 +1128,13 @@ main { overscroll-behavior: none; }
   body:has(#tour-overlay:not([hidden])) .fnav-edge{animation:none;opacity:.08}
 }
 
-@media (prefers-reduced-motion: reduce){ .fnav-edge{animation:none!important} }
+/* Reducerad rörelse tar bort rörelsen — inte synligheten. Första versionen
+   satte bara animation:none, vilket lämnade pilarna på vilonivån .38 utan
+   glöd: permanent bleka för alla som har Reducera rörelse påslaget i iOS. */
+@media (prefers-reduced-motion: reduce){
+  .fnav-edge{animation:none!important;opacity:.85!important;
+             filter:drop-shadow(0 0 9px rgba(67,225,155,.7))!important}
+}
 
 /* --k skalar ned minvärdena på smala skärmar. På 360 px bryts texten på fler
    rader än på 390, så samma golv blir för högt där. En faktor räcker; allt
@@ -1139,33 +1145,33 @@ main { overscroll-behavior: none; }
 
 @media (max-width: 820px) {
   /* ---------- START ---------- */
-  #core .hero-title { font-size: clamp(calc(28 * var(--k) * 1px), calc((5.404vh - 7.67px) * var(--k)), 40px); gap: clamp(calc(4 * var(--k) * 1px), calc((0.772vh - 1.10px) * var(--k)), 10px); }
+  #core .hero-title { font-size: clamp(calc(28 * var(--k) * 1px), calc((5.404vh - 7.67px) * var(--k)), 33px); gap: clamp(calc(4 * var(--k) * 1px), calc((0.772vh - 1.10px) * var(--k)), 10px); }
   /* Höjden var 1.4em — glöden runt orden klipptes av kanten och orden såg
      avhuggna ut. 1.72em ger luft. Bredden sätter taket för graden: det längsta
      ordet, Marknadsföringsbyrå, är 19 tecken och måste rymmas på 350 px. */
   #core .spin-box { font-size: clamp(calc(24 * var(--k) * 1px), min(calc((4.632vh - 6.58px) * var(--k)), 7.3vw), 30px); height: 1.72em;
                     filter: drop-shadow(0 0 12px rgba(12,196,129,.75)); }
   #core .spin-inner div { height: 1.72em; }
-  #core .hero-desc { font-size: clamp(calc(14.5 * var(--k) * 1px), calc((2.799vh - 3.97px) * var(--k)), 18px); margin-top: clamp(calc(10 * var(--k) * 1px), calc((1.930vh - 2.74px) * var(--k)), 20px); }
+  #core .hero-desc { font-size: clamp(calc(14.5 * var(--k) * 1px), calc((2.799vh - 3.97px) * var(--k)), 15.5px); margin-top: clamp(calc(10 * var(--k) * 1px), calc((1.930vh - 2.74px) * var(--k)), 20px); }
   #core .hero-tag { margin-top: clamp(calc(6 * var(--k) * 1px), calc((1.158vh - 1.64px) * var(--k)), 16px); }
   #core .path-cards { margin-top: clamp(calc(8 * var(--k) * 1px), calc((1.544vh - 2.19px) * var(--k)), 22px); gap: clamp(calc(6 * var(--k) * 1px), calc((1.158vh - 1.64px) * var(--k)), 14px); }
   #core .path-card { padding: clamp(calc(8 * var(--k) * 1px), calc((1.544vh - 2.19px) * var(--k)), 20px) 14px; }
   #core .path-card p { font-size: clamp(calc(12.5 * var(--k) * 1px), calc((2.413vh - 3.43px) * var(--k)), 14.5px); }
 
   /* ---------- TJÄNSTER ---------- */
-  #neural .phil-h1 { font-size: clamp(calc(20 * var(--k) * 1px), calc((3.860vh - 5.48px) * var(--k)), 27px); }
-  #neural .phil-sub { font-size: clamp(calc(11.5 * var(--k) * 1px), calc((2.220vh - 3.15px) * var(--k)), 15px); }
+  #neural .phil-h1 { font-size: clamp(calc(20 * var(--k) * 1px), calc((3.860vh - 5.48px) * var(--k)), 24px); }
+  #neural .phil-sub { font-size: clamp(calc(11.5 * var(--k) * 1px), calc((2.220vh - 3.15px) * var(--k)), 13.5px); }
   #neural .svc-grid { gap: clamp(calc(6 * var(--k) * 1px), calc((1.158vh - 1.64px) * var(--k)), 13px); margin: clamp(calc(8 * var(--k) * 1px), calc((1.544vh - 2.19px) * var(--k)), 20px) 0 clamp(calc(6 * var(--k) * 1px), calc((1.158vh - 1.64px) * var(--k)), 14px); }
   #neural .svc-card { padding: clamp(calc(9 * var(--k) * 1px), calc((1.737vh - 2.47px) * var(--k)), 18px) clamp(calc(10 * var(--k) * 1px), calc((1.930vh - 2.74px) * var(--k)), 15px); }
   #neural .svc-card strong { font-size: clamp(calc(13.5 * var(--k) * 1px), calc((2.606vh - 3.70px) * var(--k)), 15.5px); }
-  #neural .svc-card p { font-size: clamp(calc(11 * var(--k) * 1px), calc((2.123vh - 3.01px) * var(--k)), 13px); line-height: 1.4; }
+  #neural .svc-card p { font-size: clamp(calc(11 * var(--k) * 1px), calc((2.123vh - 3.01px) * var(--k)), 12.5px); line-height: 1.4; }
 
   /* ---------- DEMO ---------- */
   #flux { --avatar: clamp(calc(96 * var(--k) * 1px), calc((18.528vh - 26.30px) * var(--k)), 150px); }
   #flux .flux-columns { grid-template-columns: var(--avatar) 1fr; gap: clamp(calc(10 * var(--k) * 1px), calc((1.930vh - 2.74px) * var(--k)), 16px); }
   #flux .flux-right .alex-face { width: var(--avatar); max-width: none; }
   #flux .intro-h1 { font-size: clamp(calc(16 * var(--k) * 1px), calc((3.088vh - 4.38px) * var(--k)), 22px); }
-  #flux .intro-desc { font-size: clamp(calc(11 * var(--k) * 1px), calc((2.123vh - 3.01px) * var(--k)), 14px); -webkit-line-clamp: 6; }
+  #flux .intro-desc { font-size: clamp(calc(11 * var(--k) * 1px), calc((2.123vh - 3.01px) * var(--k)), 13px); -webkit-line-clamp: 6; }
   #flux .voice-panel { gap: clamp(calc(8 * var(--k) * 1px), calc((1.544vh - 2.19px) * var(--k)), 16px); }
   #flux .starter-btn { font-size: clamp(calc(10.5 * var(--k) * 1px), calc((2.026vh - 2.88px) * var(--k)), 13px); padding: clamp(calc(6 * var(--k) * 1px), calc((1.158vh - 1.64px) * var(--k)), 12px) 9px; }
   #flux .starter-panel { gap: clamp(calc(5 * var(--k) * 1px), calc((0.965vh - 1.37px) * var(--k)), 10px); padding-top: clamp(calc(8 * var(--k) * 1px), calc((1.544vh - 2.19px) * var(--k)), 16px); }
@@ -1202,7 +1208,7 @@ main { overscroll-behavior: none; }
   }
   #void .alex-face--sm .alex-face-play .material-symbols-outlined { font-size: calc(var(--avatar) * .115); }
   #void .form-panel > h2 { font-size: clamp(calc(18 * var(--k) * 1px), calc((3.474vh - 4.93px) * var(--k)), 25px); }
-  #void .form-panel > p { font-size: clamp(calc(11.5 * var(--k) * 1px), calc((2.220vh - 3.15px) * var(--k)), 14px); }
+  #void .form-panel > p { font-size: clamp(calc(11.5 * var(--k) * 1px), calc((2.220vh - 3.15px) * var(--k)), 13px); }
   #void .form-group input { min-height: clamp(calc(28 * var(--k) * 1px), calc((5.404vh - 7.67px) * var(--k)), 40px); }
   #void #contact-form textarea { height: clamp(calc(50 * var(--k) * 1px), calc((9.650vh - 13.70px) * var(--k)), 84px); }
   #void #contact-form > .form-group { margin-top: clamp(calc(7 * var(--k) * 1px), calc((1.351vh - 1.92px) * var(--k)), 14px); }
@@ -1236,4 +1242,25 @@ main { overscroll-behavior: none; }
   #dashboard .dash-tabs { min-width: 0; }
   #dashboard .dash-tab { min-width: 0; overflow: hidden; }
   #dashboard .dash-tab span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+@media (max-width: 820px) {
+  /* Textkolumnen på Demo hade max-height satt till avatarens höjd. Det höll
+     måtten men skar av meningen mitt i ett ord utan ellips. Radantalet gör
+     samma jobb och ger "…" på slutet. */
+  #flux .intro-desc { -webkit-line-clamp: 6; }
+}
+
+/* På låga skärmar räcker inte utrymmet till hela hero-texten när den sätts i
+   Inter/Manrope — mätt i fallback-typsnitt såg det ut att gå ihop, vilket var
+   fel. Sammanfattningen kortas till tre rader; hela resonemanget står ändå på
+   Tjänster. Över 720 px höjd visas den i sin helhet. */
+@media (max-width: 820px) and (max-height: 730px) {
+  #core .hero-desc {
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  #core .hero-tag { font-size: 8px; margin-top: 4px; }
+  #core .path-card { padding: calc(6 * var(--k) * 1px) 14px; }
+  #core .path-card p { font-size: calc(12 * var(--k) * 1px); line-height: 1.35; }
+  #core .hero-title { gap: 2px; }
 }
