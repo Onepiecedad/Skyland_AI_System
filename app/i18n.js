@@ -9,7 +9,7 @@
       hero_spin_3: "Software developer",
       hero_spin_4: "Marketing agency",
       hero_spin_5: "Web agency",
-      hero_desc: "We're all four — but that's not what you're buying. You're getting rid of problems that cost time and money: missed customers, evening admin and leads that never become business. You get the result. We handle the rest.",
+      hero_desc: "We're all four — and we remove your problems: missed customers, evening admin and leads that never become business. You get the result. We handle the rest.",
       hero_tag: "FEWER MISSED CUSTOMERS · LESS ADMIN · MORE BUSINESS FROM WHAT YOU ALREADY HAVE",
 
       // Neural
@@ -79,13 +79,13 @@
       svc_h1: "You don't need more software.<br/>You need fewer problems.",
       svc_sub: "Four things that cost service businesses money every week — and what happens when they're gone.",
       svc1_t: "Stop losing customers who call",
-      svc1_d: "Missed calls are missed business. When you can't answer, the customer still gets help, day and night. More calls become customers.",
+      svc1_d: "When you can't answer, the customer still gets help right away, day and night. More calls become customers.",
       svc2_t: "Get rid of the repetitive work",
-      svc2_d: "Calls, bookings, replies and routine admin eat hours every week. We remove the work that doesn't need you. You get the time back.",
+      svc2_d: "Calls, bookings, replies and reminders eat hours every week. We remove it — you get the hours back.",
       svc3_t: "Fill empty capacity",
       svc3_d: "Empty slots cost money. We keep the right customers coming — all the way to a booked meeting. More of your capacity becomes revenue.",
       svc4_t: "Stop leads going cold",
-      svc4_d: "The interest is already there. It shouldn't die from a slow reply — every lead is followed up to an outcome. More of it becomes business.",
+      svc4_d: "A slow reply costs business. Every lead is followed up to an outcome — more of what you already have becomes business.",
       consent_text: "I agree that Skyland AI Solutions processes my personal data in accordance with the <a href=\"/integritetspolicy.html\" id=\"void-privacy-link\" target=\"_blank\" rel=\"noopener\">privacy policy</a>. My message creates a ticket in Skyland's CRM.",
       scan_toggle_show: "Show AI analysis",
       scan_title: "LEAD PROFILE SCAN",
@@ -98,14 +98,14 @@
       flux_kicker: "LIVE DEMO — VOICE AGENT",
       flux_video_cta: "Watch Alex introduce herself",
       flux_h1: "The customer calls.<br/>You can't answer.",
-      flux_desc: "You're working, driving or asleep. The customer wants an answer now — if they don't get one, they call the next company. Alex answers right away, finds out what they need and books a meeting when that's the right next step. Try it yourself: tap the orb and talk to her.",
+      flux_desc: "You're working, driving or asleep. The customer wants an answer now — or they call the next company. Alex answers right away and books a meeting. Try it yourself: tap the orb and talk to her.",
       flux_how: "Click the orb or pick a question below. Your browser will ask for microphone access.",
 
       // Void intro (smart form copy)
       void_kicker: "CONTACT & BOOKING",
       void_video_cta: "Watch Alex explain the form",
       void_h2: "What problem would you like gone?",
-      void_sub: "Tell us what's costing you time or money — too few customers, too much admin, leads that disappear, or something else entirely. You get a first answer right away. If we see a sensible way forward, we'll show you what the problem can be replaced with and what that's worth.",
+      void_sub: "Tell us what's costing you time or money — too few customers, too much admin, leads that disappear. You get a first answer right away, and an honest assessment of what you'd gain by solving it.",
       void_hint: "Describe your business and what eats your time.",
 
       // Dashboard (visitor-facing SCC view)
@@ -168,7 +168,7 @@
       hero_spin_3: "Mjukvaruutvecklare",
       hero_spin_4: "Marknadsföringsbyrå",
       hero_spin_5: "Webbyrå",
-      hero_desc: "Vi är alla fyra — men det är inte det du köper. Du köper bort problem som kostar tid och pengar: missade kunder, kvällsadmin och leads som aldrig blir affär. Du får resultatet. Vi sköter resten.",
+      hero_desc: "Vi är alla fyra — och vi tar bort dina problem: missade kunder, kvällsadmin och leads som aldrig blir affär. Du får resultatet. Vi sköter resten.",
       hero_tag: "FÄRRE MISSADE KUNDER · MINDRE ADMIN · MER AFFÄR UR DET DU REDAN HAR",
 
       // Neural
@@ -238,13 +238,13 @@
       svc_h1: "Du behöver inte fler verktyg.<br/>Du behöver färre problem.",
       svc_sub: "Fyra saker som kostar tjänsteföretag pengar varje vecka — och vad som händer när de försvinner.",
       svc1_t: "Sluta tappa kunder som ringer",
-      svc1_d: "Missade samtal blir missade affärer. När du inte kan svara får kunden ändå hjälp direkt, dygnet runt. Fler samtal blir kunder.",
+      svc1_d: "När du inte kan svara får kunden ändå hjälp direkt, dygnet runt. Fler samtal blir kunder.",
       svc2_t: "Få bort det repetitiva",
-      svc2_d: "Samtal, bokningar, svar, påminnelser och rutinjobb äter timmar varje vecka. Vi tar bort arbetet som inte behöver dig. Du får tiden tillbaka.",
+      svc2_d: "Samtal, bokningar, svar och påminnelser äter timmar varje vecka. Vi tar bort det — du får timmarna tillbaka.",
       svc3_t: "Fyll tom kapacitet",
       svc3_d: "Tomma tider kostar pengar varje vecka. Vi fyller på med rätt kunder — hela vägen till bokat möte. Mer av din kapacitet blir intäkt.",
       svc4_t: "Låt inga leads kallna",
-      svc4_d: "Intresset finns redan. Det ska inte dö av ett sent svar — varje lead följs upp tills det har ett utfall. Mer av det du redan har blir affär.",
+      svc4_d: "Ett sent svar kostar affärer. Varje lead följs upp tills det har ett utfall — mer av det du redan har blir affär.",
       consent_text: "Jag godkänner att Skyland AI Solutions behandlar mina personuppgifter enligt <a href=\"/integritetspolicy.html\" id=\"void-privacy-link\" target=\"_blank\" rel=\"noopener\">integritetspolicyn</a>. Mitt meddelande skapar ett ärende i Skylands CRM.",
       scan_toggle_show: "Visa AI-analys",
       scan_title: "LEAD-PROFILSKANNING",
@@ -257,14 +257,14 @@
       flux_kicker: "LIVE DEMO — RÖSTAGENT",
       flux_video_cta: "Se Alex presentera sig",
       flux_h1: "Kunden ringer.<br/>Du kan inte svara.",
-      flux_desc: "Du jobbar, kör bil eller sover. Kunden vill ha svar nu — får de inget ringer de vidare. Alex svarar direkt, tar reda på vad kunden behöver och bokar ett möte när det är rätt nästa steg. Prova själv: tryck på orben och prata med henne.",
+      flux_desc: "Du jobbar, kör bil eller sover. Kunden vill ha svar nu — annars ringer de vidare. Alex svarar direkt och bokar möte. Prova själv: tryck på orben och prata med henne.",
       flux_how: "Klicka på orben eller välj en fråga nedan. Webbläsaren ber om mikrofonåtkomst.",
 
       // Void intro (smart form copy)
       void_kicker: "KONTAKT & BOKA",
       void_video_cta: "Se Alex förklara formuläret",
       void_h2: "Vilket problem vill du bli av med?",
-      void_sub: "Skriv vad som kostar dig tid eller pengar — för få kunder, för mycket admin, leads som försvinner eller något helt annat. Du får ett första svar direkt. Ser vi en vettig väg framåt visar vi vad problemet kan ersättas med och vad det är värt.",
+      void_sub: "Skriv vad som kostar dig tid eller pengar — för få kunder, för mycket admin, leads som försvinner. Du får ett första svar direkt och en ärlig bedömning av vad du kan vinna på att lösa det.",
       void_hint: "Beskriv din verksamhet och vad som tar mest tid.",
 
       // Dashboard (visitor-facing SCC view)

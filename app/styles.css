@@ -1577,3 +1577,17 @@ main { overscroll-behavior: none; }
   #core .hero-desc { margin-top: calc(6 * var(--k) * 1px); }
   #core .path-cards { margin-top: 6px; }
 }
+
+/* ── ROI-reglagen tappade sina etiketter i scroll (2026-09-01, sen kväll) ──
+   När panelen scrollar någon rad hamnar första etiketten ovanför synfältet
+   och "Ditt timvärde" ser ut att höra till fel reglage. Varje etikett+reglage
+   får en egen ruta så paret håller ihop visuellt oavsett scrolläge. */
+@media (max-width: 820px) {
+  #dashboard .dash-roi-label {
+    background: rgba(28, 32, 32, .45);
+    border: 1px solid rgba(60, 74, 65, .35);
+    border-radius: 10px;
+    padding: 8px 12px 6px;
+  }
+  #dashboard .dash-roi-controls { gap: 8px; }
+}
