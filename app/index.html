@@ -51,38 +51,29 @@
     </div>
   </header>
 
-  <!-- Sidebar Navigation -->
-  <nav class="sidebar">
-    <div class="nav-version">
-      <span class="v-label">SYSTEM</span>
-      <span class="v-num">V.2.0.4-AI</span>
-    </div>
-    <div class="nav-item active" data-page="core">
-      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">grid_view</span>
-      <span class="label">Core</span>
-    </div>
-    <div class="nav-item" data-page="neural">
-      <span class="material-symbols-outlined">psychology</span>
-      <span class="label">Neural</span>
-    </div>
-    <div class="nav-item" data-page="flux">
-      <span class="material-symbols-outlined">waves</span>
-      <span class="label">Flux</span>
-    </div>
-    <div class="nav-item" data-page="void">
-      <span class="material-symbols-outlined">filter_tilt_shift</span>
-      <span class="label">Void</span>
-    </div>
-    <div class="nav-item" data-page="dashboard">
+  <!-- Tabbnavigering (SCC-stil, 2026-09-01) -->
+  <nav class="site-nav" id="site-nav" aria-label="Huvudnavigering">
+    <button class="site-nav-btn active" data-page="core">
+      <span class="material-symbols-outlined">grid_view</span>
+      <span class="label" data-i18n="nav_hem">Hem</span>
+    </button>
+    <button class="site-nav-btn" data-page="neural">
+      <span class="material-symbols-outlined">handshake</span>
+      <span class="label" data-i18n="nav_tjanster">Tjänster</span>
+    </button>
+    <button class="site-nav-btn" data-page="dashboard">
       <span class="material-symbols-outlined">monitoring</span>
-      <span class="label">Dashboard</span>
-    </div>
+      <span class="label" data-i18n="nav_system">Systemet</span>
+    </button>
+    <button class="site-nav-btn" data-page="flux">
+      <span class="material-symbols-outlined">mic</span>
+      <span class="label" data-i18n="nav_demo">Demo</span>
+    </button>
+    <button class="site-nav-btn" data-page="void">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <span class="label" data-i18n="nav_kontakt">Kontakt</span>
+    </button>
   </nav>
-
-  <!-- Scroll indicator dots -->
-  <div class="scroll-indicator" id="scroll-indicator"></div>
-  <!-- Scroll progress bar -->
-  <div class="scroll-progress"><div class="scroll-progress-bar" id="scroll-progress-bar"></div></div>
 
   <main>
 
@@ -109,13 +100,19 @@
             We're all of them: We help companies find the AI solutions that saves them real time and money, then we build it, deploy it, and train your team to use it.
           </p>
           <p class="hero-tag" data-i18n="hero_tag">THE INTELLIGENT OPERATING SYSTEM FOR SERVICE SMB'S</p>
-          <div class="scroll-arrow" id="scroll-arrow" data-target="neural">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
+          <div class="path-cards">
+            <button class="path-card" data-target="neural">
+              <span class="material-symbols-outlined">handshake</span>
+              <strong data-i18n="path1_title">Vi sköter det åt dig</strong>
+              <p data-i18n="path1_desc">Annonser, leads, hemsidor och röstagenter som tjänst. Du får resultaten — vi driver systemen.</p>
+              <span class="path-cta" data-i18n="path1_cta">Se tjänsterna →</span>
+            </button>
+            <button class="path-card" data-target="dashboard">
+              <span class="material-symbols-outlined">monitoring</span>
+              <strong data-i18n="path2_title">Ditt eget Skyland-system</strong>
+              <p data-i18n="path2_desc">Ett eget AI-drivet command center som svarar, bokar och följer upp — och som du äger.</p>
+              <span class="path-cta" data-i18n="path2_cta">Se systemet →</span>
+            </button>
           </div>
         </div>
         </div>
@@ -125,41 +122,32 @@
       <div id="neural" class="page">
         <div class="page-glass">
         <div class="phil-inner">
-          <h1 class="phil-h1" data-i18n="neural_h1">Most companies buy AI tools.<br/>Then nothing happens.</h1>
-          <p class="phil-sub" data-i18n="neural_sub">The tools sit unused. The team doesn't trust it.<br/>Nobody saved a single hour.</p>
-          <div class="phil-box">
-            <p data-i18n="neural_box">We don't sell tools.<br/>We build systems that work.</p>
-          </div>
-          <div class="phil-flow">
-            <div class="flow-step">
-              <div class="circle"><span class="material-symbols-outlined">search</span></div>
-              <span class="flow-label" data-i18n="flow_find">Find it</span>
+          <span class="intro-kicker" data-i18n="svc_kicker">TJÄNSTER — VI SKÖTER DET ÅT DIG</span>
+          <h1 class="phil-h1" data-i18n="svc_h1">Du driver företaget.<br/>Vi driver systemen.</h1>
+          <p class="phil-sub" data-i18n="svc_sub">Det våra kunder köper: färdiga resultat, inte verktyg att lära sig.</p>
+          <div class="svc-grid">
+            <div class="svc-card">
+              <span class="material-symbols-outlined">mic</span>
+              <strong data-i18n="svc1_t">Röstagent i din telefon</strong>
+              <p data-i18n="svc1_d">Svarar, kvalificerar och bokar — dygnet runt. Samma teknik som Alex på den här sajten.</p>
             </div>
-            <span class="material-symbols-outlined flow-arrow">arrow_right_alt</span>
-            <div class="flow-step">
-              <div class="circle"><span class="material-symbols-outlined">build</span></div>
-              <span class="flow-label" data-i18n="flow_build">Build it</span>
+            <div class="svc-card">
+              <span class="material-symbols-outlined">campaign</span>
+              <strong data-i18n="svc2_t">Annonser & leads</strong>
+              <p data-i18n="svc2_d">Kampanjer som fylls på med kunder, hanterade hela vägen till bokat möte.</p>
             </div>
-            <span class="material-symbols-outlined flow-arrow">arrow_right_alt</span>
-            <div class="flow-step">
-              <div class="circle"><span class="material-symbols-outlined">rocket_launch</span></div>
-              <span class="flow-label" data-i18n="flow_deploy">Deploy it</span>
+            <div class="svc-card">
+              <span class="material-symbols-outlined">language</span>
+              <strong data-i18n="svc3_t">Hemsida som säljer</strong>
+              <p data-i18n="svc3_d">Byggd, driftad och kopplad till vårt CRM — besökare blir ärenden, inte pdf:er i en inkorg.</p>
             </div>
-            <span class="material-symbols-outlined flow-arrow">arrow_right_alt</span>
-            <div class="flow-step">
-              <div class="circle"><span class="material-symbols-outlined">group</span></div>
-              <span class="flow-label" data-i18n="flow_use">Use it</span>
+            <div class="svc-card">
+              <span class="material-symbols-outlined">event_repeat</span>
+              <strong data-i18n="svc4_t">Uppföljning som aldrig glömmer</strong>
+              <p data-i18n="svc4_d">Påminnelser, svar och bokningar sköts automatiskt. Inget faller mellan stolarna.</p>
             </div>
           </div>
           <p class="hero-tag" data-i18n="neural_tag">NO PILOTS. NO EXPERIMENTS. YOU OWN IT FROM DAY ONE.</p>
-          <div class="scroll-arrow" data-target="flux">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-          </div>
         </div>
         </div>
       </div>
@@ -230,14 +218,6 @@
           </div>
           </div>
         </div>
-        <div class="scroll-arrow" data-target="void">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </div>
         </div>
       </div>
 
@@ -246,7 +226,11 @@
         <div class="page-glass">
         <div class="void-inner">
           <div class="form-panel">
-            <span class="intro-kicker" data-i18n="void_kicker">LIVE DEMO — SMART FORM</span>
+            <span class="intro-kicker" data-i18n="void_kicker">KONTAKT & BOKA</span>
+            <div class="kontakt-book">
+              <a class="dash-book" href="https://cal.com/joakim-landqvist-yrcioq/15min" target="_blank" rel="noreferrer"><span class="material-symbols-outlined" style="font-size:17px">calendar_month</span> <span data-i18n="dash_cta_book">Book 15 min with Joakim</span></a>
+              <span class="dash-cta-note" data-i18n="dash_cta_free">Free · honest assessment · no strings</span>
+            </div>
             <h2 data-i18n="void_h2">A form that answers immediately.</h2>
             <p data-i18n="void_sub">Standard contact forms are black holes — a reply arrives days later, if at all. This form is read by an AI connected to our knowledge base: you get a relevant answer in seconds, tailored to what you write. At the same time a lead card is created in our dashboard — see the next page.</p>
             <p class="intro-how" style="margin-bottom:24px"><span class="material-symbols-outlined" style="font-size:15px">edit_note</span> <span data-i18n="void_hint">Describe your business and what eats your time. Hit send — the AI response appears in the panel within seconds.</span></p>
@@ -322,14 +306,6 @@
             </div>
           </div>
         </div>
-        <div class="scroll-arrow" data-target="dashboard">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </div>
         </div>
       </div>
 
@@ -338,9 +314,9 @@
         <div class="page-glass">
         <div class="dash-inner">
           <div class="dash-head">
-            <span class="intro-kicker" data-i18n="dash_kicker">LIVE DEMO — COMMAND CENTER</span>
-            <h2 class="intro-h1 dash-h1" data-i18n="dash_h1">Your journey, seen from our side.</h2>
-            <p class="intro-desc dash-desc" data-i18n="dash_desc_short">The same dashboard we run our customers' systems with. This is your session — live.</p>
+            <span class="intro-kicker" data-i18n="dash_kicker">SKYLAND-SYSTEMET — DITT EGET COMMAND CENTER</span>
+            <h2 class="intro-h1 dash-h1" data-i18n="dash_h1">Ett system som jobbar medan du gör annat.</h2>
+            <p class="intro-desc dash-desc" data-i18n="dash_desc_short">Det här är produkten: samma dashboard vi driver våra kunders system med — och det du ser är din session, live. Som abonnent får du ett eget.</p>
           </div>
 
           <!-- Tab bar -->
@@ -450,6 +426,22 @@
   <script src="tracker.js"></script>
   <script src="intro-video.js"></script>
   <script type="module" src="bg-shader.js?v=12"></script>
+  <!-- Guidad rundtur (2026-09-01) -->
+  <div id="tour-overlay" class="tour-overlay" hidden>
+    <div class="tour-spotlight" id="tour-spotlight"></div>
+    <div class="tour-bubble" id="tour-bubble" role="dialog" aria-live="polite">
+      <div class="tour-progress" id="tour-progress"></div>
+      <h3 id="tour-title"></h3>
+      <p id="tour-text"></p>
+      <div class="tour-btns">
+        <button id="tour-skip" class="tour-skip"></button>
+        <button id="tour-next" class="tour-next"></button>
+      </div>
+    </div>
+  </div>
+  <audio id="tour-audio" preload="none"></audio>
+
+  <script src="tour.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
