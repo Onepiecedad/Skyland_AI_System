@@ -790,3 +790,15 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
    .82s med mjukare utgång gör att glasskivan syns färdas åt sitt håll. */
 .page{transition:transform .82s cubic-bezier(.3,.85,.35,1),visibility 0s linear .82s}
 .page.active{transition:transform .82s cubic-bezier(.3,.85,.35,1),visibility 0s linear 0s}
+
+/* Kontaktsidans avatar större (220 -> 275px). 9:16-formatet gör att bredden
+   slår igenom med nästan dubbel höjd, så panelen strammades åt i motsvarande
+   grad — kortet ryms fortfarande i en vy utan intern scroll (uppmätt).
+   Knappen följer proportionerligt: 50px ~ 18% av bredden, samma andel som
+   demosidan. */
+.alex-face--sm{width:275px}
+.alex-face--sm .alex-face-play{width:50px;height:50px}
+.alex-face--sm .alex-face-play .material-symbols-outlined{font-size:25px}
+#void .scan-panel{padding:14px 26px;gap:8px}
+#void .ai-response{min-height:92px}
+#void .kontakt-to-system{margin-top:8px}
