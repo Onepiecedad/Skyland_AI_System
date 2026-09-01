@@ -175,7 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   minimap.querySelector('.fnav-collapse').addEventListener('click', () => setCollapsed(true, true));
   collapsedBtn.addEventListener('click', () => setCollapsed(false, true));
-  try { if (localStorage.getItem(COLLAPSE_KEY) === '1') setCollapsed(true, false); } catch (e) { /* ignore */ }
+  // Ihopfällt som utgångsläge: korset är en genväg, inte huvudnavigationen —
+  // svep och kantpilar räcker för den som just landat. Den som fällt ut det
+  // får behålla sitt val.
+  try { setCollapsed(localStorage.getItem(COLLAPSE_KEY) !== '0', false); } catch (e) { setCollapsed(true, false); }
 
   // Kantpilarna lär ut svepet på mobil. När en riktning väl använts slutar den
   // pulsa och blir en svag vilogöd — fyra saker som blinkar i evighet är brus
