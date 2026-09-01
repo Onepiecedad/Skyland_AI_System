@@ -375,6 +375,29 @@ document.addEventListener('DOMContentLoaded', () => {
     navigate(dir);
   }, { passive: true });
 
+  // ── Systemet > Agenter som dragspel ──
+  // Fyra kort med brödtext blev högre än panelen och tvingade fram intern
+  // scroll. Intern scroll på en sida som samtidigt lyssnar efter svep är en
+  // dålig kombination — man byter sida av misstag och har svårt att hitta
+  // tillbaka. Ett öppet kort i taget ryms utan scroll.
+  const agentCards = [...document.querySelectorAll('#dashboard .dash-agent')];
+  agentCards.forEach((card, i) => {
+    const head = card.querySelector('.dash-agent-head');
+    if (!head) return;
+    if (i === 0) card.classList.add('is-open');
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    const toggle = () => {
+      const wasOpen = card.classList.contains('is-open');
+      agentCards.forEach(c => c.classList.remove('is-open'));
+      if (!wasOpen) card.classList.add('is-open');
+    };
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+
   // ── Start: hash-djuplänk vinner över sparat läge ──
   const hash = location.hash.replace('#', '');
   if (PAGE_IDS.includes(hash) && layout.center !== hash) {
