@@ -708,3 +708,25 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
 /* Kontakt → Systemet-genväg under AI-svaret */
 .kontakt-to-system{margin-top:14px;align-self:flex-start;display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;border:1px solid rgba(67,225,155,.35);background:rgba(67,225,155,.08);color:var(--primary);font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:background .15s ease}
 .kontakt-to-system:hover{background:rgba(67,225,155,.18)}
+
+/* ─── Kontakt komprimerad: allt i EN vy, ingen inre scroll (2026-09-01) ───
+   Värdena är uppmätta live mot deploy-preview vid 1440x900: glass 702px < vy. */
+#void .form-panel{padding:20px 32px 16px}
+#void .form-panel h2{font-size:23px;margin-bottom:4px}
+#void .form-panel>p{font-size:12.5px;line-height:1.5;margin-bottom:8px}
+#void .intro-how{margin-bottom:10px!important;font-size:12.5px}
+#void .kontakt-book{margin:6px 0 10px}
+#void .form-group input{min-height:36px;padding:8px 12px;font-size:13.5px}
+#void .form-group textarea{min-height:54px;padding:8px 12px}
+#void .form-grid{gap:7px}
+#void .form-group label{font-size:10px;margin-bottom:2px}
+#void .void-consent{margin:8px 0;font-size:11.5px}
+#void .transmit-btn{padding:10px 18px}
+#void .scan-panel{padding:20px 28px;gap:10px}
+#void .alex-face--sm{width:220px}
+#void .ai-response{min-height:110px}
+#void .kontakt-to-system{margin-top:10px;padding:8px 12px;font-size:12px}
+
+/* Playknappen centrerad under ansiktet (sent lager hade satt den på left:30%) */
+.alex-face-play{left:50%;transform:translate(-50%,0)}
+.alex-face:hover .alex-face-play{transform:translate(-50%,0) scale(1.12)}
