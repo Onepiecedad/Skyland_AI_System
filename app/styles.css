@@ -573,7 +573,7 @@ main::-webkit-scrollbar{display:none}
 .alex-face-play .material-symbols-outlined{font-size:38px}
 .alex-face--sm .alex-face-play{width:62px;height:62px}
 .alex-face--sm .alex-face-play .material-symbols-outlined{font-size:32px}
-@media (max-height:860px){
+@media (max-height:860px) and (min-width:821px){
   .flux-columns{grid-template-columns:1fr 340px}
   .alex-face{width:340px}
   .alex-face--sm{width:280px}
@@ -589,3 +589,16 @@ main::-webkit-scrollbar{display:none}
 
 /* ─── Play-knappen snett till vänster under ansiktet ─── */
 .alex-face-play{left:30%}
+
+
+/* ─── Mobilfixar 2026-09-01: sista ordet i kaskaden ───
+   Flux: enkolumn på mobil — sena lager ("Större ansikten", max-height:860)
+   satte tvåkolumn som svämmade över 375px-skärmar.
+   Void: pilen låg över samtyckestexten; tunn scrollbar visar att kortet scrollar. */
+@media (max-width:820px){
+  .flux-columns{grid-template-columns:1fr;gap:4px}
+  .flux-right{order:-1}
+  .alex-face{width:240px}
+  #void .scroll-arrow{display:none}
+  #void .page-glass{scrollbar-width:thin;scrollbar-color:rgba(12,196,129,.45) transparent}
+}

@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Scroll to page ---
   let isNavigating = false;
+  let currentPageId = 'core'; // uppdateras av IntersectionObservern
 
   function scrollToPage(pageId) {
     const target = document.getElementById(pageId);
@@ -96,8 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function getCurrentPage() {
-    const inView = document.querySelector('.page.in-view');
-    return inView ? inView.id : 'core';
+    // Bugfix 2026-09-01: in-view togs aldrig bort, så första .page.in-view var
+    // alltid 'core' och tangentbordsnav fastnade på sektion 2. Observern äger
+    // nu sanningen om aktiv sektion.
+    return currentPageId;
   }
 
   // --- Sidebar nav clicks ---
@@ -124,7 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       const page = entry.target;
+      if (!entry.isIntersecting) {
+        page.classList.remove('in-view');
+        return;
+      }
       if (entry.isIntersecting) {
+        currentPageId = page.id;
         // Mark as in-view for CSS animations
         page.classList.add('in-view');
         
