@@ -187,16 +187,51 @@ document.addEventListener('DOMContentLoaded', () => {
     if (map[e.key]) { e.preventDefault(); navigate(map[e.key]); }
   });
 
-  // ── Trackpad-swipe som börjar vid skärmkant ──
-  const EDGE = 36;
+  // ── Tvåfingersswipe på styrplattan: navigerar i alla fyra riktningar ──
+  // Respekterar sidans egen scroll: vertikal swipe navigerar först när den
+  // aktiva panelen inte kan scrolla vidare åt det hållet (kontaktsidan m.fl.
+  // ska kunna scrollas internt utan att korset hoppar). Gesten ackumuleras och
+  // nollställs vid paus, så en lång svep ger EN navigation — inte fem.
+  const SWIPE_THRESHOLD = 90;   // hur bestämd gesten måste vara
+  const SWIPE_RESET_MS = 260;   // paus som avslutar en gest
+  const SCROLL_EPS = 2;         // tolerans för "längst upp/ner"
+  let accX = 0, accY = 0, lastWheelAt = 0, gestureConsumed = false;
+
+  function canScroll(el, dir) {
+    if (!el) return false;
+    if (dir === 'down') return el.scrollHeight - el.clientHeight - el.scrollTop > SCROLL_EPS;
+    if (dir === 'up') return el.scrollTop > SCROLL_EPS;
+    return false;
+  }
+
   window.addEventListener('wheel', (e) => {
-    const w = window.innerWidth, hh = window.innerHeight;
-    const nearL = e.clientX < EDGE, nearR = e.clientX > w - EDGE;
-    const nearT = e.clientY < EDGE, nearB = e.clientY > hh - EDGE;
-    if (!(nearL || nearR || nearT || nearB)) return;
-    const horiz = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-    if (horiz && (nearL || nearR) && Math.abs(e.deltaX) > 24) { e.preventDefault(); navigate(e.deltaX > 0 ? 'right' : 'left'); }
-    else if (!horiz && (nearT || nearB) && Math.abs(e.deltaY) > 24) { e.preventDefault(); navigate(e.deltaY > 0 ? 'down' : 'up'); }
+    const now = Date.now();
+    if (now - lastWheelAt > SWIPE_RESET_MS) { accX = 0; accY = 0; gestureConsumed = false; }
+    lastWheelAt = now;
+    if (gestureConsumed) return;
+
+    // Scroll inuti ett eget scrollande element (t.ex. formulärkortet) lämnas ifred
+    const page = pages[layout.center];
+    const inner = e.target.closest ? e.target.closest('.page-glass, textarea') : null;
+    const scroller = (inner && inner.scrollHeight > inner.clientHeight) ? inner : page;
+
+    accX += e.deltaX;
+    accY += e.deltaY;
+    const horiz = Math.abs(accX) > Math.abs(accY);
+
+    if (horiz) {
+      if (Math.abs(accX) < SWIPE_THRESHOLD) return;
+      e.preventDefault();
+      gestureConsumed = true;
+      navigate(accX > 0 ? 'right' : 'left');
+    } else {
+      const dir = accY > 0 ? 'down' : 'up';
+      if (canScroll(scroller, dir)) return;      // sidan scrollar själv först
+      if (Math.abs(accY) < SWIPE_THRESHOLD) return;
+      e.preventDefault();
+      gestureConsumed = true;
+      navigate(dir);
+    }
   }, { passive: false });
 
   // ── Touch-swipe i sidled (mobil) — vertikalt lämnas åt inre scroll ──
