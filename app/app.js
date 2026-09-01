@@ -168,16 +168,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Kantpilarna lär ut svepet på mobil. När en riktning väl använts slutar den
   // pulsa och blir en svag vilogöd — fyra saker som blinkar i evighet är brus
   // för den som redan kan sajten. Sparas per webbläsare.
+  // sessionStorage, inte localStorage: inlärningen gäller det här besöket.
+  // Med localStorage slocknade pilarna för alltid så fort man svept åt alla
+  // fyra håll en gång — för den som använder sajten dagligen syntes de aldrig
+  // igen. Nu bjuder de in på nytt varje gång man kommer tillbaka.
   const LEARNED_KEY = 'skyland_swipe_learned';
   let learned = new Set();
-  try { learned = new Set(JSON.parse(localStorage.getItem(LEARNED_KEY) || '[]')); } catch (e) { /* ignore */ }
+  try { learned = new Set(JSON.parse(sessionStorage.getItem(LEARNED_KEY) || '[]')); } catch (e) { /* ignore */ }
+  try { localStorage.removeItem(LEARNED_KEY); } catch (e) { /* rensar det gamla permanenta läget */ }
   function applyLearned() {
     DIRECTIONS.forEach(d => edges[d].classList.toggle('is-learned', learned.has(d)));
   }
   function markLearned(dir) {
     if (learned.has(dir)) return;
     learned.add(dir);
-    try { localStorage.setItem(LEARNED_KEY, JSON.stringify([...learned])); } catch (e) { /* ignore */ }
+    try { sessionStorage.setItem(LEARNED_KEY, JSON.stringify([...learned])); } catch (e) { /* ignore */ }
     applyLearned();
   }
   applyLearned();
