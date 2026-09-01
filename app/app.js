@@ -85,12 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
     swapTimer = setTimeout(() => {
       document.body.classList.remove('is-swapping');
       if (window.SkylandBG && typeof window.SkylandBG.resume === 'function') window.SkylandBG.resume();
-    }, 620);
+    }, 880);
   }
 
   function navigate(dir) {
     const now = Date.now();
-    if (now - cooldown < 450) return;
+    if (now - cooldown < 620) return;
     cooldown = now;
     if (layout.center === 'flux' && window.SkylandVoice) window.SkylandVoice.stop();
     const incoming = layout[dir];
