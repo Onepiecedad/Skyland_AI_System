@@ -688,3 +688,19 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
   .tour-bubble{bottom:calc(88px + env(safe-area-inset-bottom))}
   #void .page-glass{overflow-y:visible}
 }
+
+/* ─── Finputs 2026-09-01 kväll ─── */
+
+/* 1. Kantpilarna pulserar grönt och bjuder in till klick */
+@keyframes edgePulse{0%,100%{box-shadow:0 0 0 0 rgba(67,225,155,0);border-color:rgba(67,225,155,.2);color:rgba(67,225,155,.65)}50%{box-shadow:0 0 16px 2px rgba(67,225,155,.38);border-color:rgba(67,225,155,.6);color:var(--primary)}}
+.fnav-edge{opacity:.85;animation:edgePulse 2.8s ease-in-out infinite}
+.fnav-edge--right{animation-delay:.7s}
+.fnav-edge--down{animation-delay:1.4s}
+.fnav-edge--left{animation-delay:2.1s}
+.fnav-edge:hover{animation:none;opacity:1;box-shadow:0 0 16px 2px rgba(67,225,155,.38)}
+@media (prefers-reduced-motion:reduce){.fnav-edge{animation:none}}
+
+/* 2. Kontakt: kortet växer med innehållet i stället för att klippa det;
+      sidan scrollar och safe center hindrar toppklipp vid högt innehåll */
+.page{align-items:safe center;justify-content:safe center}
+#void .void-inner{max-height:none}
