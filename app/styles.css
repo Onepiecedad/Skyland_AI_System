@@ -704,3 +704,7 @@ main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-
       sidan scrollar och safe center hindrar toppklipp vid högt innehåll */
 .page{align-items:safe center;justify-content:safe center}
 #void .void-inner{max-height:none}
+
+/* Kontakt → Systemet-genväg under AI-svaret */
+.kontakt-to-system{margin-top:14px;align-self:flex-start;display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;border:1px solid rgba(67,225,155,.35);background:rgba(67,225,155,.08);color:var(--primary);font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:background .15s ease}
+.kontakt-to-system:hover{background:rgba(67,225,155,.18)}
