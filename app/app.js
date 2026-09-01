@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sv: { core: 'Hem', neural: 'Tjänster', dashboard: 'Systemet', flux: 'Demo', void: 'Kontakt' },
     en: { core: 'Home', neural: 'Services', dashboard: 'The System', flux: 'Demo', void: 'Contact' },
   };
+  // Headerkorset på mobil har 13 px celler — där ryms en bokstav, inte ett ord.
+  const SHORT = {
+    sv: { core: 'H', neural: 'T', dashboard: 'S', flux: 'D', void: 'K' },
+    en: { core: 'H', neural: 'S', dashboard: 'T', flux: 'D', void: 'C' },
+  };
   function lang() {
     try {
       if (window.SkylandLang) return window.SkylandLang.getCurrentLang();
@@ -35,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) { return 'sv'; }
   }
   const labels = LABELS[lang()] || LABELS.sv;
+  const shortLabels = SHORT[lang()] || SHORT.sv;
 
   const pages = {};
   PAGE_IDS.forEach(id => { pages[id] = document.getElementById(id); });
@@ -135,6 +141,26 @@ document.addEventListener('DOMContentLoaded', () => {
     edges[dir] = b;
   });
 
+  // ── Headerkors (mobil) ──
+  // Den flytande widgeten tog en remsa i underkant och låg i vägen. På telefon
+  // sitter korset i stället i headern bredvid språkväljaren: fem celler, den
+  // man står på upplyst i mitten, de fyra grannarna runt om som tryckytor.
+  const headerCross = document.createElement('nav');
+  headerCross.className = 'fnav-hcross';
+  headerCross.setAttribute('aria-label', 'Navigering');
+  headerCross.innerHTML =
+    '<span></span><button class="hc" data-dir="up"></button><span></span>' +
+    '<button class="hc" data-dir="left"></button>' +
+    '<span class="hc hc--center" data-dir="center"></span>' +
+    '<button class="hc" data-dir="right"></button>' +
+    '<span></span><button class="hc" data-dir="down"></button><span></span>';
+  const headerEl = document.querySelector('header');
+  const langEl = document.querySelector('.lang-switcher');
+  if (headerEl && langEl) headerEl.insertBefore(headerCross, langEl);
+  headerCross.querySelectorAll('button.hc[data-dir]').forEach(b => {
+    b.addEventListener('click', () => navigate(b.dataset.dir));
+  });
+
   // ── Navigationskorset (dragbart, kollapsbart) ──
   const minimap = document.createElement('div');
   minimap.className = 'fnav-minimap';
@@ -209,6 +235,18 @@ document.addEventListener('DOMContentLoaded', () => {
       mini.textContent = labels[layout[dir]];
       mini.setAttribute('data-page', layout[dir]);
     });
+    DIRECTIONS.forEach(dir => {
+      const cell = headerCross.querySelector('[data-dir="' + dir + '"]');
+      cell.textContent = shortLabels[layout[dir]];
+      cell.title = labels[layout[dir]];
+      cell.setAttribute('aria-label', labels[layout[dir]]);
+      cell.setAttribute('data-page', layout[dir]);
+    });
+    const hcc = headerCross.querySelector('[data-dir="center"]');
+    hcc.textContent = shortLabels[layout.center];
+    hcc.title = labels[layout.center];
+    hcc.setAttribute('data-page', layout.center);
+
     const c = minimap.querySelector('[data-dir="center"]');
     c.textContent = labels[layout.center];
     c.setAttribute('data-page', layout.center);
