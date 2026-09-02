@@ -140,6 +140,7 @@
 
   function render() {
     if (!active) return;
+    if (window.SkylandNav && window.SkylandNav.mode === 'scroll') { stop(); return; }
     var cur = window.SkylandNav ? window.SkylandNav.current() : null;
     var step = cur ? stepFor(cur) : null;
     if (!step) { hide(); return; }
