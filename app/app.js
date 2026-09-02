@@ -17,7 +17,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const PAGE_IDS = ['core', 'neural', 'dashboard', 'flux', 'void'];
   const DIRECTIONS = ['up', 'right', 'down', 'left'];
-  const DEFAULT_LAYOUT = { center: 'core', up: 'dashboard', left: 'neural', right: 'flux', down: 'void' };
+
+  /* ── Två hjul i stället för ett roterande kors (2026-09-02) ──────────────
+     Korset roterade vid varje förflyttning: sidan man kom ifrån lades i det
+     hål man drog in den nya från. Då bytte riktningarna betydelse under
+     fötterna på besökaren, och svep upp följt av svep ner tog en någon
+     annanstans. Det fanns inget "tillbaka" i systemet.
+     Nu ligger de fem sidorna på två hjul. Vänster/höger vrider det
+     horisontella, upp/ner det vertikala, och ett svep åt motsatt håll tar
+     alltid tillbaka. Varje sida har därmed fyra fasta grannar, och korset i
+     headern visar dem som de är — det slutar bara rotera.
+     Det vertikala hjulet är det horisontella med varannan sida (pentagonen
+     och pentagrammet). Det är inte ett estetiskt val: med fem sidor är det
+     enda sättet att få fyra olika grannar runt varje mitt. Byter man ordning
+     i det ena hjulet måste det andra följa med, annars dyker samma sida upp
+     två gånger i korset och en saknas. */
+  const RING_H = ['dashboard', 'core', 'void', 'neural', 'flux'];   // S H K T D
+  const RING_V = ['core', 'neural', 'dashboard', 'void', 'flux'];   // H T S K D
+  const HOME = 'core';
+  function ringStep(ring, id, step) {
+    const i = ring.indexOf(id);
+    return ring[(i + step + ring.length) % ring.length];
+  }
+  function layoutFor(center) {
+    return {
+      center,
+      left: ringStep(RING_H, center, -1), right: ringStep(RING_H, center, +1),
+      up: ringStep(RING_V, center, +1), down: ringStep(RING_V, center, -1),
+    };
+  }
   const ROLE_OFFSET = {
     center: 'translate(0,0)', up: 'translate(0,-104%)', down: 'translate(0,104%)',
     left: 'translate(-104%,0)', right: 'translate(104%,0)',
@@ -46,15 +74,17 @@ document.addEventListener('DOMContentLoaded', () => {
   PAGE_IDS.forEach(id => { pages[id] = document.getElementById(id); });
   const mainEl = document.querySelector('main');
 
+  // Bara mitten sparas i praktiken: grannarna följer av hjulen. Ett gammalt
+  // sparat, roterat kors läses därför som "den sidan" och räknas om.
   function loadLayout() {
     try {
       const raw = localStorage.getItem(LAYOUT_KEY);
-      if (!raw) return { ...DEFAULT_LAYOUT };
-      const p = JSON.parse(raw);
-      const vals = [p.center, p.up, p.right, p.down, p.left];
-      if (new Set(vals).size === 5 && vals.every(v => PAGE_IDS.includes(v))) return p;
-    } catch (e) { /* korrupt → default */ }
-    return { ...DEFAULT_LAYOUT };
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (p && PAGE_IDS.includes(p.center)) return layoutFor(p.center);
+      }
+    } catch (e) { /* korrupt → hem */ }
+    return layoutFor(HOME);
   }
   let layout = loadLayout();
   let cooldown = 0;
@@ -64,10 +94,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return DIRECTIONS.find(d => layout[d] === id) || 'up';
   }
 
+  // Vid ett svep byter tre paneler plats utanför skärmen. De är osynliga
+  // (visibility:hidden) men skulle ändå animera sin transform i .82 s — tre
+  // paneler i rörelse för ingenting. De flyttas direkt, utan övergång.
+  let prevRoles = {};
   function applyLayout() {
     PAGE_IDS.forEach(id => {
       const role = roleOf(id);
       const isCenter = role === 'center';
+      const was = prevRoles[id];
+      if (was && was !== 'center' && !isCenter && was !== role) {
+        pages[id].classList.add('is-parked');
+        pages[id].style.transform = ROLE_OFFSET[role];
+        void pages[id].offsetWidth;
+        pages[id].classList.remove('is-parked');
+      }
+      prevRoles[id] = role;
       pages[id].style.transform = ROLE_OFFSET[role];
       pages[id].classList.toggle('active', isCenter);
       pages[id].classList.toggle('in-view', isCenter);
@@ -121,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Nollställ scrollen INNAN panelen börjar röra sig — görs den efteråt
     // hoppar innehållet synligt medan skivan glider in.
     resetScroll(pages[incoming]);
-    layout = { ...layout, center: incoming, [dir]: layout.center };
+    layout = layoutFor(incoming);
     applyLayout();
   }
 
@@ -132,8 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   window.SkylandNav = {
     showPage: focusPane, pageIds: PAGE_IDS, current: () => layout.center,
-    // Korset roterar när man flyttar sig — den som vill peka mot en sida
-    // måste fråga var den ligger just nu, inte minnas var den låg.
+    // Riktningen till en sida är fast per mitt, men beror på vilken mitt
+    // man står i — fråga alltid, minns aldrig.
     directionTo: (id) => DIRECTIONS.find(d => layout[d] === id) || null,
   };
 
@@ -453,10 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Start: hash-djuplänk vinner över sparat läge ──
   const hash = location.hash.replace('#', '');
-  if (PAGE_IDS.includes(hash) && layout.center !== hash) {
-    const dir = DIRECTIONS.find(d => layout[d] === hash);
-    if (dir) layout = { ...layout, center: hash, [dir]: layout.center };
-  }
+  if (PAGE_IDS.includes(hash) && layout.center !== hash) layout = layoutFor(hash);
   applyLayout();
 
   // ── Smart Portal: live-spegling av formulärfälten ──
