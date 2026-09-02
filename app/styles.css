@@ -1733,3 +1733,36 @@ main { overscroll-behavior: none; }
   #neural .svc-card p{font-size:clamp(calc(11 * var(--k) * 1px), calc((2.123vh - 3.01px) * var(--k)), 12.5px)}
   #neural .svc-card strong{font-size:clamp(calc(13.5 * var(--k) * 1px), calc((2.606vh - 3.70px) * var(--k)), 15px)}
 }
+
+/* ── Hero i tre steg (2026-09-02) ──────────────────────────────────────────
+   Rotatorn ställer frågan, bryggan landar vändningen, problemraden är det man
+   ska minnas och löftet stänger. Problemen är samma fyra ord som korten på
+   Tjänster — hero namnger, Tjänster förklarar.
+   Symbolerna i flödet är egna SVG, inte teckensnittsikoner: ✦ är Alex märke
+   och ska se likadan ut överallt. */
+.hero-problems{
+  color:var(--primary);font-weight:500;line-height:1.5;margin:0 auto;
+  text-shadow:0 0 18px rgba(67,225,155,.4);
+  animation:heroHlBreathe 4.5s ease-in-out infinite;
+}
+.hero-promise{color:var(--on-bg);font-weight:300;line-height:1.5;margin:0 auto}
+.hero-desc{color:var(--on-surface-var)}
+.hf-ico svg{width:1em;height:1em;display:block}
+
+@media (max-width: 820px){
+  #core .hero-desc{font-size:clamp(calc(13 * var(--k) * 1px), calc((2.9vh - 4.1px) * var(--k)), 16.5px);
+                   margin-top:clamp(calc(8 * var(--k) * 1px), calc((2.6vh - 3.7px) * var(--k)), 28px)}
+  #core .hero-problems{font-size:clamp(calc(14.5 * var(--k) * 1px), calc((3.3vh - 4.7px) * var(--k)), 19.5px);
+                       margin-top:clamp(calc(6 * var(--k) * 1px), calc((1.8vh - 2.6px) * var(--k)), 16px)}
+  #core .hero-promise{font-size:clamp(calc(13 * var(--k) * 1px), calc((2.9vh - 4.1px) * var(--k)), 16.5px);
+                      margin-top:clamp(calc(6 * var(--k) * 1px), calc((1.8vh - 2.6px) * var(--k)), 16px)}
+  #core .hero-tag{margin-top:clamp(calc(8 * var(--k) * 1px), calc((2.4vh - 3.4px) * var(--k)), 26px)}
+  #core .hero-flow{margin-top:clamp(calc(12 * var(--k) * 1px), calc((3.6vh - 5.1px) * var(--k)), 44px)}
+  #core .hero-links{margin-top:clamp(calc(8 * var(--k) * 1px), calc((3.0vh - 4.3px) * var(--k)), 36px)}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero-problems{animation:none;text-shadow:0 0 18px rgba(67,225,155,.5)}
+}
+/* Ljuspunkten ska passera bakom symbolerna, inte över dem. */
+.hf-track{z-index:0}
+.hf-step{position:relative;z-index:1}
