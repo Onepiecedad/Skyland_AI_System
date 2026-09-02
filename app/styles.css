@@ -2128,3 +2128,12 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
   .flux-book{margin:12px 0 0;flex-direction:column;gap:5px}
   .flux-book .dash-book{padding:8px 14px;font-size:12px}
 }
+
+/* ── Snap mellan sektionerna ──────────────────────────────────────────────
+   Ett svep = en sektion: sidan glider in och stannar. Snap-punkten ligger
+   vid varje sektions topp, med scroll-margin så att den hamnar under
+   headern. scroll-snap-stop:always gör att en lång snärt inte hoppar över
+   en sektion. Innehåll som är högre än skärmen (Kontakt när
+   meddelandefältet växer) går fortfarande att scrolla inom sektionen. */
+html.is-scroll{scroll-snap-type:y mandatory}
+html.is-scroll .page{scroll-snap-align:start;scroll-snap-stop:always}
