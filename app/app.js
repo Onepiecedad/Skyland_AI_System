@@ -499,21 +499,20 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(function () {
     var lang = (document.documentElement.lang || 'sv').slice(0, 2);
     var txt = lang === 'en' ? 'Swipe to navigate' : 'Swipa för att navigera';
-    var CH = {
-      up: '<polyline points="18 15 12 9 6 15"/>', down: '<polyline points="6 9 12 15 18 9"/>',
-      left: '<polyline points="15 18 9 12 15 6"/>', right: '<polyline points="9 18 15 12 9 6"/>'
-    };
-    function chev(dir) {
-      return '<span class="shc shc--' + dir + '"><svg viewBox="0 0 24 24" fill="none" ' +
-        'stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-        CH[dir] + '</svg></span>';
+    // Tre chevroner som tänds i följd bygger en svepande rörelse i stället för
+    // en stillastående bild. Samma komponent används i rundturens pill — ett
+    // visuellt språk för "dra hitåt".
+    function cascade(dir) {
+      var c = '<svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.6" ' +
+              'stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 3l8.5 8"/></svg>';
+      return '<span class="sw-cas sw-cas--' + dir + '">' + c + c + c + '</span>';
     }
     el = document.createElement('div');
     el.className = 'swipe-hint';
     el.setAttribute('aria-hidden', 'true');
     el.innerHTML = '<div class="swipe-hint-box">' +
-      '<div class="swipe-hint-cross">' + chev('up') + chev('right') + chev('down') + chev('left') +
-      '<span class="shc-dot"></span></div>' +
+      '<div class="swipe-hint-cross">' + cascade('up') + cascade('right') +
+        cascade('down') + cascade('left') + '</div>' +
       '<div class="swipe-hint-text">' + txt + '</div>' +
       '<button type="button" class="swipe-hint-tour">' +
         (lang === 'en' ? 'Show me around' : 'Visa mig runt') + ' \u2192</button></div>';
@@ -529,6 +528,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('touchstart', dismiss, true);
     window.addEventListener('pointerdown', dismiss, true);
     window.addEventListener('keydown', dismiss, true);
-    setTimeout(dismiss, 5500);
+    setTimeout(dismiss, 6800);
   }, 1000);
 })();

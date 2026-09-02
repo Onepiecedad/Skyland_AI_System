@@ -1252,7 +1252,13 @@ main { overscroll-behavior: none; }
   #dashboard .dash-panels { align-items: center; }
   #dashboard .dash-panel.active { max-height: 100%; }
   #dashboard .dash-empty { height: auto; max-height: 100%; }
-  #dashboard .dash-inner { justify-content: space-between; }
+  /* space-between fördelade slacken som luft mellan blocken. Ändras höjden
+     under sidans liv — iOS adressfält som fälls in, teckensnitt som laddar —
+     kan head och flikar hamna ovanför vyn. Panelen suger upp slacken i
+     stället, och toppen står still. */
+  #dashboard .dash-inner { justify-content: flex-start; }
+  #dashboard .dash-head, #dashboard .dash-tabs { flex: 0 0 auto; }
+  #dashboard .dash-panels { flex: 1 1 auto; }
 
   /* Demo: space-between sköt röstpanelen ända ner och lämnade ett hål under
      texten. Raderna får ligga i mitten med en jämn lucka i stället. */
@@ -1561,24 +1567,9 @@ main { overscroll-behavior: none; }
 .swipe-hint.is-on{opacity:1}
 .swipe-hint-box{display:flex;flex-direction:column;align-items:center;gap:16px;padding:28px 32px;border-radius:18px;background:rgba(4,14,9,.74);border:1px solid rgba(67,225,155,.35);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 48px rgba(0,0,0,.45)}
 .swipe-hint-cross{position:relative;width:96px;height:96px}
-.swipe-hint-cross .shc{position:absolute;width:24px;height:24px;color:var(--primary);filter:drop-shadow(0 0 7px rgba(67,225,155,.85))}
-.swipe-hint-cross .shc svg{width:100%;height:100%;display:block}
-.swipe-hint-cross .shc--up{top:0;left:50%;transform:translateX(-50%);animation:shDriftUp 1.6s ease-in-out infinite}
-.swipe-hint-cross .shc--down{bottom:0;left:50%;transform:translateX(-50%);animation:shDriftDown 1.6s ease-in-out infinite}
-.swipe-hint-cross .shc--left{left:0;top:50%;transform:translateY(-50%);animation:shDriftLeft 1.6s ease-in-out infinite}
-.swipe-hint-cross .shc--right{right:0;top:50%;transform:translateY(-50%);animation:shDriftRight 1.6s ease-in-out infinite}
-.swipe-hint-cross .shc-dot{position:absolute;left:50%;top:50%;width:8px;height:8px;transform:translate(-50%,-50%);border-radius:50%;background:var(--primary);box-shadow:0 0 10px rgba(67,225,155,.9)}
 .swipe-hint-text{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--on-bg)}
-@keyframes shDriftUp{0%,100%{transform:translate(-50%,0);opacity:.45}50%{transform:translate(-50%,-8px);opacity:1}}
-@keyframes shDriftDown{0%,100%{transform:translate(-50%,0);opacity:.45}50%{transform:translate(-50%,8px);opacity:1}}
-@keyframes shDriftLeft{0%,100%{transform:translate(0,-50%);opacity:.45}50%{transform:translate(-8px,-50%);opacity:1}}
-@keyframes shDriftRight{0%,100%{transform:translate(0,-50%);opacity:.45}50%{transform:translate(8px,-50%);opacity:1}}
 @media (prefers-reduced-motion: reduce){
-  .swipe-hint-cross .shc--up,.swipe-hint-cross .shc--down{animation:shGlowY 1.6s ease-in-out infinite}
-  .swipe-hint-cross .shc--left,.swipe-hint-cross .shc--right{animation:shGlowX 1.6s ease-in-out infinite}
-}
-@keyframes shGlowY{0%,100%{transform:translate(-50%,0);opacity:.55}50%{transform:translate(-50%,0);opacity:1}}
-@keyframes shGlowX{0%,100%{transform:translate(0,-50%);opacity:.55}50%{transform:translate(0,-50%);opacity:1}}
+    }
 
 /* ── Kedjan formulär → Systemet → Alex (2026-09-02) ────────────────────────
    Efter skickat formulär pulserar vägen vidare till svaret i Systemet.
@@ -1822,4 +1813,63 @@ main { overscroll-behavior: none; }
 @media (prefers-reduced-motion: reduce){
   .guide-arrow svg{animation:guideGlow 2.4s ease-in-out infinite}
   @keyframes guideGlow{0%,100%{opacity:.55}50%{opacity:1}}
+}
+
+/* ── Svepkaskaden (2026-09-02) ─────────────────────────────────────────────
+   Tre chevroner som tänds i följd. Yttre elementet vrider hela kaskaden åt
+   rätt håll; barnen far framåt i sin egen vridna axel, så en uppsättning
+   keyframes räcker för alla fyra riktningar. Används både i förstagångshinten
+   och i rundturens pill — samma rörelse betyder samma sak. */
+.sw-cas{display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--primary)}
+.sw-cas svg{width:22px;height:13px;display:block;opacity:0;
+  filter:drop-shadow(0 0 7px rgba(67,225,155,.8));
+  animation:swCas 1.8s ease-in-out infinite}
+/* Den som ligger längst fram i rörelseriktningen tänds sist. */
+.sw-cas svg:nth-child(3){animation-delay:0s}
+.sw-cas svg:nth-child(2){animation-delay:.16s}
+.sw-cas svg:nth-child(1){animation-delay:.32s}
+@keyframes swCas{
+  0%{opacity:0;transform:translateY(5px)}
+  16%{opacity:1;transform:translateY(0)}
+  46%{opacity:1;transform:translateY(-2px)}
+  72%{opacity:0;transform:translateY(-5px)}
+  100%{opacity:0;transform:translateY(-5px)}
+}
+
+/* Hinten: fyra svep runt mitten, ett i taget, så det läses som fyra
+   riktningar och inte som en blinkande stjärna. */
+.swipe-hint-cross{width:132px;height:132px}
+.swipe-hint-cross .sw-cas{position:absolute}
+.swipe-hint-cross .sw-cas--up{top:0;left:50%;transform:translateX(-50%) rotate(0deg)}
+.swipe-hint-cross .sw-cas--right{top:50%;right:0;transform:translateY(-50%) rotate(90deg);transform-origin:center}
+.swipe-hint-cross .sw-cas--down{bottom:0;left:50%;transform:translateX(-50%) rotate(180deg)}
+.swipe-hint-cross .sw-cas--left{top:50%;left:0;transform:translateY(-50%) rotate(270deg)}
+.swipe-hint-cross .sw-cas--up svg{animation-name:swCasA}
+.swipe-hint-cross .sw-cas--right svg{animation-name:swCasB}
+.swipe-hint-cross .sw-cas--down svg{animation-name:swCasC}
+.swipe-hint-cross .sw-cas--left svg{animation-name:swCasD}
+.swipe-hint-cross .sw-cas svg{animation-duration:4.4s}
+/* Fyra fönster i ett sexsekunderscykel: upp, höger, ner, vänster. */
+@keyframes swCasA{0%{opacity:0;transform:translateY(5px)}5%{opacity:1;transform:translateY(0)}
+  16%{opacity:0;transform:translateY(-5px)}100%{opacity:0;transform:translateY(-5px)}}
+@keyframes swCasB{25%{opacity:0;transform:translateY(5px)}30%{opacity:1;transform:translateY(0)}
+  41%{opacity:0;transform:translateY(-5px)}0%,100%{opacity:0;transform:translateY(-5px)}}
+@keyframes swCasC{50%{opacity:0;transform:translateY(5px)}55%{opacity:1;transform:translateY(0)}
+  66%{opacity:0;transform:translateY(-5px)}0%,100%{opacity:0;transform:translateY(-5px)}}
+@keyframes swCasD{75%{opacity:0;transform:translateY(5px)}80%{opacity:1;transform:translateY(0)}
+  91%{opacity:0;transform:translateY(-5px)}0%,100%{opacity:0;transform:translateY(-5px)}}
+
+/* Pillret: kaskaden ersätter den enda pilen, och underrubriken är borta —
+   riktningen är budskapet. */
+.guide-arrow{width:auto;height:auto}
+.guide-arrow svg{width:22px;height:13px;animation:swCas 1.8s ease-in-out infinite;opacity:0}
+.guide-arrow svg:nth-child(3){animation-delay:0s}
+.guide-arrow svg:nth-child(2){animation-delay:.16s}
+.guide-arrow svg:nth-child(1){animation-delay:.32s}
+.guide-t2{display:none}
+
+@media (prefers-reduced-motion: reduce){
+  .sw-cas svg,.guide-arrow svg,
+  .swipe-hint-cross .sw-cas svg{animation:swCasStill 2.6s ease-in-out infinite;animation-delay:0s}
+  @keyframes swCasStill{0%,100%{opacity:.45;transform:none}50%{opacity:1;transform:none}}
 }
