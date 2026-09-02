@@ -19,12 +19,9 @@
   var KEY = 'skyland_guide_v1';
 
   var STEPS = [
-    { page: 'core', next: 'neural',
-      sv: ['Svep hitåt', 'Vilka problem vi tar bort'],
-      en: ['Swipe this way', 'The problems we remove'] },
-    { page: 'neural', next: 'void',
-      sv: ['Svep hitåt', 'Berätta vad som kostar dig tid'],
-      en: ['Swipe this way', "Tell us what's costing you time"] },
+    { page: 'core', next: 'neural' },
+    { page: 'neural', next: 'void' },
+    { page: 'dashboard', next: 'flux' },
   ];
 
   // Att hämta in sidan till höger görs genom att dra fingret åt vänster.
@@ -48,10 +45,8 @@
     el.className = 'guide';
     el.innerHTML =
       '<div class="guide-pill">' +
-        '<span class="guide-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-          'stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">' +
-          '<path d="M12 19V5"/><path d="M5.5 11.5 12 5l6.5 6.5"/></svg></span>' +
-        '<span class="guide-t1"></span><span class="guide-t2"></span>' +
+        '<span class="guide-arrow sw-cas">' + '<svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 3l8.5 8"/></svg>' + '<svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 3l8.5 8"/></svg>' + '<svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 3l8.5 8"/></svg>' + '</span>' +
+        '<span class="guide-t1"></span>' +
         '<button type="button" class="guide-skip" aria-label="Avsluta">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" ' +
           'stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
@@ -69,10 +64,9 @@
     if (!dir) { if (el) el.classList.remove('is-on'); return; }
 
     build();
-    var l = lang(), txt = step[l];
+    var l = lang();
     var finger = FINGER[dir];
-    el.querySelector('.guide-t1').textContent = txt[0];
-    el.querySelector('.guide-t2').textContent = txt[1];
+    el.querySelector('.guide-t1').textContent = l === 'en' ? 'Swipe this way' : 'Svep hitåt';
     el.querySelector('.guide-skip').setAttribute('aria-label', l === 'en' ? 'End the tour' : 'Avsluta rundturen');
     var arrow = el.querySelector('.guide-arrow');
     // Yttre elementet vrider pilen, den inre svg:n far framåt i sin egen
