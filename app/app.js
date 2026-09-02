@@ -122,9 +122,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const langEl = document.querySelector('.lang-switcher');
     if (headerEl && langEl) headerEl.insertBefore(rail, langEl);
 
+    // Scroll-ikonen: tre chevroner som tänds i följd nedåt, med glöd, i
+    // remsan under kortet. Trycker man på den glider nästa sektion in. På
+    // sista sektionen slocknar den — det finns inget mer att peka på.
+    const chev = '<svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.6" ' +
+      'stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 3l8.5 8"/></svg>';
+    const cue = document.createElement('button');
+    cue.type = 'button';
+    cue.className = 'scroll-cue';
+    cue.setAttribute('aria-label', lang() === 'en' ? 'Scroll down' : 'Scrolla ner');
+    cue.innerHTML = '<span class="sw-cas">' + chev + chev + chev + '</span>';
+    cue.addEventListener('click', () => {
+      const i = ORDER.indexOf(current);
+      if (i < ORDER.length - 1) go(ORDER[i + 1]);
+    });
+    document.body.appendChild(cue);
+
     let current = ORDER[0];
     function setCurrent(id) {
       rail.querySelectorAll('.rail-btn').forEach(b => b.classList.toggle('is-current', b.dataset.page === id));
+      cue.classList.toggle('is-off', id === ORDER[ORDER.length - 1]);
       if (id === current) return;
       current = id;
       history.replaceState(null, '', '#' + id);
