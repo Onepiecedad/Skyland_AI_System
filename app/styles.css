@@ -2087,7 +2087,9 @@ main { overscroll-behavior: none; }
    dokumentet ska aldrig scrolla — 100vh är den stora viewporten på iOS och
    kortet gled in under headern förut. Det här är samma konstruktion som
    sajten hade från början, innan korset. */
-html.is-scroll, html.is-scroll body{height:100%;overflow:hidden;overscroll-behavior:none}
+/* Låset från SCC:s mobil-CSS: position:fixed på dokumentet dödar iOS
+   gummiband och adressfältshopp helt, inte bara scrollen. */
+html.is-scroll, html.is-scroll body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
 html.is-scroll main{
   height:100dvh;min-height:0;overflow-y:auto;overflow-x:hidden;
   display:flex;flex-direction:column;

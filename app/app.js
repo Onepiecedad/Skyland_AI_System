@@ -154,26 +154,38 @@ document.addEventListener('DOMContentLoaded', () => {
        ser kortet komma. Hjulet på desktop och piltangenterna ger samma
        glid. Element som scrollar själva (Systemets panel, meddelandefältet)
        lämnas ifred när de kan scrolla åt det hållet. */
-    const GLIDE_MS = 1000;
+    /* Rörelsen är en fjäder, inte en tidskurva — samma modell som SCC:s
+       panelbyten (framer-motion spring). Skillnaden mot en kurva: kortet
+       tar över fingrets fart i släppet och bromsar in mjukt, i stället för
+       att starta om från noll. Kritiskt dämpad: ingen studs, lång mjuk
+       landning. Tre tal styr känslan — lägre stiffness = segare. */
+    const SPRING = { stiffness: 48, damping: 14, mass: 1 };
     const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     function targetTop(id) {
       const el = pages[id];
       return Math.max(0, el.offsetTop - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0));
     }
     let glide = 0;
-    function glideTo(id) {
+    function glideTo(id, v0) {
       if (!pages[id]) return;
       cancelAnimationFrame(glide);
-      const from = mainEl.scrollTop, to = targetTop(id), dist = to - from;
-      if (Math.abs(dist) < 1) return;
+      const to = targetTop(id);
+      let x = mainEl.scrollTop, v = (v0 || 0) * 1000;   // px/s
+      if (Math.abs(to - x) < 1 && Math.abs(v) < 20) return;
       if (reduced) { mainEl.scrollTop = to; return; }
-      const t0 = performance.now();
-      const ease = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      let last = performance.now();
       (function step(now) {
-        const x = Math.min(1, (now - t0) / GLIDE_MS);
-        mainEl.scrollTop = from + dist * ease(x);
-        if (x < 1) glide = requestAnimationFrame(step); else glide = 0;
-      })(t0);
+        let dt = Math.min(0.032, (now - last) / 1000); last = now;
+        // Delsteg för stabilitet vid låg bildfrekvens.
+        for (let i = 0; i < 4; i++) {
+          const h = dt / 4;
+          const a = (-SPRING.stiffness * (x - to) - SPRING.damping * v) / SPRING.mass;
+          v += a * h; x += v * h;
+        }
+        if (Math.abs(x - to) < 1.5 && Math.abs(v) < 30) { mainEl.scrollTop = to; glide = 0; return; }
+        mainEl.scrollTop = x;
+        glide = requestAnimationFrame(step);
+      })(last);
     }
     function go(id) { glideTo(id); }
     function neighbour(id, dir) {
@@ -244,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dir = flick ? (t.v < 0 ? 1 : -1) : (dy > 0 ? 1 : -1);
         target = neighbour(t.startId, dir);
       }
-      glideTo(target);
+      glideTo(target, -t.v);
     }
     mainEl.addEventListener('touchend', touchEnd, { passive: true });
     mainEl.addEventListener('touchcancel', touchEnd, { passive: true });
@@ -263,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
       acc += e.deltaY;
       if (Math.abs(acc) < 40) return;
       acc = 0;
-      wheelLock = now + GLIDE_MS + 150;
+      wheelLock = now + 900;
       glideTo(neighbour(current, dir));
     }, { passive: false });
 
