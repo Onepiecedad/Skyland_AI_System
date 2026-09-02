@@ -427,7 +427,6 @@ document.addEventListener('DOMContentLoaded', () => {
   agentCards.forEach((card, i) => {
     const head = card.querySelector('.dash-agent-head');
     if (!head) return;
-    if (i === 0) card.classList.add('is-open');
     head.setAttribute('role', 'button');
     head.setAttribute('tabindex', '0');
     const toggle = () => {
