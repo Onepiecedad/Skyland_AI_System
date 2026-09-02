@@ -77,7 +77,7 @@
             sector_value: "AI Automation",
 
       // Flux intro (live demo copy)
-      flux_kicker: "LIVE DEMO — VOICE AGENT",
+      flux_kicker: "LIVE DEMO — TALK TO ALEX",
       flux_h1: "The customer calls.<br/>You can't answer.",
       flux_desc: "You're working, driving or asleep. The customer wants an answer now — or they call the next company. Alex answers right away and books a meeting. Try it yourself: tap the orb and talk to her.",
       flux_how: "Click the orb or pick a question below. Your browser will ask for microphone access.",
@@ -214,7 +214,7 @@
             sector_value: "AI-automatisering",
 
       // Flux intro (live demo copy)
-      flux_kicker: "LIVE DEMO — RÖSTAGENT",
+      flux_kicker: "LIVE DEMO — PRATA MED ALEX",
       flux_h1: "Kunden ringer.<br/>Du kan inte svara.",
       flux_desc: "Du jobbar, kör bil eller sover. Kunden vill ha svar nu — annars ringer de vidare. Alex svarar direkt och bokar möte. Prova själv: tryck på orben och prata med henne.",
       flux_how: "Klicka på orben eller välj en fråga nedan. Webbläsaren ber om mikrofonåtkomst.",
