@@ -1759,15 +1759,9 @@ main { overscroll-behavior: none; }
 .hf-ico svg{width:1em;height:1em;display:block}
 
 @media (max-width: 820px){
-  #core .hero-desc{font-size:clamp(calc(13 * var(--k) * 1px), calc((2.9vh - 4.1px) * var(--k)), 16.5px);
-                   margin-top:clamp(calc(8 * var(--k) * 1px), calc((2.6vh - 3.7px) * var(--k)), 28px)}
-  #core .hero-problems{font-size:clamp(calc(14.5 * var(--k) * 1px), calc((3.3vh - 4.7px) * var(--k)), 19.5px);
-                       margin-top:clamp(calc(6 * var(--k) * 1px), calc((1.8vh - 2.6px) * var(--k)), 16px)}
-  #core .hero-promise{font-size:clamp(calc(13 * var(--k) * 1px), calc((2.9vh - 4.1px) * var(--k)), 16.5px);
-                      margin-top:clamp(calc(6 * var(--k) * 1px), calc((1.8vh - 2.6px) * var(--k)), 16px)}
-  #core .hero-tag{margin-top:clamp(calc(8 * var(--k) * 1px), calc((2.4vh - 3.4px) * var(--k)), 26px)}
-  #core .hero-flow{margin-top:clamp(calc(12 * var(--k) * 1px), calc((3.6vh - 5.1px) * var(--k)), 44px)}
-  #core .hero-links{margin-top:clamp(calc(8 * var(--k) * 1px), calc((3.0vh - 4.3px) * var(--k)), 36px)}
+  #core .hero-desc{font-size:clamp(calc(13 * var(--k) * 1px), calc((2.9vh - 4.1px) * var(--k)), 16.5px)}
+  #core .hero-problems{font-size:clamp(calc(14.5 * var(--k) * 1px), calc((3.3vh - 4.7px) * var(--k)), 19.5px)}
+  #core .hero-promise{font-size:clamp(calc(13 * var(--k) * 1px), calc((2.9vh - 4.1px) * var(--k)), 16.5px)}
 }
 @media (prefers-reduced-motion: reduce){
   .hero-problems{animation:none;text-shadow:0 0 18px rgba(67,225,155,.5)}
@@ -1907,10 +1901,33 @@ main { overscroll-behavior: none; }
   #core .hero-title{gap:clamp(2px, .6vh, 8px)}
 
   #core .hero-inner{justify-content:flex-start}
-  #core .hero-title{margin-top:0}
-  #core .hero-links{margin-bottom:0}
-  #core .hero-inner::before{content:'';flex:2 1 0;min-height:0}
-  #core .hero-inner::after{content:'';flex:3 1 0;min-height:0}
+}
+
+/* ── Hero: luften fördelas i stället för att samlas ───────────────────────
+   Två flexspacers med fasta vikter la all överbliven höjd i toppen och botten:
+   85 px över rubriken och 116 px död yta under länkarna på 430×790, mer på
+   högre skärmar. Ingen klampformel klarar det, eftersom textblockets höjd
+   varierar med språk och skärm — svenskan på 640 px är 256 px hög, engelskan
+   på 844 px är 425.
+   Auto-marginaler i en flexkolumn delar den fria höjden lika mellan sig. En
+   auto på varje rad plus en på avslutaren ger åtta lika stora andelar: toppen,
+   de sex mellanrummen och botten mäts alltid ut mot samma skärm, utan en enda
+   vh-konstant. Går luften ut blir andelarna noll och padding-top nedan är
+   golvet — samma minsta avstånd som tidigare, så låga telefoner är orörda.
+   Paddingen är också den enda vikten som finns: den lägger extra luft där
+   kompositionen behöver den (flödet, länkarna) och håller löftesparet tätt.
+   html[lang] i selektorn är inte dekoration: de engelska höjdreglerna längre
+   upp är skrivna med html[lang="en"] och vinner annars över #core. */
+@media (max-width: 820px){
+  #core .hero-inner::before{content:none}
+  #core .hero-inner::after{content:'';display:block;flex:0 0 auto;height:0;margin-top:auto}
+  html[lang] #core .hero-title{margin-top:auto}
+  html[lang] #core .hero-desc{margin-top:auto;padding-top:calc(6 * var(--k) * 1px)}
+  html[lang] #core .hero-problems{margin-top:auto;padding-top:calc(2 * var(--k) * 1px)}
+  html[lang] #core .hero-promise{margin-top:auto;padding-top:0}
+  html[lang] #core .hero-tag{margin-top:auto;padding-top:calc(4 * var(--k) * 1px)}
+  html[lang] #core .hero-flow{margin-top:auto;padding-top:calc(12 * var(--k) * 1px)}
+  html[lang] #core .hero-links{margin-top:auto;padding-top:calc(10 * var(--k) * 1px);margin-bottom:0}
 }
 
 /* ── Djupare glas på alla sidor (2026-09-02) ───────────────────────────────
