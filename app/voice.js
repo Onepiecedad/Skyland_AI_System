@@ -310,6 +310,44 @@
         }
       }
 
+      // 3b. Formulärkontext: har besökaren redan skickat ett ärende vet Alex
+      //     vem hon pratar med och vad det gäller. Variablerna läses av
+      //     agentprompten i SCC ({{visitor_context}} med tom default, så
+      //     vanliga samtal utan kontext påverkas inte). firstMessage-overriden
+      //     gör öppningen personlig — samma mekanism som Variant 1 ovan, men
+      //     starterknappens svar vinner om båda finns.
+      try {
+        var rawCtx = sessionStorage.getItem('skyland_lead_ctx');
+        if (rawCtx) {
+          var ctx = JSON.parse(rawCtx);
+          var isEn = (document.documentElement.lang || 'sv').slice(0, 2) === 'en';
+          var msg = (ctx.message || '').slice(0, 600);
+          var ans = (ctx.ai_response || '').slice(0, 800);
+          sessionConfig.dynamicVariables = {
+            visitor_name: ctx.name || '',
+            visitor_company: ctx.company || '',
+            visitor_message: msg,
+            ai_answer: ans,
+            visitor_context: isEn
+              ? 'The visitor has already submitted a message through the site form. Name: ' + (ctx.name || '-') +
+                '. Company: ' + (ctx.company || '-') + '. Their message: "' + msg +
+                '". The AI answer they received: "' + ans + '". Continue from there — do not ask again for things you already know.'
+              : 'Besökaren har redan skickat ett meddelande via formuläret på sajten. Namn: ' + (ctx.name || '-') +
+                '. Företag: ' + (ctx.company || '-') + '. Meddelandet: "' + msg +
+                '". AI-svaret hen fick: "' + ans + '". Fortsätt därifrån — fråga inte om sådant du redan vet.'
+          };
+          if (!starterText) {
+            var first = (ctx.name || '').trim().split(/\s+/)[0];
+            sessionConfig.overrides = sessionConfig.overrides || { agent: {} };
+            sessionConfig.overrides.agent = sessionConfig.overrides.agent || {};
+            sessionConfig.overrides.agent.firstMessage = isEn
+              ? 'Hi' + (first ? ' ' + first : '') + '! I saw your message and the answer you got. Want to pick it up from there?'
+              : 'Hej' + (first ? ' ' + first : '') + '! Jag såg ditt meddelande och svaret du fick. Vill du fortsätta därifrån?';
+            console.log('[VOICE] Lead context attached for', ctx.name || '(namnlös)');
+          }
+        }
+      } catch (e) { /* kontexten är aldrig obligatorisk */ }
+
       // 4. Start ElevenLabs conversation via SDK
       var Conversation = window.ElevenLabsClient.Conversation;
       conversation = await Conversation.startSession(sessionConfig);

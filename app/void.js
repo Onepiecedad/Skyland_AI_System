@@ -35,6 +35,7 @@
       btn_send: 'SKICKA',
       btn_sending: 'SKICKAR...',
       btn_sent: 'SKICKAT',
+      goto_dash: 'SE SVARET I SYSTEMET',
     },
     en: {
       ai_title: 'AUTOMATED AI RESPONSE',
@@ -47,6 +48,7 @@
       btn_send: 'SEND',
       btn_sending: 'SENDING...',
       btn_sent: 'SENT',
+      goto_dash: 'SEE THE ANSWER IN THE SYSTEM',
     }
   };
   function lang() {
@@ -172,6 +174,17 @@
       // SCC svarar med ett objekt; n8n svarade med array — båda hanteras
       var result = Array.isArray(data) ? data[0] : data;
       if (result && result.status === 'success') {
+        // Kontext till resten av kedjan: Systemet-knappen och Alex
+        // röstsamtal vet vem besökaren är och vad ärendet gäller.
+        try {
+          sessionStorage.setItem('skyland_lead_ctx', JSON.stringify({
+            name: name,
+            company: (formData.get('company') || '').trim(),
+            message: message,
+            ai_response: result.ai_response || '',
+            ts: Date.now()
+          }));
+        } catch (e) { /* kontexten är aldrig obligatorisk */ }
         setState(STATES.SUCCESS, result.ai_response);
         updateLeadProfileScan(payload);
       } else {
@@ -199,6 +212,8 @@
 
     switch (state) {
       case STATES.IDLE:
+        var oldGoto = document.getElementById('void-goto-dash');
+        if (oldGoto) oldGoto.remove();
         responseContainer.innerHTML =
           '<div class="ai-response-title">' +
             '<span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span>' +
@@ -251,6 +266,23 @@
         if (submitBtn) {
           submitBtn.disabled = true;
           submitBtn.innerHTML = '<span>' + tr('btn_sent') + '</span><span class="material-symbols-outlined" style="font-size:16px">check</span>';
+        }
+        // AI-svarspanelen är dold på mobil — vägen till svaret måste ligga
+        // där man faktiskt är: direkt under skicka-knappen.
+        if (submitBtn && !document.getElementById('void-goto-dash')) {
+          var gotoBtn = document.createElement('button');
+          gotoBtn.type = 'button';
+          gotoBtn.id = 'void-goto-dash';
+          gotoBtn.className = 'void-goto-dash';
+          gotoBtn.innerHTML =
+            '<span class="material-symbols-outlined" style="font-size:16px">monitoring</span> ' +
+            tr('goto_dash') +
+            ' <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span>';
+          gotoBtn.addEventListener('click', function () {
+            try { sessionStorage.setItem('skyland_show_answer', '1'); } catch (e) {}
+            if (window.SkylandNav) window.SkylandNav.showPage('dashboard');
+          });
+          submitBtn.insertAdjacentElement('afterend', gotoBtn);
         }
         break;
 
