@@ -2148,7 +2148,14 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
 /* Snappen sköts av app.js (segt glid); webbläsarens egen är avstängd så
    att de två inte drar i samma kort. Inre scrollare får inte kedja vidare
    till main när de nått kanten. */
-html.is-scroll .dash-panel,html.is-scroll textarea,html.is-scroll .ai-response-body{overscroll-behavior:contain}
+html.is-scroll .dash-panel,html.is-scroll textarea,html.is-scroll .ai-response-body{overscroll-behavior:contain;touch-action:pan-y}
+/* iOS startar sin egen scroll på första touchmove om den inte stoppas
+   just där, och ignorerar sedan preventDefault för resten av gesten. Då
+   drog webbläsarens rörelsemängd och vårt glid i samma kort — nedåt
+   råkade de mötas, uppåt vann rörelsemängden och kortet stannade på
+   halva vägen. touch-action stänger av den inbyggda panoreringen i main
+   från början; de inre scrollarna ovan behåller sin. */
+html.is-scroll main{touch-action:pinch-zoom}
 
 /* ── Scroll-ikonen ────────────────────────────────────────────────────────
    Samma kaskad som svephinten hade, vriden nedåt, med en andande glöd bakom.

@@ -214,7 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const t = e.touches[0];
       const dy = t.clientY - touch.y, dx = t.clientX - touch.x;
       if (!touch.decided) {
-        if (Math.abs(dy) < 4 && Math.abs(dx) < 4) return;
+        if (Math.abs(dy) < 4 && Math.abs(dx) < 4) {
+          // Första rörelsen avgör på iOS om webbläsaren får panorera. Är det
+          // ingen inre scrollare under fingret stoppas den redan här.
+          if (!innerScroller(touch.target, 1) && !innerScroller(touch.target, -1) &&
+              !(touch.target.closest && touch.target.closest('input,textarea,select'))) e.preventDefault();
+          return;
+        }
         touch.decided = true;
         // Horisontell gest eller en inre scrollare som kan ta den: släpp.
         touch.own = !(Math.abs(dx) > Math.abs(dy)) && !innerScroller(touch.target, dy < 0 ? 1 : -1) &&
