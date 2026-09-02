@@ -9,7 +9,7 @@
       hero_spin_3: "Software developer",
       hero_spin_4: "Marketing agency",
       hero_spin_5: "Web agency",
-      hero_desc: "We're all four — and we remove your problems: missed customers, evening admin and leads that never become business. You get the result. We handle the rest.",
+      hero_desc: "We're all four — and <span class='hero-hl'>we remove your problems</span>: missed customers, evening admin and leads that never become business. You get the result. We handle the rest.",
       hero_tag: "FEWER MISSED CUSTOMERS · LESS ADMIN · MORE BUSINESS FROM WHAT YOU ALREADY HAVE",
 
       // Neural
@@ -75,6 +75,10 @@
       path2_title: "Your own Skyland system",
       path2_desc: "See what the system actually does: response times, leads, bookings, time saved and ROI — all in a system you own.",
       path2_cta: "See the system →",
+      flow_1: "A customer reaches out",
+      flow_2: "Alex answers",
+      flow_3: "Meeting booked",
+      flow_4: "In your system",
       svc_kicker: "SERVICES — PROBLEMS WE REMOVE",
       svc_h1: "You don't need more software.<br/>You need fewer problems.",
       svc_sub: "Four things that cost service businesses money every week — and what happens when they're gone.",
@@ -171,7 +175,7 @@
       hero_spin_3: "Mjukvaruutvecklare",
       hero_spin_4: "Marknadsföringsbyrå",
       hero_spin_5: "Webbyrå",
-      hero_desc: "Vi är alla fyra — och vi tar bort dina problem: missade kunder, kvällsadmin och leads som aldrig blir affär. Du får resultatet. Vi sköter resten.",
+      hero_desc: "Vi är alla fyra — och <span class='hero-hl'>vi tar bort dina problem</span>: missade kunder, kvällsadmin och leads som aldrig blir affär. Du får resultatet. Vi sköter resten.",
       hero_tag: "FÄRRE MISSADE KUNDER · MINDRE ADMIN · MER AFFÄR UR DET DU REDAN HAR",
 
       // Neural
@@ -237,6 +241,10 @@
       path2_title: "Ditt eget Skyland-system",
       path2_desc: "Se vad systemet faktiskt gör: svarstider, leads, bokningar, sparad tid och ROI — samlat i ett system du äger.",
       path2_cta: "Se systemet →",
+      flow_1: "Kunden hör av sig",
+      flow_2: "Alex svarar",
+      flow_3: "Möte bokas",
+      flow_4: "I ditt system",
       svc_kicker: "TJÄNSTER — PROBLEM VI TAR BORT",
       svc_h1: "Du behöver inte fler verktyg.<br/>Du behöver färre problem.",
       svc_sub: "Fyra saker som kostar tjänsteföretag pengar varje vecka — och vad som händer när de försvinner.",
