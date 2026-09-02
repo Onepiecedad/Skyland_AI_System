@@ -2069,3 +2069,7 @@ main { overscroll-behavior: none; }
 @media (prefers-reduced-motion: reduce){
   .dash-cue svg{animation:none;opacity:1}
 }
+
+/* Paneler som byter plats utanför skärmen flyttas utan övergång (se
+   applyLayout i app.js). */
+.page.is-parked{transition:none !important}
