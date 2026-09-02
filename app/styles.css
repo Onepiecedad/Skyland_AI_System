@@ -2012,3 +2012,60 @@ main { overscroll-behavior: none; }
   #void #contact-form textarea{height:auto;flex:1 1 auto;min-height:44px}
   #void #contact-form .transmit-btn{align-self:flex-start}
 }
+
+/* ── Rundturen, etapp 2–3: ljuset pekar på elementet (2026-09-02) ──────────
+   På sidorna man passerar är nästa handling ett svep och pillret ligger
+   stilla i tumzonen. På Kontakt och Demo är nästa handling något på sidan —
+   då lyser elementet självt och pillret ställer sig intill det. Kaskaden
+   göms: den betyder "svep", och den betyder inget annat.
+   Ringen ritas med box-shadow och följer därför elementets egen radie. Orben
+   är fyrkantig i markupen men rund för ögat, och får sin radie av is-round. */
+.guide--point{bottom:auto}
+.guide--point .guide-arrow{display:none}
+.guide--point .guide-pill{padding:9px 34px 9px 16px}
+.guide--point .guide-t1{text-transform:none;letter-spacing:.02em;font-size:12.5px;
+  font-weight:600;line-height:1.35;text-align:center}
+.guide-focus{
+  position:relative;z-index:3;border-radius:10px;
+  animation:guideFocus 1.9s ease-in-out infinite;
+}
+.guide-focus.is-round{border-radius:50%}
+@keyframes guideFocus{
+  0%,100%{box-shadow:0 0 0 1px rgba(67,225,155,.45), 0 0 0 0 rgba(67,225,155,0)}
+  50%{box-shadow:0 0 0 1px rgba(67,225,155,.95), 0 0 18px 4px rgba(67,225,155,.32)}
+}
+@media (prefers-reduced-motion: reduce){
+  .guide-focus{animation:none;box-shadow:0 0 0 1px rgba(67,225,155,.9), 0 0 14px 2px rgba(67,225,155,.3)}
+}
+
+/* ── Landningen i Systemet: ledtråden ner till svaret (2026-09-02) ─────────
+   Djuplänken hoppade förr rakt ner till AI-svaret, och besökaren såg en
+   textmassa utan avsändare. Nu landar man överst på kortet — det egna namnet
+   och företaget först — och den här knappen säger att svaret finns längre
+   ner. Den ligger ovanpå panelens nederkant, ovanför scrollskuggan, och
+   slocknar så fort svaret är i vyn. */
+.dash-cue{
+  position:absolute;left:50%;bottom:10px;transform:translate(-50%,6px);
+  width:max-content;
+  display:flex;align-items:center;gap:7px;
+  padding:7px 13px;border-radius:11px;max-width:92%;
+  background:rgba(4,14,9,.9);border:1px solid rgba(67,225,155,.5);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  box-shadow:0 8px 26px rgba(0,0,0,.5);
+  color:var(--primary);font-family:'Space Grotesk',sans-serif;
+  font-size:11.5px;font-weight:600;letter-spacing:.02em;line-height:1.3;
+  cursor:pointer;z-index:4;opacity:0;transition:opacity .35s ease,transform .35s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.dash-cue.is-on{opacity:1;transform:translate(-50%,0)}
+.dash-cue:active{background:rgba(67,225,155,.22)}
+.dash-cue svg{width:16px;height:10px;flex:0 0 auto;
+  filter:drop-shadow(0 0 7px rgba(67,225,155,.7));
+  animation:dashCueNudge 1.8s ease-in-out infinite}
+@keyframes dashCueNudge{
+  0%,100%{transform:translateY(-2px);opacity:.55}
+  50%{transform:translateY(2px);opacity:1}
+}
+@media (prefers-reduced-motion: reduce){
+  .dash-cue svg{animation:none;opacity:1}
+}

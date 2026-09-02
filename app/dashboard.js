@@ -149,6 +149,64 @@
     return box;
   }
 
+  /* ── Landningen från formuläret ─────────────────────────────────────────
+     Att hoppa rakt ner till svaret gav besökaren en textmassa utan avsändare:
+     man såg AI-svaret men aldrig att det var ens eget namn och företag som
+     hade blivit ett lead. Nu landar man överst på kortet — namn, företag,
+     poäng — och får en ledtråd om att svaret ligger längre ner. Ledtråden är
+     en knapp: den som hellre trycker än sveper kommer fram ändå. Den slocknar
+     när svaret är i vyn, och den ligger aldrig kvar längre än tolv sekunder. */
+  function flashDetail(detail) {
+    detail.classList.add('flash');
+    setTimeout(function () { detail.classList.remove('flash'); }, 2400);
+  }
+
+  var cueEl = null, cuePanel = null, cueScroll = null, cueTimer = 0;
+
+  function hideCue() {
+    if (cueTimer) { clearTimeout(cueTimer); cueTimer = 0; }
+    if (cuePanel && cueScroll) cuePanel.removeEventListener('scroll', cueScroll);
+    cueScroll = null; cuePanel = null;
+    if (cueEl) {
+      cueEl.classList.remove('is-on');
+      var gone = cueEl; cueEl = null;
+      setTimeout(function () { if (gone.parentNode) gone.parentNode.removeChild(gone); }, 400);
+    }
+  }
+
+  function inView(panel, detail) {
+    return detail.getBoundingClientRect().top < panel.getBoundingClientRect().bottom - 56;
+  }
+
+  function showCue(panel, detail) {
+    hideCue();
+    var wrap = document.querySelector('#dashboard .dash-panels');
+    if (!wrap) return;
+    if (inView(panel, detail)) { flashDetail(detail); return; }
+    cueEl = document.createElement('button');
+    cueEl.type = 'button';
+    cueEl.className = 'dash-cue';
+    cueEl.innerHTML = '<span>' + t('dash_cue', 'Svaret ligger längre ner') + '</span>' +
+      '<svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.6" ' +
+      'stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 3 12 11l8.5-8"/></svg>';
+    cueEl.addEventListener('click', function () {
+      panel.scrollTo({ top: panel.scrollTop + detail.getBoundingClientRect().top -
+        panel.getBoundingClientRect().top - 44, behavior: 'smooth' });
+      flashDetail(detail);
+      hideCue();
+    });
+    wrap.appendChild(cueEl);
+    requestAnimationFrame(function () { if (cueEl) cueEl.classList.add('is-on'); });
+
+    cuePanel = panel;
+    cueScroll = function () {
+      if (!cueEl) return;
+      if (inView(panel, detail)) { flashDetail(detail); hideCue(); }
+    };
+    panel.addEventListener('scroll', cueScroll, { passive: true });
+    cueTimer = setTimeout(hideCue, 12000);
+  }
+
   function showAnswer() {
     var page = document.getElementById('dashboard');
     if (!page) return;
@@ -157,11 +215,8 @@
     setTimeout(function () {
       var panel = page.querySelector('.dash-panel[data-panel="lead"]');
       var detail = elTimeline ? elTimeline.querySelector('.dash-event-detail') : null;
-      if (panel && detail) {
-        panel.scrollTop += detail.getBoundingClientRect().top - panel.getBoundingClientRect().top - 44;
-        detail.classList.add('flash');
-        setTimeout(function () { detail.classList.remove('flash'); }, 2400);
-      }
+      if (panel) panel.scrollTop = 0;
+      if (panel && detail) showCue(panel, detail);
       updateFade();
     }, 180);
   }

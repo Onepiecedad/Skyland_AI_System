@@ -299,6 +299,9 @@
   function setState(state, content) {
     currentState = state;
     responseContainer.dataset.state = state;
+    // Rundturen pekar på nästa handling i formuläret. Byter formuläret
+    // tillstånd byter den handling — då måste ljuset flytta sig direkt.
+    try { window.dispatchEvent(new CustomEvent('skyland:void', { detail: { state: state } })); } catch (e) {}
 
     switch (state) {
       case STATES.IDLE:
