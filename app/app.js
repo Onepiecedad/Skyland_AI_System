@@ -89,8 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // gav ~4 fps till men syntes som ett ryck i första bildrutan (glaset bytte
     // utseende precis när rörelsen startade), så det är borttaget.
     if (window.SkylandBG && typeof window.SkylandBG.pause === 'function') window.SkylandBG.pause();
+    // Lagret befordras bara medan skivan rör sig. Permanent will-change på fem
+    // backdrop-filtrerade paneler höll fem lager befordrade dygnet runt, och
+    // det är den vanligaste orsaken till att iOS slutar måla om innehåll
+    // förrän man rör skärmen.
+    document.body.classList.add('is-swapping');
     clearTimeout(swapTimer);
     swapTimer = setTimeout(() => {
+      document.body.classList.remove('is-swapping');
       if (window.SkylandBG && typeof window.SkylandBG.resume === 'function') window.SkylandBG.resume();
     }, 880);
   }
