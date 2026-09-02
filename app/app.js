@@ -124,7 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const dir = DIRECTIONS.find(d => layout[d] === id);
     if (dir) navigate(dir);
   }
-  window.SkylandNav = { showPage: focusPane, pageIds: PAGE_IDS, current: () => layout.center };
+  window.SkylandNav = {
+    showPage: focusPane, pageIds: PAGE_IDS, current: () => layout.center,
+    // Korset roterar när man flyttar sig — den som vill peka mot en sida
+    // måste fråga var den ligger just nu, inte minnas var den låg.
+    directionTo: (id) => DIRECTIONS.find(d => layout[d] === id) || null,
+  };
 
   // ── Kantpilar (desktop) ──
   const CHEV = {
@@ -509,8 +514,15 @@ document.addEventListener('DOMContentLoaded', () => {
     el.innerHTML = '<div class="swipe-hint-box">' +
       '<div class="swipe-hint-cross">' + chev('up') + chev('right') + chev('down') + chev('left') +
       '<span class="shc-dot"></span></div>' +
-      '<div class="swipe-hint-text">' + txt + '</div></div>';
+      '<div class="swipe-hint-text">' + txt + '</div>' +
+      '<button type="button" class="swipe-hint-tour">' +
+        (lang === 'en' ? 'Show me around' : 'Visa mig runt') + ' \u2192</button></div>';
     document.body.appendChild(el);
+    var tourBtn = el.querySelector('.swipe-hint-tour');
+    if (tourBtn) tourBtn.addEventListener('pointerdown', function (ev) {
+      ev.preventDefault();
+      if (window.SkylandGuide) window.SkylandGuide.start();
+    });
     requestAnimationFrame(function () { requestAnimationFrame(function () {
       if (el) el.classList.add('is-on');
     }); });
