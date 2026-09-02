@@ -1988,3 +1988,27 @@ main { overscroll-behavior: none; }
   .vs-dot{animation:none !important}
   .vs-fill{transition:none !important}
 }
+
+/* ── Kontakt: hålet mellan texten och formuläret (2026-09-02) ──────────────
+   Ett tomrum på ungefär 100 px satt mellan introtexten och första fältet.
+   Tre saker byggde det tillsammans.
+   Avatarpanelen spänner tre rader i rutnätet men innehöll också en tom
+   flexbehållare — AI-svaret inuti är display:none på mobil, men wrappern
+   hade kvar sin höjd och sträckte raderna. Den har en inline-style, därför
+   !important; det är enda gången selektorn förlorar mot markupen.
+   Rutnätet hade dessutom bara auto-rader, och grid delar ut allt överblivet
+   utrymme jämnt över alla rader — även den tomma raden bredvid avataren.
+   Med en uttalad radmall går slacket i stället till formuläret, som får
+   sträcka sig i sin rad (align-items:start på behållaren stoppade det).
+   Där gör utrymmet nytta: meddelandefältet var 44 px högt trots att sidan
+   ber besökaren beskriva sitt problem på minst 30 tecken. Nu växer det med
+   skärmen — 84 px på 660, 156 på 790 — utan tak, för ett tak flyttar bara
+   hålet in i formuläret i stället för att ta bort det. */
+@media (max-width: 820px){
+  #void .scan-panel > div:not(.alex-face){display:none !important}
+  #void .void-inner{grid-template-rows:min-content min-content min-content 1fr min-content}
+  #void #contact-form{align-self:stretch;display:flex;flex-direction:column;min-height:0}
+  #void #contact-form > .form-group{min-height:0}
+  #void #contact-form textarea{height:auto;flex:1 1 auto;min-height:44px}
+  #void #contact-form .transmit-btn{align-self:flex-start}
+}
