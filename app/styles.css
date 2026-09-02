@@ -2091,7 +2091,7 @@ html.is-scroll, html.is-scroll body{height:100%;overflow:hidden;overscroll-behav
 html.is-scroll main{
   height:100dvh;min-height:0;overflow-y:auto;overflow-x:hidden;
   display:flex;flex-direction:column;
-  scroll-snap-type:y mandatory;scroll-behavior:auto;
+  scroll-snap-type:none;scroll-behavior:auto;
   -webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;
 }
 html.is-scroll main::-webkit-scrollbar{display:none}
@@ -2145,7 +2145,10 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
    headern. scroll-snap-stop:always gör att en lång snärt inte hoppar över
    en sektion. Innehåll som är högre än skärmen (Kontakt när
    meddelandefältet växer) går fortfarande att scrolla inom sektionen. */
-html.is-scroll .page{scroll-snap-align:start;scroll-snap-stop:always}
+/* Snappen sköts av app.js (segt glid); webbläsarens egen är avstängd så
+   att de två inte drar i samma kort. Inre scrollare får inte kedja vidare
+   till main när de nått kanten. */
+html.is-scroll .dash-panel,html.is-scroll textarea,html.is-scroll .ai-response-body{overscroll-behavior:contain}
 
 /* ── Scroll-ikonen ────────────────────────────────────────────────────────
    Samma kaskad som svephinten hade, vriden nedåt, med en andande glöd bakom.
@@ -2180,3 +2183,6 @@ html.is-scroll .page{scroll-snap-align:start;scroll-snap-stop:always}
 /* Flödesstripen på Hero (kund → Alex → jobb → resultat) är borttagen:
    ikonerna gjorde sidan rörig. Luften fördelas om av sig själv. */
 .hero-flow{display:none}
+/* På låga skärmar (≤700 px) stack notisen under bokningen 9 px utanför
+   kortet på Demo. Knappen räcker där. */
+@media (max-width: 820px) and (max-height: 700px){ .flux-book .dash-cta-note{display:none} }

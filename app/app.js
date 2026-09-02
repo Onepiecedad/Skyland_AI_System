@@ -147,10 +147,129 @@ document.addEventListener('DOMContentLoaded', () => {
       history.replaceState(null, '', '#' + id);
       window.dispatchEvent(new CustomEvent('skyland:page', { detail: { page: id } }));
     }
-    function go(id) {
-      if (!pages[id]) return;
-      pages[id].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    /* ── Segt svep ─────────────────────────────────────────────────────────
+       Webbläsarens egen snap är snabb och går inte att ställa in. Här sköts
+       scrollen själv: fingret drar kortet 1:1, och när man släpper glider
+       nästa sektion in på GLIDE_MS ms med mjuk in- och utbromsning — man
+       ser kortet komma. Hjulet på desktop och piltangenterna ger samma
+       glid. Element som scrollar själva (Systemets panel, meddelandefältet)
+       lämnas ifred när de kan scrolla åt det hållet. */
+    const GLIDE_MS = 1000;
+    const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function targetTop(id) {
+      const el = pages[id];
+      return Math.max(0, el.offsetTop - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0));
     }
+    let glide = 0;
+    function glideTo(id) {
+      if (!pages[id]) return;
+      cancelAnimationFrame(glide);
+      const from = mainEl.scrollTop, to = targetTop(id), dist = to - from;
+      if (Math.abs(dist) < 1) return;
+      if (reduced) { mainEl.scrollTop = to; return; }
+      const t0 = performance.now();
+      const ease = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      (function step(now) {
+        const x = Math.min(1, (now - t0) / GLIDE_MS);
+        mainEl.scrollTop = from + dist * ease(x);
+        if (x < 1) glide = requestAnimationFrame(step); else glide = 0;
+      })(t0);
+    }
+    function go(id) { glideTo(id); }
+    function neighbour(id, dir) {
+      const i = ORDER.indexOf(id);
+      return ORDER[Math.max(0, Math.min(ORDER.length - 1, i + dir))];
+    }
+
+    // Inre scrollare får sina gester. Samma kontroll som korset hade.
+    function canScroll(el, dir) {
+      if (!el || el === mainEl || el === document.body || el === document.documentElement) return false;
+      const oy = getComputedStyle(el).overflowY;
+      if (oy !== 'auto' && oy !== 'scroll') return false;
+      if (dir > 0) return el.scrollHeight - el.clientHeight - el.scrollTop > 2;
+      return el.scrollTop > 2;
+    }
+    function innerScroller(target, dir) {
+      let el = target;
+      while (el && el !== mainEl && el.nodeType === 1) {
+        if (canScroll(el, dir)) return el;
+        el = el.parentElement;
+      }
+      return null;
+    }
+
+    // Touch: dra 1:1, släpp → glid.
+    let touch = null;
+    mainEl.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) { touch = null; return; }
+      cancelAnimationFrame(glide); glide = 0;
+      const t = e.touches[0];
+      // Utgångssektionen läses vid nedtryck: aktuell sektion byts halvvägs
+      // genom draget, och då skulle "nästa" annars bli två steg.
+      touch = { y: t.clientY, x: t.clientX, top: mainEl.scrollTop, startId: current,
+                target: e.target, own: false, decided: false, lastY: t.clientY, lastAt: performance.now(), v: 0 };
+    }, { passive: true });
+    mainEl.addEventListener('touchmove', (e) => {
+      if (!touch || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dy = t.clientY - touch.y, dx = t.clientX - touch.x;
+      if (!touch.decided) {
+        if (Math.abs(dy) < 4 && Math.abs(dx) < 4) return;
+        touch.decided = true;
+        // Horisontell gest eller en inre scrollare som kan ta den: släpp.
+        touch.own = !(Math.abs(dx) > Math.abs(dy)) && !innerScroller(touch.target, dy < 0 ? 1 : -1) &&
+                    !(touch.target.closest && touch.target.closest('input,textarea,select'));
+      }
+      if (!touch.own) return;
+      e.preventDefault();
+      const now = performance.now();
+      touch.v = (t.clientY - touch.lastY) / Math.max(1, now - touch.lastAt);
+      touch.lastY = t.clientY; touch.lastAt = now;
+      mainEl.scrollTop = touch.top - dy;
+    }, { passive: false });
+    function touchEnd() {
+      if (!touch) return;
+      const t = touch; touch = null;
+      if (!t.own) return;
+      const dy = mainEl.scrollTop - t.top;              // hur långt kortet dragits
+      const flick = Math.abs(t.v) > 0.5;                 // px/ms — en snärt räcker
+      let target = t.startId;
+      if (Math.abs(dy) > window.innerHeight * 0.18 || flick) {
+        const dir = flick ? (t.v < 0 ? 1 : -1) : (dy > 0 ? 1 : -1);
+        target = neighbour(t.startId, dir);
+      }
+      glideTo(target);
+    }
+    mainEl.addEventListener('touchend', touchEnd, { passive: true });
+    mainEl.addEventListener('touchcancel', touchEnd, { passive: true });
+
+    // Hjul: en gest = en sektion.
+    let acc = 0, wheelAt = 0, wheelLock = 0;
+    // På dokumentet, inte main: ett hjul över headern ska också bläddra.
+    document.addEventListener('wheel', (e) => {
+      const dir = e.deltaY > 0 ? 1 : -1;
+      if (innerScroller(e.target, dir)) return;
+      e.preventDefault();
+      const now = performance.now();
+      if (now - wheelAt > 300) acc = 0;
+      wheelAt = now;
+      if (now < wheelLock) return;
+      acc += e.deltaY;
+      if (Math.abs(acc) < 40) return;
+      acc = 0;
+      wheelLock = now + GLIDE_MS + 150;
+      glideTo(neighbour(current, dir));
+    }, { passive: false });
+
+    // Tangenter.
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+      const down = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ';
+      const up = e.key === 'ArrowUp' || e.key === 'PageUp';
+      if (!down && !up) return;
+      e.preventDefault();
+      glideTo(neighbour(current, down ? 1 : -1));
+    });
 
     // Innehållet tänds när sektionen kommer in i bild — samma reveal som
     // förut, men driven av scrollen. Klassen tas aldrig bort: animationen
@@ -196,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Djuplänk: landa på sektionen utan animation vid start.
     const hash = location.hash.replace('#', '');
     if (PAGE_IDS.includes(hash) && hash !== ORDER[0]) {
-      requestAnimationFrame(() => { pages[hash].scrollIntoView({ block: 'start' }); pickCurrent(); });
+      requestAnimationFrame(() => { mainEl.scrollTop = targetTop(hash); pickCurrent(); });
     } else {
       setCurrent(ORDER[0]);
     }
