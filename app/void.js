@@ -36,6 +36,15 @@
       btn_sending: 'SKICKAR...',
       btn_sent: 'SKICKAT',
       goto_dash: 'SE SVARET I SYSTEMET',
+      still: 'Tar lite längre tid än vanligt — svaret kommer',
+      err_name: 'Namnet behöver vara minst 2 tecken.',
+      err_email: 'E-postadressen ser inte rätt ut.',
+      err_message: 'Skriv minst 30 tecken så vi förstår vad det gäller.',
+      err_consent: 'Du behöver godkänna att vi behandlar dina uppgifter innan vi kan ta emot meddelandet.',
+      err_input: 'Något i formuläret behöver justeras. Kolla att alla fält är ifyllda korrekt.',
+      err_internal: 'Något krånglade hos oss. Försök igen om en stund eller skicka direkt till joakim@skylandai.se.',
+      err_network: 'Kunde inte nå servern. Kolla din anslutning och försök igen.',
+      err_timeout: 'Det tog längre tid än väntat. Joakim får ditt meddelande ändå — vi återkommer inom kort.',
     },
     en: {
       ai_title: 'AUTOMATED AI RESPONSE',
@@ -49,6 +58,15 @@
       btn_sending: 'SENDING...',
       btn_sent: 'SENT',
       goto_dash: 'SEE THE ANSWER IN THE SYSTEM',
+      still: 'Taking a little longer than usual — the answer is coming',
+      err_name: 'Your name needs at least 2 characters.',
+      err_email: "That email address doesn't look right.",
+      err_message: 'Write at least 30 characters so we understand what it is about.',
+      err_consent: 'Please accept that we process your details before we can take the message.',
+      err_input: 'Something in the form needs adjusting. Check that every field is filled in correctly.',
+      err_internal: 'Something went wrong on our end. Try again in a moment, or write straight to joakim@skylandai.se.',
+      err_network: 'Could not reach the server. Check your connection and try again.',
+      err_timeout: 'That took longer than expected. Joakim gets your message anyway — we will be in touch shortly.',
     }
   };
   function lang() {
@@ -59,13 +77,14 @@
   }
   function tr(key) { return (T[lang()] || T.sv)[key]; }
 
-  var ERROR_MESSAGES = {
-    INVALID_INPUT: 'Något i formuläret behöver justeras. Kolla att alla fält är ifyllda korrekt.',
-    MISSING_CONSENT: 'Du behöver godkänna att vi behandlar dina uppgifter innan vi kan ta emot meddelandet.',
-    INTERNAL_ERROR: 'Något krånglade hos oss. Försök igen om en stund eller skicka direkt till joakim@skylandai.se.',
-    NETWORK: 'Kunde inte nå servern. Kolla din anslutning och försök igen.',
-    TIMEOUT: 'Det tog längre tid än väntat. Joakim får ditt meddelande ändå — vi återkommer inom kort.'
+  var ERROR_KEYS = {
+    INVALID_INPUT: 'err_input',
+    MISSING_CONSENT: 'err_consent',
+    INTERNAL_ERROR: 'err_internal',
+    NETWORK: 'err_network',
+    TIMEOUT: 'err_timeout'
   };
+  function errText(code) { return tr(ERROR_KEYS[code] || 'err_internal'); }
 
   var currentState = STATES.IDLE;
   var formEl = null;
@@ -119,7 +138,7 @@
     // Validate consent
     var consentBox = document.getElementById('void-consent');
     if (!consentBox || !consentBox.checked) {
-      setState(STATES.ERROR, ERROR_MESSAGES.MISSING_CONSENT);
+      setState(STATES.ERROR, errText('MISSING_CONSENT'));
       return;
     }
 
@@ -129,15 +148,15 @@
     var message = (formData.get('message') || '').trim();
 
     if (!name || name.length < 2) {
-      setState(STATES.ERROR, 'Namn behöver vara minst 2 tecken.');
+      setState(STATES.ERROR, tr('err_name'));
       return;
     }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setState(STATES.ERROR, 'E-post ser inte rätt ut.');
+      setState(STATES.ERROR, tr('err_email'));
       return;
     }
     if (!message || message.length < 30) {
-      setState(STATES.ERROR, 'Meddelandet behöver vara minst 30 tecken så vi förstår vad det gäller.');
+      setState(STATES.ERROR, tr('err_message'));
       return;
     }
 
@@ -188,18 +207,89 @@
         setState(STATES.SUCCESS, result.ai_response);
         updateLeadProfileScan(payload);
       } else {
-        var errorMessage = (result && (ERROR_MESSAGES[result.error_code] || result.message)) || ERROR_MESSAGES.INTERNAL_ERROR;
+        var errorMessage = (result && (ERROR_KEYS[result.error_code] ? errText(result.error_code) : result.message)) || errText('INTERNAL_ERROR');
         setState(STATES.ERROR, errorMessage);
       }
     })
     .catch(function (err) {
       clearTimeout(timeoutId);
       if (err.name === 'AbortError') {
-        setState(STATES.ERROR, ERROR_MESSAGES.TIMEOUT);
+        setState(STATES.ERROR, errText('TIMEOUT'));
       } else {
-        setState(STATES.ERROR, ERROR_MESSAGES.NETWORK);
+        setState(STATES.ERROR, errText('NETWORK'));
       }
     });
+  }
+
+  /* ── Statusraden vid knappen ───────────────────────────────────────────
+     AI-panelen som visar arbetet är display:none under 820 px. På mobil
+     såg besökaren därför ingenting mellan "SKICKAR..." och svaret — och
+     ett valideringsfel syntes inte alls, formuläret bara vägrade. Raden
+     nedan ligger direkt under knappen, alltså där tummen och blicken
+     redan är, och säger samma sak som panelen: vilket steg som pågår, hur
+     långt det har gått, och vad som gick fel när något gör det.
+     Mätaren är ärlig så långt den kan vara: backend svarar på 3–12
+     sekunder utan att rapportera framsteg, så den går mot 92 % och
+     stannar där tills svaret faktiskt kommer. Den ljuger aldrig om att
+     vara klar. Dröjer det över 14 sekunder byts texten mot ett besked om
+     att det tar längre tid än vanligt, i stället för att låta besökaren
+     undra om något har hängt sig. */
+  var statusTimers = [];
+
+  function clearStatusTimers() {
+    statusTimers.forEach(clearTimeout);
+    statusTimers = [];
+  }
+
+  function removeStatus() {
+    clearStatusTimers();
+    var el = document.getElementById('void-status');
+    if (el) el.remove();
+  }
+
+  function ensureStatus() {
+    var el = document.getElementById('void-status');
+    if (el) return el;
+    if (!submitBtn) return null;
+    el = document.createElement('div');
+    el.id = 'void-status';
+    el.className = 'void-status';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.innerHTML =
+      '<div class="vs-bar"><span class="vs-fill"></span></div>' +
+      '<div class="vs-row"><span class="vs-dot"></span><span class="vs-label"></span></div>';
+    submitBtn.insertAdjacentElement('afterend', el);
+    return el;
+  }
+
+  function startStatusProgress() {
+    var el = ensureStatus();
+    if (!el) return;
+    clearStatusTimers();
+    el.dataset.state = 'busy';
+    var label = el.querySelector('.vs-label');
+    var fill = el.querySelector('.vs-fill');
+    label.textContent = tr('step_profile');
+    fill.style.transition = 'none';
+    fill.style.width = '0%';
+    // Reflow så att bredden verkligen börjar om från noll vid ett andra försök.
+    void fill.offsetWidth;
+    fill.style.transition = 'width 14s cubic-bezier(.16,.8,.3,1)';
+    fill.style.width = '92%';
+    [[1800, 'step_kb'], [4600, 'step_answer']].forEach(function (step) {
+      statusTimers.push(setTimeout(function () { label.textContent = tr(step[1]); }, step[0]));
+    });
+    statusTimers.push(setTimeout(function () { label.textContent = tr('still'); }, 14000));
+  }
+
+  function showStatusError(text) {
+    var el = ensureStatus();
+    if (!el) return;
+    clearStatusTimers();
+    el.dataset.state = 'error';
+    el.querySelector('.vs-fill').style.width = '0%';
+    el.querySelector('.vs-label').textContent = text;
   }
 
   /**
@@ -209,11 +299,15 @@
   function setState(state, content) {
     currentState = state;
     responseContainer.dataset.state = state;
+    // Rundturen pekar på nästa handling i formuläret. Byter formuläret
+    // tillstånd byter den handling — då måste ljuset flytta sig direkt.
+    try { window.dispatchEvent(new CustomEvent('skyland:void', { detail: { state: state } })); } catch (e) {}
 
     switch (state) {
       case STATES.IDLE:
         var oldGoto = document.getElementById('void-goto-dash');
         if (oldGoto) oldGoto.remove();
+        removeStatus();
         responseContainer.innerHTML =
           '<div class="ai-response-title">' +
             '<span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span>' +
@@ -251,6 +345,7 @@
           submitBtn.innerHTML = '<span>' + tr('btn_sending') + '</span>';
         }
         animateSubsteps();
+        startStatusProgress();
         break;
 
       case STATES.SUCCESS:
@@ -266,6 +361,13 @@
         if (submitBtn) {
           submitBtn.disabled = true;
           submitBtn.innerHTML = '<span>' + tr('btn_sent') + '</span><span class="material-symbols-outlined" style="font-size:16px">check</span>';
+        }
+        var doneEl = document.getElementById('void-status');
+        if (doneEl) {
+          clearStatusTimers();
+          doneEl.dataset.state = 'done';
+          doneEl.querySelector('.vs-fill').style.width = '100%';
+          statusTimers.push(setTimeout(removeStatus, 700));
         }
         // AI-svarspanelen är dold på mobil — vägen till svaret måste ligga
         // där man faktiskt är: direkt under skicka-knappen.
@@ -301,6 +403,7 @@
           var cb2 = document.getElementById('void-consent');
           if (cb2) submitBtn.disabled = !cb2.checked;
         }
+        showStatusError(content);
         break;
     }
   }
