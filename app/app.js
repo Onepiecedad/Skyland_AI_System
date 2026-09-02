@@ -175,7 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       setCurrent(best);
     }
-    window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(pickCurrent); }, { passive: true });
+    // main är scrollbehållaren (se styles.css), inte fönstret.
+    mainEl.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(pickCurrent); }, { passive: true });
     window.addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(pickCurrent); });
 
     window.SkylandNav = {

@@ -2082,9 +2082,19 @@ main { overscroll-behavior: none; }
    scroll-margin-top lika med headern så att en djuplänk landar under den,
    och en mindre topp-padding så att mellanrummet mellan korten blir luft och
    inte ett hål. Korten får växa om innehållet behöver det. */
-html.is-scroll, html.is-scroll body{height:auto;overflow:visible;overflow-x:hidden;overscroll-behavior:auto}
-html.is-scroll body{min-height:100dvh}
-html.is-scroll main{height:auto;min-height:0;overflow:visible;display:flex;flex-direction:column;scroll-snap-type:none;scroll-behavior:auto}
+/* main är scrollbehållaren, inte dokumentet. Två skäl: iOS Safari tappar
+   snap på roten så fort body har overflow-x:hidden (känt fel), och
+   dokumentet ska aldrig scrolla — 100vh är den stora viewporten på iOS och
+   kortet gled in under headern förut. Det här är samma konstruktion som
+   sajten hade från början, innan korset. */
+html.is-scroll, html.is-scroll body{height:100%;overflow:hidden;overscroll-behavior:none}
+html.is-scroll main{
+  height:100dvh;min-height:0;overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;
+  scroll-snap-type:y mandatory;scroll-behavior:auto;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;
+}
+html.is-scroll main::-webkit-scrollbar{display:none}
 html.is-scroll .page{
   position:relative;inset:auto;visibility:visible;pointer-events:auto;z-index:auto;
   transform:none !important;transition:none;will-change:auto;
@@ -2135,7 +2145,6 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
    headern. scroll-snap-stop:always gör att en lång snärt inte hoppar över
    en sektion. Innehåll som är högre än skärmen (Kontakt när
    meddelandefältet växer) går fortfarande att scrolla inom sektionen. */
-html.is-scroll{scroll-snap-type:y mandatory}
 html.is-scroll .page{scroll-snap-align:start;scroll-snap-stop:always}
 
 /* ── Scroll-ikonen ────────────────────────────────────────────────────────
@@ -2167,3 +2176,7 @@ html.is-scroll .page{scroll-snap-align:start;scroll-snap-stop:always}
 @media (prefers-reduced-motion: reduce){
   .scroll-cue::before{animation:none;opacity:.7}
 }
+
+/* Flödesstripen på Hero (kund → Alex → jobb → resultat) är borttagen:
+   ikonerna gjorde sidan rörig. Luften fördelas om av sig själv. */
+.hero-flow{display:none}
