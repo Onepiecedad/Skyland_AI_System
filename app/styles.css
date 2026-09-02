@@ -1891,3 +1891,39 @@ main { overscroll-behavior: none; }
   .swipe-hint-cross .sw-cas svg{animation:swCasStill 2.6s ease-in-out infinite;animation-delay:0s}
   @keyframes swCasStill{0%,100%{opacity:.45;transform:none}50%{opacity:1;transform:none}}
 }
+
+/* ── Hero: rotatorn klipptes, och blocket satt för lågt (2026-09-02) ───────
+   .spin-box var 1.4em hög med overflow:hidden. Ord med både uppstapel och
+   nedstapel — Mjukvaruutvecklare — nuddade klipplinjen, och eftersom glödens
+   filter räknas på det redan klippta innehållet såg ljuset avhugget ut.
+   Boxen är nu högre än raden, så klipplinjen ligger utanför glöden.
+   Vikten mellan luften över och under blocket var 50/50 via auto-marginaler.
+   Två flexutfyllnader med olika grow ger 40/60 i stället — blocket lyfts utan
+   att något kan tryckas ur vy, för grow fördelar bara positivt överskott. */
+@media (max-width: 820px){
+  #core .spin-box{height:1.66em;font-size:min(.82em, 7vw)}
+  #core .spin-inner div{height:1.66em}
+  #core .hero-title .static{font-size:.88em}
+  #core .hero-title{gap:clamp(2px, .6vh, 8px)}
+
+  #core .hero-inner{justify-content:flex-start}
+  #core .hero-title{margin-top:0}
+  #core .hero-links{margin-bottom:0}
+  #core .hero-inner::before{content:'';flex:2 1 0;min-height:0}
+  #core .hero-inner::after{content:'';flex:3 1 0;min-height:0}
+}
+
+/* ── Djupare glas på alla sidor (2026-09-02) ───────────────────────────────
+   Videoläget släcker glaset helt och lägger en nästan tät mörk yta — och det
+   ser bättre ut än det ljusa frostade. Tre skäl att ta ner det överallt:
+   texten får mer kontrast, den animerade bakgrunden slutar konkurrera med
+   innehållet, och blur(60px) på fem alltid monterade paneler är dyrt och är
+   precis den sortens lager som får iOS att sluta måla om.
+   Det här är mellanläget: tydligt mörkare och mindre grönt, men bakgrunden
+   andas fortfarande igenom. Vill du gå hela vägen till videolägets finish är
+   det två tal — sätt blur till 0 och opaciteten till .92/.90. Vill du tillbaka
+   till det gamla: blur 60px och rgba(255,255,255,.08)/(.02). */
+.page-glass{
+  background:linear-gradient(135deg,rgba(10,16,13,.72),rgba(6,10,8,.66));
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
