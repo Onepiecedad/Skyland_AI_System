@@ -85,26 +85,96 @@
       item.appendChild(head);
 
       if (ev.ai_response) {
-        var ai = document.createElement('div');
-        ai.className = 'dash-event-detail';
-        ai.innerHTML = '<span class="dash-event-detail-label">' + t('dash_ai_label', 'AI RESPONSE SENT') + '</span>';
-        var p = document.createElement('p');
-        p.textContent = ev.ai_response;
-        ai.appendChild(p);
-        item.appendChild(ai);
+        item.appendChild(buildDetail(t('dash_ai_label', 'AI RESPONSE SENT'), ev.ai_response));
       }
       if (ev.summary) {
-        var sum = document.createElement('div');
-        sum.className = 'dash-event-detail';
-        sum.innerHTML = '<span class="dash-event-detail-label">' + t('dash_summary_label', 'CALL SUMMARY') + '</span>';
-        var ps = document.createElement('p');
         var dur = ev.duration_seconds ? ' (' + Math.round(ev.duration_seconds / 60 * 10) / 10 + ' min)' : '';
-        ps.textContent = ev.summary + dur;
-        sum.appendChild(ps);
-        item.appendChild(sum);
+        item.appendChild(buildDetail(t('dash_summary_label', 'CALL SUMMARY'), ev.summary + dur));
       }
       elTimeline.appendChild(item);
     });
+
+    // Vägen vidare: fortsätt ärendet i röstsamtal med Alex, med kontexten kvar.
+    if (events.length) {
+      var cont = document.createElement('button');
+      cont.type = 'button';
+      cont.className = 'dash-continue';
+      cont.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">mic</span> ' +
+        t('dash_continue', 'Fortsätt konversationen med Alex') + ' →';
+      cont.addEventListener('click', function () {
+        if (window.SkylandNav) window.SkylandNav.showPage('flux');
+        // Sidbytet tar .82s — starta samtalet när Demo står stilla. Blockeras
+        // ljudet av webbläsaren är orben nästa tryck, och kontexten följer med
+        // ändå eftersom voice.js läser den vid varje samtalsstart.
+        if (window.SkylandVoice && window.SkylandVoice.start) {
+          setTimeout(function () { window.SkylandVoice.start(); }, 950);
+        }
+      });
+      elTimeline.appendChild(cont);
+    }
+
+    updateFade();
+
+    // Djuplänken från formuläret: öppna lead-fliken och scrolla fram svaret.
+    if (events.length && sessionStorage.getItem('skyland_show_answer')) {
+      try { sessionStorage.removeItem('skyland_show_answer'); } catch (e) {}
+      showAnswer();
+    }
+  }
+
+  // En svarsdetalj: långa texter visas hopfällda med en egen expander i
+  // stället för att trycka allt annat ur vyn.
+  function buildDetail(label, text) {
+    var box = document.createElement('div');
+    box.className = 'dash-event-detail';
+    box.innerHTML = '<span class="dash-event-detail-label"></span>';
+    box.querySelector('.dash-event-detail-label').textContent = label;
+    var p = document.createElement('p');
+    p.className = 'dash-detail-text';
+    p.textContent = text;
+    box.appendChild(p);
+    if (text.length > 220) {
+      p.classList.add('clamped');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'dash-more';
+      btn.textContent = t('dash_more', 'Visa hela svaret');
+      btn.addEventListener('click', function () {
+        var open = p.classList.toggle('clamped');
+        btn.textContent = open ? t('dash_more', 'Visa hela svaret') : t('dash_less', 'Visa mindre');
+        updateFade();
+      });
+      box.appendChild(btn);
+    }
+    return box;
+  }
+
+  function showAnswer() {
+    var page = document.getElementById('dashboard');
+    if (!page) return;
+    var leadTab = page.querySelector('.dash-tab[data-tab="lead"]');
+    if (leadTab) leadTab.click();
+    setTimeout(function () {
+      var panel = page.querySelector('.dash-panel[data-panel="lead"]');
+      var detail = elTimeline ? elTimeline.querySelector('.dash-event-detail') : null;
+      if (panel && detail) {
+        panel.scrollTop += detail.getBoundingClientRect().top - panel.getBoundingClientRect().top - 44;
+        detail.classList.add('flash');
+        setTimeout(function () { detail.classList.remove('flash'); }, 2400);
+      }
+      updateFade();
+    }, 180);
+  }
+
+  // Scrollskuggan i panelens nederkant: syns bara när det finns mer innehåll.
+  var fadeWrap = null;
+  function updateFade() {
+    var page = document.getElementById('dashboard');
+    if (!page) return;
+    if (!fadeWrap) fadeWrap = page.querySelector('.dash-panels');
+    var p = page.querySelector('.dash-panel.active');
+    if (!p || !fadeWrap) return;
+    fadeWrap.classList.toggle('has-more', p.scrollHeight - p.clientHeight - p.scrollTop > 8);
   }
 
   async function poll() {
@@ -198,9 +268,18 @@
     // CTA buttons scroll to the referenced page
     page.querySelectorAll('.dash-cta').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var target = document.getElementById(btn.getAttribute('data-target'));
+        var id = btn.getAttribute('data-target');
+        if (window.SkylandNav && window.SkylandNav.showPage) { window.SkylandNav.showPage(id); return; }
+        var target = document.getElementById(id);
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
+    });
+
+    page.querySelectorAll('.dash-panel').forEach(function (p) {
+      p.addEventListener('scroll', updateFade, { passive: true });
+    });
+    page.querySelectorAll('.dash-tab').forEach(function (tb) {
+      tb.addEventListener('click', function () { setTimeout(updateFade, 60); });
     });
 
     // Poll only while the dashboard page is (near) visible

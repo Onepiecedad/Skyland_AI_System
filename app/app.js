@@ -367,8 +367,17 @@ document.addEventListener('DOMContentLoaded', () => {
   let touch = null;
 
   function scrollerFor(target) {
-    const inner = target && target.closest ? target.closest('.page-glass, textarea') : null;
-    return (inner && inner.scrollHeight > inner.clientHeight) ? inner : pages[layout.center];
+    // Gå uppåt från beröringspunkten till närmaste element som faktiskt kan
+    // scrolla. Den gamla varianten tittade bara på .page-glass — på Systemet
+    // är det flikpanelen som scrollar, och vertikala svep i den bytte sida
+    // i stället för att scrolla innehållet.
+    let el = target;
+    while (el && el.nodeType === 1 && el !== document.body) {
+      if (el.scrollHeight > el.clientHeight + SCROLL_EPS &&
+          (canScroll(el, 'up') || canScroll(el, 'down'))) return el;
+      el = el.parentElement;
+    }
+    return pages[layout.center];
   }
   document.addEventListener('touchstart', (e) => {
     if (e.touches.length !== 1) { touch = null; return; }
