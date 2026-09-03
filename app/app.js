@@ -274,10 +274,23 @@ document.addEventListener('DOMContentLoaded', () => {
     cue.addEventListener('click', () => goIndex(index + 1));
     document.body.appendChild(cue);
 
+    // Tillbaka till toppen: dyker upp så fort man lämnat första sidan och
+    // ligger i vänstra hörnet av samma remsa som ner-ikonen, så de aldrig
+    // konkurrerar om tumzonens mitt.
+    const top = document.createElement('button');
+    top.type = 'button';
+    top.className = 'scroll-top';
+    top.setAttribute('aria-label', lang() === 'en' ? 'Back to top' : 'Till toppen');
+    top.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
+      'stroke-linecap="round" stroke-linejoin="round"><path d="M5 14l7-7 7 7"/><path d="M5 20l7-7 7 7"/></svg>';
+    top.addEventListener('click', () => goIndex(0));
+    document.body.appendChild(top);
+
     let current = ORDER[0];
     function setCurrent(id) {
       rail.querySelectorAll('.rail-btn').forEach(b => b.classList.toggle('is-current', b.dataset.page === id));
       cue.classList.toggle('is-off', id === ORDER[ORDER.length - 1]);
+      top.classList.toggle('is-on', id !== ORDER[0]);
       pages[id].classList.add('in-view');
       if (id === current) return;
       current = id;
