@@ -185,9 +185,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (Math.abs(dy) < 5 && Math.abs(dx) < 5) return;
         t0.decided = true;
         const dir = dy < 0 ? 1 : -1;
+        // Fält fick förut alltid gesten, och på Kontakt är formuläret nästan
+        // hela kortet — tummen landade mitt i det och skivan rörde sig inte.
+        // Nu lämnas fältet ifred bara när det FAKTISKT kan scrolla åt det
+        // hållet (ett meddelandefält med mer text än plats); annars är det
+        // sidan man drar i.
+        const field = t0.target.closest && t0.target.closest('input,textarea,select');
         t0.own = Math.abs(dy) >= Math.abs(dx) &&
                  !innerScroller(t0.target, dir) &&
-                 !(t0.target.closest && t0.target.closest('input,textarea,select'));
+                 !(field && canScroll(field, dir));
         if (t0.own) dragging = true;
       }
       if (!t0.own) return;
@@ -271,7 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
     cue.className = 'scroll-cue';
     cue.setAttribute('aria-label', lang() === 'en' ? 'Scroll down' : 'Scrolla ner');
     cue.innerHTML = '<span class="sw-cas">' + chev + chev + chev + '</span>';
-    cue.addEventListener('click', () => goIndex(index + 1));
+    // På sista sidan vänder pilen uppåt i stället för att slockna. En ikon
+    // som tonas ut och in igen är en ikon som kan bli hängande osynlig;
+    // den här finns alltid och pekar alltid dit man kan ta vägen.
+    const atLast = () => index === ORDER.length - 1;
+    cue.addEventListener('click', () => goIndex(index + (atLast() ? -1 : 1)));
     document.body.appendChild(cue);
 
     // Tillbaka till toppen: dyker upp så fort man lämnat första sidan och
@@ -289,7 +299,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let current = ORDER[0];
     function setCurrent(id) {
       rail.querySelectorAll('.rail-btn').forEach(b => b.classList.toggle('is-current', b.dataset.page === id));
-      cue.classList.toggle('is-off', id === ORDER[ORDER.length - 1]);
+      const last = id === ORDER[ORDER.length - 1];
+      cue.classList.toggle('is-up', last);
+      cue.setAttribute('aria-label', lang() === 'en' ? (last ? 'Scroll up' : 'Scroll down')
+                                                     : (last ? 'Scrolla upp' : 'Scrolla ner'));
       top.classList.toggle('is-on', id !== ORDER[0]);
       pages[id].classList.add('in-view');
       if (id === current) return;

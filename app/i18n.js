@@ -37,10 +37,10 @@
       link_error: "LINK ERROR",
       voice_err_400: "Session error — reload the page",
       voice_err_unavailable: "Voice link unavailable — try the form instead",
-      starter_1: "What can you help me with?",
-      starter_2: "How much does it cost?",
-      starter_3: "How does the process work?",
-      starter_4: "Which companies have you worked with?",
+      starter_1: "What can you do?",
+      starter_2: "What does it cost?",
+      starter_3: "How does it work?",
+      starter_4: "Who are your clients?",
 
       // Void
                   label_name: "NAME",
@@ -79,7 +79,7 @@
       // Flux intro (live demo copy)
       flux_kicker: "LIVE DEMO — TALK TO ALEX",
       flux_h1: "The customer gets in touch.<br/>You don't have time to answer.",
-      flux_desc: "You're working, driving or asleep. The customer wants an answer now — or they move on to the next company. Alex answers right away and books a meeting. Try it yourself: tap the microphone and talk to her.",
+      flux_desc: "You're working, driving or asleep. The customer wants an answer now — or they move on. Alex answers and books the meeting. Try it: tap the microphone.",
       flux_how: "Tap the microphone or pick a question below. Your browser will ask for microphone access.",
 
       // Void intro (smart form copy)
@@ -175,10 +175,10 @@
       link_error: "LÄNKFEL",
       voice_err_400: "Sessionsfel — ladda om sidan",
       voice_err_unavailable: "Röstlänken är otillgänglig — testa formuläret istället",
-      starter_1: "Vad kan ni hjälpa mig med?",
-      starter_2: "Hur mycket kostar det?",
-      starter_3: "Hur fungerar processen?",
-      starter_4: "Vilka företag har ni jobbat med?",
+      starter_1: "Vad kan ni göra?",
+      starter_2: "Vad kostar det?",
+      starter_3: "Hur går det till?",
+      starter_4: "Vilka kunder har ni?",
 
       // Void
                   label_name: "NAMN",
@@ -217,7 +217,7 @@
       // Flux intro (live demo copy)
       flux_kicker: "LIVE DEMO — PRATA MED ALEX",
       flux_h1: "Kunden hör av sig.<br/>Du hinner inte svara.",
-      flux_desc: "Du jobbar, kör bil eller sover. Kunden vill ha svar nu — annars går de vidare till nästa. Alex svarar direkt och bokar möte. Prova själv: tryck på mikrofonen och prata med henne.",
+      flux_desc: "Du jobbar, kör bil eller sover. Kunden vill ha svar nu — annars går de vidare. Alex svarar direkt och bokar mötet. Prova: tryck på mikrofonen.",
       flux_how: "Tryck på mikrofonen eller välj en fråga nedan. Webbläsaren ber om mikrofonåtkomst.",
 
       // Void intro (smart form copy)

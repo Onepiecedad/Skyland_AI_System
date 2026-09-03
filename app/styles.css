@@ -2085,17 +2085,23 @@ html.is-scroll main{
   position:fixed;inset:0;height:100dvh;min-height:0;overflow:hidden;
   display:block;scroll-snap-type:none;touch-action:pinch-zoom;
 }
-.scroll-track{display:flex;flex-direction:column;width:100%;will-change:transform}
+/* Skivan och sidorna mäts mot main, inte mot dvh. Adressfältet gör dvh och
+   den faktiska rutan olika stora i vissa lägen, och då hamnade kortets
+   underkant utanför vyn — det var därför bokningsknappen såg ut att ligga
+   utanför kortet. */
+.scroll-track{display:flex;flex-direction:column;width:100%;height:100%;will-change:transform}
 html.is-scroll .page{
   position:relative;inset:auto;visibility:visible;pointer-events:auto;z-index:auto;
   transform:none !important;transition:none;will-change:auto;
-  flex:0 0 100dvh;height:100dvh;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  flex:0 0 100%;height:100%;min-height:0;overflow-y:auto;overscroll-behavior:contain;
 }
 html.is-scroll .page-glass{height:auto;max-height:none;overflow:visible;overscroll-behavior:auto}
 html.is-scroll .dash-panel,html.is-scroll textarea,html.is-scroll .ai-response-body{overscroll-behavior:contain}
 @media (max-width: 820px){
-  html.is-scroll .page{padding-bottom:46px}
-  html.is-scroll .page-glass{min-height:calc(100dvh - 124px)}
+  /* Hemknappsremsan är en no-touch-zon: kortet måste sluta ovanför den,
+     annars lägger sig ner-ikonen och till-toppen-knappen på kortkanten. */
+  html.is-scroll .page{padding-bottom:calc(46px + env(safe-area-inset-bottom))}
+  html.is-scroll .page-glass{min-height:100%}
 }
 /* Innehållet ligger tätt under headern nu — tätare glas så att inget lyser
    igenom logotypraden. */
@@ -2128,7 +2134,7 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
 /* ── Scroll-ikonen ────────────────────────────────────────────────────────
    Kaskaden vriden nedåt med en andande glöd bakom, i remsan UNDER kortet:
    sidan reserverar 34 px i botten och ikonen ligger i de nedersta 30, så
-   den rör aldrig kortets kant. Slocknar på sista sektionen. */
+   den rör aldrig kortets kant. På sista sektionen vänder den uppåt. */
 .scroll-cue{
   position:fixed;left:50%;bottom:calc(5px + env(safe-area-inset-bottom));
   transform:translateX(-50%);z-index:60;
@@ -2144,7 +2150,7 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
 }
 .scroll-cue .sw-cas{transform:rotate(180deg);position:relative;gap:0}
 .scroll-cue .sw-cas svg{width:18px;height:9px;filter:drop-shadow(0 0 9px rgba(67,225,155,.95))}
-.scroll-cue.is-off{opacity:0;pointer-events:none}
+.scroll-cue.is-up .sw-cas{transform:none}
 @keyframes cueBreathe{0%,100%{opacity:.35;transform:translate(-50%,-50%) scale(.85)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}}
 @media (prefers-reduced-motion: reduce){.scroll-cue::before{animation:none;opacity:.7}}
 
@@ -2182,7 +2188,7 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
   font-style:normal;font-weight:700;letter-spacing:normal;line-height:1}
 .logo-word{
   font-size:19px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
-  color:var(--primary);text-shadow:0 0 14px rgba(67,225,155,.55),0 0 32px rgba(12,196,129,.3);
+  color:var(--primary);animation:markBreathe 4.4s ease-in-out infinite;
   /* Spärrningen lägger ett mellanrum efter sista bokstaven. Utan den här
      kompensationen är rutan bredare än bokstäverna och raderna hamnar en
      halv spärrning fel i förhållande till varandra. */
@@ -2191,6 +2197,19 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
 .logo-sub{
   font-size:7.5px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;
   color:rgba(160,240,205,.72);margin-right:-.42em;
+  animation:markBreatheSub 4.4s ease-in-out infinite;
+}
+@keyframes markBreathe{
+  0%,100%{text-shadow:0 0 10px rgba(67,225,155,.34),0 0 24px rgba(12,196,129,.16)}
+  50%{text-shadow:0 0 18px rgba(67,225,155,.72),0 0 40px rgba(12,196,129,.4)}
+}
+@keyframes markBreatheSub{
+  0%,100%{opacity:.72;text-shadow:0 0 6px rgba(67,225,155,.18)}
+  50%{opacity:1;text-shadow:0 0 12px rgba(67,225,155,.45)}
+}
+@media (prefers-reduced-motion: reduce){
+  .logo-word{animation:none;text-shadow:0 0 14px rgba(67,225,155,.55),0 0 32px rgba(12,196,129,.3)}
+  .logo-sub{animation:none}
 }
 @media (max-width:820px){
   .logo-word{font-size:16px;letter-spacing:.22em;margin-right:-.22em}
@@ -2202,22 +2221,35 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
    Ett mindre tak och tätare radavstånd ger drygt 50 px tillbaka, som lägger
    sig under knappen där de gör nytta. */
 @media (max-width: 820px){
-  html.is-scroll #flux{--avatar: clamp(calc(88 * var(--k) * 1px), calc((15.4vh - 21.9px) * var(--k)), 124px)}
+  /* Samma avatarkurva som Kontakt — det var den sidan som kändes rätt.
+     Och samma komposition: texten till vänster, ansiktet till höger. */
+  html.is-scroll #flux{--avatar: clamp(calc(96 * var(--k) * 1px), calc((18.528vh - 26.30px) * var(--k)), 122px)}
+  html.is-scroll #flux .flux-columns{grid-template-columns:minmax(0,1fr) var(--avatar)}
+  html.is-scroll #flux .flux-right{grid-column:2;grid-row:1}
+  html.is-scroll #flux .flux-intro-left{grid-column:1;grid-row:1}
   /* Rutnätet stod på height:100% med space-between och åt därför upp all
      vinst — innehållet fyllde alltid kortet. Naturlig höjd i stället, så
      ligger slacken där den ska: under knappen. */
   html.is-scroll #flux .flux-columns{height:auto;align-content:start;row-gap:clamp(9px, 1.8vh, 16px)}
   /* Knappen förankras i botten med en egen luftrand under sig — då hamnar
      inte hela vinsten som ett hål på höga skärmar. */
-  html.is-scroll #flux .flux-book{margin-top:auto;margin-bottom:clamp(14px, 4.5vh, 46px)}
+  /* Knappen förankras i botten med egen luft både över och under — på
+     korta skärmar tog den annars i förvalsknapparna. Orben ger tillbaka
+     de pixlarna där; den är rund och tål att krympa. */
+  html.is-scroll #flux .flux-book{margin-top:auto;padding-top:clamp(12px, 2.6vh, 24px);
+    margin-bottom:clamp(12px, 3.6vh, 42px)}
+  @media (max-height: 720px){
+    html.is-scroll #flux .orb-wrap{transform:scale(.48);margin:-40px 0}
+    html.is-scroll #flux .voice-label h2{font-size:15px}
+  }
 }
 
 /* ── Till toppen ──────────────────────────────────────────────────────────
-   Samma remsa som ner-ikonen men i vänstra hörnet, så de två aldrig
-   konkurrerar om mitten. Syns först när man lämnat första sidan. */
+   Högerkanten, en bit upp i högertummens båge. Ner-ikonen äger mitten,
+   den här kanten — de konkurrerar aldrig. Syns först efter första sidan. */
 .scroll-top{
-  position:fixed;left:14px;bottom:calc(6px + env(safe-area-inset-bottom));z-index:60;
-  width:34px;height:34px;padding:0;border-radius:50%;display:grid;place-items:center;
+  position:fixed;right:14px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:60;
+  width:38px;height:38px;padding:0;border-radius:50%;display:grid;place-items:center;
   border:1px solid rgba(67,225,155,.42);background:rgba(4,14,9,.72);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   color:var(--primary);cursor:pointer;-webkit-tap-highlight-color:transparent;
@@ -2226,5 +2258,7 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
 }
 .scroll-top.is-on{opacity:1;pointer-events:auto;transform:none}
 .scroll-top:active{background:rgba(67,225,155,.24)}
-.scroll-top svg{width:16px;height:16px;filter:drop-shadow(0 0 6px rgba(67,225,155,.7))}
-@media (max-width:820px){.scroll-top{left:12px;width:32px;height:32px}}
+.scroll-top svg{width:17px;height:17px;filter:drop-shadow(0 0 6px rgba(67,225,155,.7))}
+/* Högerkant, lyft en bit upp i tumbågen — men på ett halvgenomskinligt
+   fat så att den läser som ett reglage ovanpå kortet, inte som skräp. */
+@media (max-width:820px){.scroll-top{right:10px;bottom:calc(4px + env(safe-area-inset-bottom));width:38px;height:38px}}
