@@ -1,6 +1,9 @@
 [build]
   publish = "app"
 
+[[plugins]]
+  package = "./netlify/plugins/indexnow"
+
 # Netlify-subdomänen ska inte finnas kvar som egen kopia i sökindexen.
 [[redirects]]
   from = "https://skyland-ai-os.netlify.app/*"
