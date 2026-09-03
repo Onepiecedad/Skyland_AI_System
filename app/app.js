@@ -74,196 +74,152 @@ document.addEventListener('DOMContentLoaded', () => {
   PAGE_IDS.forEach(id => { pages[id] = document.getElementById(id); });
   const mainEl = document.querySelector('main');
 
-  /* ── Scroll-läge (2026-09-02) ─────────────────────────────────────────────
-     Sidorna ligger efter varandra i dokumentet och man scrollar mellan dem.
+  /* ── Scroll-läge: en skiva som glider (2026-09-03) ───────────────────────
+     Sidorna ligger på en lodrät skiva som förflyttas med transform. Ingen
+     webbläsarscroll är inblandad i själva bytet, och det är hela poängen:
+     iOS äger sin scroll och tar tillbaka den mitt i en gest, vilket gjorde
+     att svep uppåt tappade sig. En transform äger vi själva, hela vägen.
+     Det är samma modell som korset använde och som satt stabilt på telefon.
+
      Ordningen är berättelsens: problemet, vad som försvinner, skicka ditt
-     ärende, se det landa i Systemet, fortsätt med Alex. Kedjan formulär →
-     Systemet → Alex blir bokstavligen "scrolla vidare".
-     Varje sida behåller sitt glaskort och sina inre stilar; det som ryker är
-     skalet runt dem — svep, kors, kantpilar, hint och rundtur. Korset i
-     headern blir en rad med de fem bokstäverna, aktuell markerad.
-     Ordningen sätts med CSS order, inte genom att flytta markup: index.html
-     är orörd. Alex-samtalet avbryts inte längre av att man byter sida —
-     det finns inga sidor att byta, bara en att scrolla i. */
+     ärende, se det landa i Systemet, fortsätt med Alex. Varje sida är exakt
+     en vy hög och behåller sitt glaskort. Innehåll som är högre än vyn
+     (Kontakt med växt meddelandefält, Systemets panel) scrollar inuti sig
+     självt, och skivan håller sig undan så länge det finns kvar att scrolla
+     åt det hållet. */
   const SCROLL_MODE = true;
   const ORDER = ['core', 'neural', 'void', 'dashboard', 'flux'];
 
   function initScrollMode() {
     document.documentElement.classList.add('is-scroll');
     // Sidornas mobilstilar är skrivna mot läget "korset ihopfällt" — flera
-    // regler hänger på body:not(.fnav-is-collapsed). Klassen sätts så att
-    // korten ser exakt ut som de gjorde.
+    // regler hänger på body:not(.fnav-is-collapsed).
     document.body.classList.add('fnav-is-collapsed');
-    ORDER.forEach((id, i) => {
+
+    const track = document.createElement('div');
+    track.className = 'scroll-track';
+    mainEl.appendChild(track);
+    ORDER.forEach(id => {
       const el = pages[id];
-      el.style.order = String(i + 1);
       el.style.transform = '';
       el.classList.add('active');
       el.setAttribute('aria-hidden', 'false');
+      track.appendChild(el);
     });
     pages[ORDER[0]].classList.add('in-view');
 
-    // Sektionsraden i headern: fem bokstäver, aktuell upplyst, alla tryckbara.
-    const rail = document.createElement('nav');
-    rail.className = 'fnav-rail';
-    rail.setAttribute('aria-label', 'Sektioner');
-    ORDER.forEach(id => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'rail-btn';
-      b.dataset.page = id;
-      b.textContent = shortLabels[id];
-      b.title = labels[id];
-      b.setAttribute('aria-label', labels[id]);
-      b.addEventListener('click', () => go(id));
-      rail.appendChild(b);
-    });
-    const headerEl = document.querySelector('header');
-    const langEl = document.querySelector('.lang-switcher');
-    if (headerEl && langEl) headerEl.insertBefore(rail, langEl);
+    let index = 0;                       // vilken sida som står i vyn
+    let offset = 0;                      // skivans läge i px (negativt = neråt)
+    let dragging = false;
+    const vh = () => mainEl.clientHeight;
+    const restFor = i => -i * vh();
 
-    // Scroll-ikonen: tre chevroner som tänds i följd nedåt, med glöd, i
-    // remsan under kortet. Trycker man på den glider nästa sektion in. På
-    // sista sektionen slocknar den — det finns inget mer att peka på.
-    const chev = '<svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.6" ' +
-      'stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 3l8.5 8"/></svg>';
-    const cue = document.createElement('button');
-    cue.type = 'button';
-    cue.className = 'scroll-cue';
-    cue.setAttribute('aria-label', lang() === 'en' ? 'Scroll down' : 'Scrolla ner');
-    cue.innerHTML = '<span class="sw-cas">' + chev + chev + chev + '</span>';
-    cue.addEventListener('click', () => {
-      const i = ORDER.indexOf(current);
-      if (i < ORDER.length - 1) go(ORDER[i + 1]);
-    });
-    document.body.appendChild(cue);
+    function paint() { track.style.transform = 'translate3d(0,' + offset + 'px,0)'; }
 
-    let current = ORDER[0];
-    function setCurrent(id) {
-      rail.querySelectorAll('.rail-btn').forEach(b => b.classList.toggle('is-current', b.dataset.page === id));
-      cue.classList.toggle('is-off', id === ORDER[ORDER.length - 1]);
-      if (id === current) return;
-      current = id;
-      history.replaceState(null, '', '#' + id);
-      window.dispatchEvent(new CustomEvent('skyland:page', { detail: { page: id } }));
-    }
-    /* ── Segt svep ─────────────────────────────────────────────────────────
-       Webbläsarens egen snap är snabb och går inte att ställa in. Här sköts
-       scrollen själv: fingret drar kortet 1:1, och när man släpper glider
-       nästa sektion in på GLIDE_MS ms med mjuk in- och utbromsning — man
-       ser kortet komma. Hjulet på desktop och piltangenterna ger samma
-       glid. Element som scrollar själva (Systemets panel, meddelandefältet)
-       lämnas ifred när de kan scrolla åt det hållet. */
     /* Rörelsen är en fjäder, inte en tidskurva — samma modell som SCC:s
-       panelbyten (framer-motion spring). Skillnaden mot en kurva: kortet
-       tar över fingrets fart i släppet och bromsar in mjukt, i stället för
-       att starta om från noll. Kritiskt dämpad: ingen studs, lång mjuk
-       landning. Tre tal styr känslan — lägre stiffness = segare. */
-    const SPRING = { stiffness: 48, damping: 14, mass: 1 };
+       panelbyten. Kortet tar över fingrets fart i släppet och bromsar in
+       mjukt i stället för att starta om från noll. Kritiskt dämpad: ingen
+       studs. Lägre stiffness = segare; det här ligger runt 1,2 s. */
+    const SPRING = { stiffness: 33, damping: 11.6, mass: 1 };
     const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    function targetTop(id) {
-      const el = pages[id];
-      return Math.max(0, el.offsetTop - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0));
-    }
-    let glide = 0;
-    function glideTo(id, v0) {
-      if (!pages[id]) return;
-      cancelAnimationFrame(glide);
-      const to = targetTop(id);
-      let x = mainEl.scrollTop, v = (v0 || 0) * 1000;   // px/s
-      if (Math.abs(to - x) < 1 && Math.abs(v) < 20) return;
-      if (reduced) { mainEl.scrollTop = to; return; }
+    let raf = 0, vel = 0;
+
+    function settle(v0) {
+      cancelAnimationFrame(raf);
+      const to = restFor(index);
+      vel = v0 || 0;
+      if (reduced) { offset = to; paint(); return; }
       let last = performance.now();
-      (function step(now) {
-        let dt = Math.min(0.032, (now - last) / 1000); last = now;
-        // Delsteg för stabilitet vid låg bildfrekvens.
+      raf = requestAnimationFrame(function step(now) {
+        let dt = Math.min(0.034, (now - last) / 1000); last = now;
         for (let i = 0; i < 4; i++) {
           const h = dt / 4;
-          const a = (-SPRING.stiffness * (x - to) - SPRING.damping * v) / SPRING.mass;
-          v += a * h; x += v * h;
+          const a = (-SPRING.stiffness * (offset - to) - SPRING.damping * vel) / SPRING.mass;
+          vel += a * h; offset += vel * h;
         }
-        if (Math.abs(x - to) < 1.5 && Math.abs(v) < 30) { mainEl.scrollTop = to; glide = 0; return; }
-        mainEl.scrollTop = x;
-        glide = requestAnimationFrame(step);
-      })(last);
-    }
-    function go(id) { glideTo(id); }
-    function neighbour(id, dir) {
-      const i = ORDER.indexOf(id);
-      return ORDER[Math.max(0, Math.min(ORDER.length - 1, i + dir))];
+        if (Math.abs(offset - to) < 0.5 && Math.abs(vel) < 20) { offset = to; vel = 0; paint(); raf = 0; return; }
+        paint();
+        raf = requestAnimationFrame(step);
+      });
     }
 
-    // Inre scrollare får sina gester. Samma kontroll som korset hade.
+    function goIndex(i, v0) {
+      const n = Math.max(0, Math.min(ORDER.length - 1, i));
+      if (n !== index) { index = n; setCurrent(ORDER[index]); }
+      settle(v0);
+    }
+    function go(id) { const i = ORDER.indexOf(id); if (i >= 0) goIndex(i); }
+
+    // ── Inre scrollare äger sina gester ──
     function canScroll(el, dir) {
-      if (!el || el === mainEl || el === document.body || el === document.documentElement) return false;
-      const oy = getComputedStyle(el).overflowY;
-      if (oy !== 'auto' && oy !== 'scroll') return false;
-      if (dir > 0) return el.scrollHeight - el.clientHeight - el.scrollTop > 2;
-      return el.scrollTop > 2;
+      if (!el || el === track || el === mainEl || el === document.body || el === document.documentElement) return false;
+      const cs = getComputedStyle(el);
+      if (cs.overflowY !== 'auto' && cs.overflowY !== 'scroll') return false;
+      if (el.scrollHeight - el.clientHeight < 3) return false;
+      return dir > 0 ? el.scrollHeight - el.clientHeight - el.scrollTop > 2 : el.scrollTop > 2;
     }
     function innerScroller(target, dir) {
       let el = target;
-      while (el && el !== mainEl && el.nodeType === 1) {
+      while (el && el !== track && el.nodeType === 1) {
         if (canScroll(el, dir)) return el;
         el = el.parentElement;
       }
       return null;
     }
 
-    // Touch: dra 1:1, släpp → glid.
-    let touch = null;
+    // ── Touch: dra skivan 1:1, släpp → fjädra ──
+    let t0 = null;
     mainEl.addEventListener('touchstart', (e) => {
-      if (e.touches.length !== 1) { touch = null; return; }
-      cancelAnimationFrame(glide); glide = 0;
+      if (e.touches.length !== 1) { t0 = null; return; }
+      cancelAnimationFrame(raf); raf = 0; vel = 0;
       const t = e.touches[0];
-      // Utgångssektionen läses vid nedtryck: aktuell sektion byts halvvägs
-      // genom draget, och då skulle "nästa" annars bli två steg.
-      touch = { y: t.clientY, x: t.clientX, top: mainEl.scrollTop, startId: current,
-                target: e.target, own: false, decided: false, lastY: t.clientY, lastAt: performance.now(), v: 0 };
+      t0 = { y: t.clientY, x: t.clientX, base: offset, from: index, target: e.target,
+             own: false, decided: false, lastY: t.clientY, lastAt: performance.now(), v: 0 };
     }, { passive: true });
+
     mainEl.addEventListener('touchmove', (e) => {
-      if (!touch || e.touches.length !== 1) return;
+      if (!t0 || e.touches.length !== 1) return;
       const t = e.touches[0];
-      const dy = t.clientY - touch.y, dx = t.clientX - touch.x;
-      if (!touch.decided) {
-        if (Math.abs(dy) < 4 && Math.abs(dx) < 4) {
-          // Första rörelsen avgör på iOS om webbläsaren får panorera. Är det
-          // ingen inre scrollare under fingret stoppas den redan här.
-          if (!innerScroller(touch.target, 1) && !innerScroller(touch.target, -1) &&
-              !(touch.target.closest && touch.target.closest('input,textarea,select'))) e.preventDefault();
-          return;
-        }
-        touch.decided = true;
-        // Horisontell gest eller en inre scrollare som kan ta den: släpp.
-        touch.own = !(Math.abs(dx) > Math.abs(dy)) && !innerScroller(touch.target, dy < 0 ? 1 : -1) &&
-                    !(touch.target.closest && touch.target.closest('input,textarea,select'));
+      const dy = t.clientY - t0.y, dx = t.clientX - t0.x;
+      if (!t0.decided) {
+        if (Math.abs(dy) < 5 && Math.abs(dx) < 5) return;
+        t0.decided = true;
+        const dir = dy < 0 ? 1 : -1;
+        t0.own = Math.abs(dy) >= Math.abs(dx) &&
+                 !innerScroller(t0.target, dir) &&
+                 !(t0.target.closest && t0.target.closest('input,textarea,select'));
+        if (t0.own) dragging = true;
       }
-      if (!touch.own) return;
+      if (!t0.own) return;
       e.preventDefault();
       const now = performance.now();
-      touch.v = (t.clientY - touch.lastY) / Math.max(1, now - touch.lastAt);
-      touch.lastY = t.clientY; touch.lastAt = now;
-      mainEl.scrollTop = touch.top - dy;
+      t0.v = (t.clientY - t0.lastY) / Math.max(1, now - t0.lastAt) * 1000;   // px/s
+      t0.lastY = t.clientY; t0.lastAt = now;
+      // Motstånd vid ändarna så att skivan inte kan dras ut i tomma intet.
+      let want = t0.base + dy;
+      const min = restFor(ORDER.length - 1), max = 0;
+      if (want > max) want = max + (want - max) * 0.35;
+      if (want < min) want = min + (want - min) * 0.35;
+      offset = want;
+      paint();
     }, { passive: false });
-    function touchEnd() {
-      if (!touch) return;
-      const t = touch; touch = null;
-      if (!t.own) return;
-      const dy = mainEl.scrollTop - t.top;              // hur långt kortet dragits
-      const flick = Math.abs(t.v) > 0.5;                 // px/ms — en snärt räcker
-      let target = t.startId;
-      if (Math.abs(dy) > window.innerHeight * 0.18 || flick) {
-        const dir = flick ? (t.v < 0 ? 1 : -1) : (dy > 0 ? 1 : -1);
-        target = neighbour(t.startId, dir);
-      }
-      glideTo(target, -t.v);
-    }
-    mainEl.addEventListener('touchend', touchEnd, { passive: true });
-    mainEl.addEventListener('touchcancel', touchEnd, { passive: true });
 
-    // Hjul: en gest = en sektion.
+    function release() {
+      if (!t0) return;
+      const t = t0; t0 = null;
+      if (!t.own) return;
+      dragging = false;
+      const moved = offset - t.base;
+      const flick = Math.abs(t.v) > 420;                 // px/s
+      let i = t.from;
+      if (Math.abs(moved) > vh() * 0.16 || flick) i = t.from + ((flick ? t.v < 0 : moved < 0) ? 1 : -1);
+      goIndex(i, t.v);
+    }
+    mainEl.addEventListener('touchend', release, { passive: true });
+    mainEl.addEventListener('touchcancel', release, { passive: true });
+
+    // ── Hjul (desktop): en gest = en sida ──
     let acc = 0, wheelAt = 0, wheelLock = 0;
-    // På dokumentet, inte main: ett hjul över headern ska också bläddra.
     document.addEventListener('wheel', (e) => {
       const dir = e.deltaY > 0 ? 1 : -1;
       if (innerScroller(e.target, dir)) return;
@@ -274,54 +230,67 @@ document.addEventListener('DOMContentLoaded', () => {
       if (now < wheelLock) return;
       acc += e.deltaY;
       if (Math.abs(acc) < 40) return;
-      acc = 0;
-      wheelLock = now + 900;
-      glideTo(neighbour(current, dir));
+      acc = 0; wheelLock = now + 700;
+      goIndex(index + dir);
     }, { passive: false });
 
-    // Tangenter.
     document.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       const down = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ';
       const up = e.key === 'ArrowUp' || e.key === 'PageUp';
       if (!down && !up) return;
       e.preventDefault();
-      glideTo(neighbour(current, down ? 1 : -1));
+      goIndex(index + (down ? 1 : -1));
     });
 
-    // Innehållet tänds när sektionen kommer in i bild — samma reveal som
-    // förut, men driven av scrollen. Klassen tas aldrig bort: animationen
-    // har fill:both, och utan klassen är innehållet osynligt.
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('in-view'); });
-    }, { threshold: 0.15 });
-    ORDER.forEach(id => io.observe(pages[id]));
+    // ── Sektionsraden i headern: siffror, aktuell upplyst ──
+    const rail = document.createElement('nav');
+    rail.className = 'fnav-rail';
+    rail.setAttribute('aria-label', 'Sektioner');
+    ORDER.forEach((id, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'rail-btn';
+      b.dataset.page = id;
+      b.textContent = String(i + 1);
+      b.title = labels[id];
+      b.setAttribute('aria-label', labels[id]);
+      b.addEventListener('click', () => go(id));
+      rail.appendChild(b);
+    });
+    const headerEl = document.querySelector('header');
+    const langEl = document.querySelector('.lang-switcher');
+    if (headerEl && langEl) headerEl.insertBefore(rail, langEl);
 
-    // "Aktuell sektion" är den som täcker en linje en bit ner i vyn. Med
-    // sektioner högre än skärmen når ingen 50 % synlighet, så en observer med
-    // tröskel duger inte — linjen gör det.
-    let raf = 0;
-    function pickCurrent() {
-      raf = 0;
-      const line = window.innerHeight * 0.42;
-      let best = current, bd = Infinity;
-      ORDER.forEach(id => {
-        const r = pages[id].getBoundingClientRect();
-        const d = (r.top <= line && r.bottom >= line) ? 0 : Math.min(Math.abs(r.top - line), Math.abs(r.bottom - line));
-        if (d < bd) { bd = d; best = id; }
-      });
-      setCurrent(best);
+    // ── Scroll-ikonen ──
+    const chev = '<svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.6" ' +
+      'stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 3l8.5 8"/></svg>';
+    const cue = document.createElement('button');
+    cue.type = 'button';
+    cue.className = 'scroll-cue';
+    cue.setAttribute('aria-label', lang() === 'en' ? 'Scroll down' : 'Scrolla ner');
+    cue.innerHTML = '<span class="sw-cas">' + chev + chev + chev + '</span>';
+    cue.addEventListener('click', () => goIndex(index + 1));
+    document.body.appendChild(cue);
+
+    let current = ORDER[0];
+    function setCurrent(id) {
+      rail.querySelectorAll('.rail-btn').forEach(b => b.classList.toggle('is-current', b.dataset.page === id));
+      cue.classList.toggle('is-off', id === ORDER[ORDER.length - 1]);
+      pages[id].classList.add('in-view');
+      if (id === current) return;
+      current = id;
+      history.replaceState(null, '', '#' + id);
+      window.dispatchEvent(new CustomEvent('skyland:page', { detail: { page: id } }));
     }
-    // main är scrollbehållaren (se styles.css), inte fönstret.
-    mainEl.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(pickCurrent); }, { passive: true });
-    window.addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(pickCurrent); });
 
     window.SkylandNav = {
       mode: 'scroll',
       showPage: go, pageIds: PAGE_IDS, current: () => current,
       directionTo: (id) => {
-        const a = ORDER.indexOf(id), b = ORDER.indexOf(current);
-        return a < 0 || a === b ? null : (a > b ? 'down' : 'up');
+        const a = ORDER.indexOf(id);
+        return a < 0 || a === index ? null : (a > index ? 'down' : 'up');
       },
     };
 
@@ -330,24 +299,42 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btn && PAGE_IDS.includes(btn.getAttribute('data-target'))) go(btn.getAttribute('data-target'));
     }, true);
 
-    // Djuplänk: landa på sektionen utan animation vid start.
-    const hash = location.hash.replace('#', '');
-    if (PAGE_IDS.includes(hash) && hash !== ORDER[0]) {
-      requestAnimationFrame(() => { mainEl.scrollTop = targetTop(hash); pickCurrent(); });
-    } else {
-      setCurrent(ORDER[0]);
+    // Vyn ändrar höjd när adressfältet fälls in/ut och när skärmen vrids.
+    // Utan omräkning glider skivan ur läge.
+    let vhTimer = 0;
+    function remeasure() {
+      clearTimeout(vhTimer);
+      vhTimer = setTimeout(() => { if (!dragging && !raf) { offset = restFor(index); paint(); } }, 120);
     }
+    window.addEventListener('resize', remeasure);
+    window.addEventListener('orientationchange', remeasure);
+
+    const hash = location.hash.replace('#', '');
+    const start = PAGE_IDS.includes(hash) ? Math.max(0, ORDER.indexOf(hash)) : 0;
+    index = start; offset = restFor(index); paint(); setCurrent(ORDER[index]);
     try { sessionStorage.removeItem('skyland_guide_v1'); } catch (e) { /* ignore */ }
 
     // Den som scrollar hela vägen ner utan att prata med Alex ska inte hamna
-    // i en återvändsgränd: bokningen från Kontakt följer med till sista
-    // sektionen. Klonen bär sina data-i18n, så språkbytet når den också.
+    // i en återvändsgränd: bokningen från Kontakt följer med till Demo.
     const book = document.querySelector('#void .kontakt-book');
     const fluxInner = document.querySelector('#flux .flux-inner');
     if (book && fluxInner) {
       const c = book.cloneNode(true);
       c.classList.add('flux-book');
       fluxInner.appendChild(c);
+    }
+
+    // Kontakt: skicka och boka på samma rad, var sin sida. Raden byggs här
+    // så att markup:en förblir orörd; void.js hänger sin statusrad efter
+    // raden i stället för efter knappen.
+    const form = document.getElementById('contact-form');
+    const submit = form && form.querySelector('.transmit-btn');
+    if (form && submit && book) {
+      const row = document.createElement('div');
+      row.className = 'void-actions';
+      submit.parentNode.insertBefore(row, submit);
+      row.appendChild(submit);
+      row.appendChild(book);
     }
   }
 
