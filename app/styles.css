@@ -2281,6 +2281,67 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
   }
 }
 
+/* ── Tjänster och Kontakt på desktop: samma kur som Demo ──────────────────
+   Sidorna var byggda för ett högt fönster. På en laptop med 700–768 px
+   höjd rann korten ut under nederkanten och en låst sida fick en egen
+   inre scroll. Ingenting tas bort — luften mellan blocken knyts till
+   fönsterhöjden, och det rent dekorativa får ge vika först. Över ~800 px
+   rör sig nästan ingenting: där fanns plats från början. */
+@media (min-width: 821px){
+
+  /* ---------- TJÄNSTER: bara luft att ge ---------- */
+  html.is-scroll #neural .phil-inner{padding-top:clamp(18px, 4vh, 40px);padding-bottom:clamp(18px, 4vh, 40px)}
+  html.is-scroll #neural .intro-kicker{margin-bottom:clamp(6px, 1.6vh, 14px)}
+  html.is-scroll #neural .svc-grid{margin-top:clamp(10px, 2.6vh, 28px);margin-bottom:clamp(10px, 2.6vh, 28px);
+    gap:clamp(8px, 1.6vh, 14px)}
+  html.is-scroll #neural .svc-card{padding-top:clamp(10px, 2.2vh, 18px);padding-bottom:clamp(10px, 2.2vh, 18px)}
+  html.is-scroll #neural .hero-tag{margin-top:clamp(12px, 3vh, 32px)}
+
+  /* ---------- KONTAKT: kortet får sidans höjd ----------
+     Här räckte det inte att klämma luft. Kortet växte med sitt innehåll
+     och sköt ut under fönstret, och att krympa avataren gav ingenting —
+     svarsrutan är flexibel och åt genast upp vinsten. Nu får kortet exakt
+     sidans höjd, och de två elastiska ytorna (meddelandefältet och
+     svarsrutan) krymper till det som blir över. Då kan det inte bli för
+     högt, per konstruktion, oavsett fönster. */
+  html.is-scroll #void .page-glass{height:100%}
+  html.is-scroll #void .void-inner{height:100%;max-height:none;min-height:0}
+  html.is-scroll #void .form-panel,
+  html.is-scroll #void .scan-panel{min-height:0}
+  html.is-scroll #void .form-panel form{min-height:0}
+  /* Meddelandefältets grupp — den ligger direkt under rutnätet, inte i
+     det. (.full sitter på telefonfältet i markup:en.) */
+  html.is-scroll #void .form-panel form > .form-group{min-height:0;margin-top:clamp(6px, 2vh, 16px)}
+  html.is-scroll #void .form-group textarea{min-height:clamp(40px, 8vh, 120px)}
+  html.is-scroll #void .form-group input{min-height:clamp(30px, 4.4vh, 36px)}
+  html.is-scroll #void .ai-response{min-height:0;margin-top:clamp(10px, 2.6vh, 24px);
+    padding:clamp(12px, 2.6vh, 24px)}
+  html.is-scroll #void{--avatar-v: min(220px, calc((100vh - 420px) * 0.5625))}
+  html.is-scroll #void .scan-panel .alex-face,
+  html.is-scroll #void .alex-face--sm{width:var(--avatar-v);max-width:none;flex:0 0 auto}
+  html.is-scroll #void .form-panel{padding-top:clamp(16px, 3.4vh, 40px);padding-bottom:clamp(14px, 3vh, 40px)}
+  html.is-scroll #void .scan-panel{padding-top:clamp(16px, 3.4vh, 40px);padding-bottom:clamp(14px, 3vh, 40px)}
+  html.is-scroll #void .intro-kicker{margin-bottom:clamp(6px, 1.6vh, 14px)}
+  html.is-scroll #void .form-grid{gap:clamp(7px, 1.7vh, 16px)}
+  html.is-scroll #void .void-consent{margin:clamp(5px, 1.2vh, 16px) 0}
+
+  /* Under ~760 px fönsterhöjd får det dekorativa ge vika före innehållet. */
+  @media (max-height: 760px){
+    html.is-scroll #neural .phil-h1{font-size:34px}
+    html.is-scroll #void .intro-how{display:none}
+    html.is-scroll #void .form-panel h2{font-size:26px}
+  }
+  /* Ett riktigt litet fönster på en bred skärm: typografin går ner ett
+     snäpp till, och signaturraden under tjänsterna får stå över. */
+  @media (max-height: 670px){
+    html.is-scroll #neural .phil-h1{font-size:27px}
+    html.is-scroll #neural .svc-card strong{font-size:14px}
+    html.is-scroll #neural .svc-card p{font-size:12.5px;line-height:1.45}
+    html.is-scroll #neural .hero-tag{display:none}
+    html.is-scroll #void .form-panel h2{font-size:22px}
+  }
+}
+
 /* ── Till toppen ──────────────────────────────────────────────────────────
    Högerkanten, en bit upp i högertummens båge. Ner-ikonen äger mitten,
    den här kanten — de konkurrerar aldrig. Syns först efter första sidan. */
