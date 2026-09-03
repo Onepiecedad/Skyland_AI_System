@@ -2244,6 +2244,43 @@ html.is-scroll .fnav-hcross,html.is-scroll .swipe-hint,html.is-scroll .guide{dis
   }
 }
 
+/* ── Demo på desktop: kortet fick inte plats ──────────────────────────────
+   Ansiktet är 16:9 och satte radhöjden. På ett 900 px högt fönster blev
+   stapeln 70 px för hög och en sida som ska vara låst fick en inre scroll.
+   Tre grepp: avsluta-knappen göms tills det finns ett samtal att avsluta
+   (samma regel som mobilen redan har), ansiktet tar den höjd som blir
+   över, och vänsterspalten drar ihop sig med fönstret i stället för att
+   stå kvar på sin fulla höjd. Över ~1000 px fönsterhöjd rör sig
+   ingenting — där fanns plats från början. */
+@media (min-width: 821px){
+  html.is-scroll #flux .voice-panel:has(#starter-panel:not(.hidden)) .voice-btns{display:none}
+  html.is-scroll #flux{--avatar-d: min(410px, calc((100vh - 250px) * 0.5625))}
+  html.is-scroll #flux .flux-columns{grid-template-columns:minmax(0,1fr) var(--avatar-d)}
+  html.is-scroll #flux .flux-right .alex-face{width:var(--avatar-d);max-width:none}
+  html.is-scroll #flux .voice-panel{gap:clamp(8px, 2.2vh, 24px)}
+  html.is-scroll #flux .flux-intro-left{margin-bottom:clamp(6px, 1.3vh, 12px)}
+  html.is-scroll #flux .starter-panel{margin-top:clamp(2px, .7vh, 6px);padding-top:clamp(8px, 1.6vh, 14px)}
+  html.is-scroll #flux .flux-book{margin-top:clamp(10px, 2vh, 18px)}
+  @media (max-height: 960px){
+    html.is-scroll #flux .orb-wrap{transform:scale(.82);margin:-13px 0}
+  }
+  /* Under ~820 px fönsterhöjd får instruktionsraden ge vika — orben och
+     förvalen säger samma sak, och de går inte att korta. */
+  @media (max-height: 820px){
+    html.is-scroll #flux .intro-how{display:none}
+  }
+  /* Ett litet fönster på en bred skärm: typografin får gå ner ett snäpp
+     hellre än att kortet får en egen scroll. */
+  @media (max-height: 760px){
+    html.is-scroll #flux .flux-intro-left .intro-h1{font-size:20px;margin-bottom:6px}
+    html.is-scroll #flux .flux-intro-left .intro-desc{font-size:12.5px;line-height:1.45;margin-bottom:6px}
+    html.is-scroll #flux .intro-kicker{font-size:9.5px}
+    html.is-scroll #flux .voice-label h2{font-size:19px}
+    html.is-scroll #flux .orb-wrap{transform:scale(.72);margin:-21px 0}
+    html.is-scroll #flux .starter-btn{padding:8px 12px;font-size:12px}
+  }
+}
+
 /* ── Till toppen ──────────────────────────────────────────────────────────
    Högerkanten, en bit upp i högertummens båge. Ner-ikonen äger mitten,
    den här kanten — de konkurrerar aldrig. Syns först efter första sidan. */
