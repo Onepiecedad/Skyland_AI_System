@@ -74,6 +74,330 @@ document.addEventListener('DOMContentLoaded', () => {
   PAGE_IDS.forEach(id => { pages[id] = document.getElementById(id); });
   const mainEl = document.querySelector('main');
 
+  /* ── Scroll-läge: en skiva som glider (2026-09-03) ───────────────────────
+     Sidorna ligger på en lodrät skiva som förflyttas med transform. Ingen
+     webbläsarscroll är inblandad i själva bytet, och det är hela poängen:
+     iOS äger sin scroll och tar tillbaka den mitt i en gest, vilket gjorde
+     att svep uppåt tappade sig. En transform äger vi själva, hela vägen.
+     Det är samma modell som korset använde och som satt stabilt på telefon.
+
+     Ordningen är berättelsens: problemet, vad som försvinner, skicka ditt
+     ärende, se det landa i Systemet, fortsätt med Alex. Varje sida är exakt
+     en vy hög och behåller sitt glaskort. Innehåll som är högre än vyn
+     (Kontakt med växt meddelandefält, Systemets panel) scrollar inuti sig
+     självt, och skivan håller sig undan så länge det finns kvar att scrolla
+     åt det hållet. */
+  const SCROLL_MODE = true;
+  const ORDER = ['core', 'neural', 'void', 'dashboard', 'flux'];
+
+  function initScrollMode() {
+    document.documentElement.classList.add('is-scroll');
+    // Sidornas mobilstilar är skrivna mot läget "korset ihopfällt" — flera
+    // regler hänger på body:not(.fnav-is-collapsed).
+    document.body.classList.add('fnav-is-collapsed');
+
+    const track = document.createElement('div');
+    track.className = 'scroll-track';
+    mainEl.appendChild(track);
+    ORDER.forEach(id => {
+      const el = pages[id];
+      el.style.transform = '';
+      el.classList.add('active');
+      el.setAttribute('aria-hidden', 'false');
+      track.appendChild(el);
+    });
+    pages[ORDER[0]].classList.add('in-view');
+
+    let index = 0;                       // vilken sida som står i vyn
+    let offset = 0;                      // skivans läge i px (negativt = neråt)
+    let dragging = false;
+    const vh = () => mainEl.clientHeight;
+    const restFor = i => -i * vh();
+
+    function paint() { track.style.transform = 'translate3d(0,' + offset + 'px,0)'; }
+
+    /* Rörelsen är en fjäder, inte en tidskurva — samma modell som SCC:s
+       panelbyten. Kortet tar över fingrets fart i släppet och bromsar in
+       mjukt i stället för att starta om från noll. Kritiskt dämpad: ingen
+       studs. Lägre stiffness = segare; det här ligger runt 1,2 s. */
+    const SPRING = { stiffness: 33, damping: 11.6, mass: 1 };
+    const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let raf = 0, vel = 0;
+
+    function settle(v0) {
+      cancelAnimationFrame(raf);
+      const to = restFor(index);
+      vel = v0 || 0;
+      if (reduced) { offset = to; paint(); return; }
+      let last = performance.now();
+      raf = requestAnimationFrame(function step(now) {
+        let dt = Math.min(0.034, (now - last) / 1000); last = now;
+        for (let i = 0; i < 4; i++) {
+          const h = dt / 4;
+          const a = (-SPRING.stiffness * (offset - to) - SPRING.damping * vel) / SPRING.mass;
+          vel += a * h; offset += vel * h;
+        }
+        if (Math.abs(offset - to) < 0.5 && Math.abs(vel) < 20) { offset = to; vel = 0; paint(); raf = 0; return; }
+        paint();
+        raf = requestAnimationFrame(step);
+      });
+    }
+
+    function goIndex(i, v0) {
+      const n = Math.max(0, Math.min(ORDER.length - 1, i));
+      if (n !== index) { index = n; setCurrent(ORDER[index]); }
+      settle(v0);
+    }
+    function go(id) { const i = ORDER.indexOf(id); if (i >= 0) goIndex(i); }
+
+    // ── Inre scrollare äger sina gester ──
+    function canScroll(el, dir) {
+      if (!el || el === track || el === mainEl || el === document.body || el === document.documentElement) return false;
+      const cs = getComputedStyle(el);
+      if (cs.overflowY !== 'auto' && cs.overflowY !== 'scroll') return false;
+      if (el.scrollHeight - el.clientHeight < 3) return false;
+      return dir > 0 ? el.scrollHeight - el.clientHeight - el.scrollTop > 2 : el.scrollTop > 2;
+    }
+    function innerScroller(target, dir) {
+      let el = target;
+      while (el && el !== track && el.nodeType === 1) {
+        if (canScroll(el, dir)) return el;
+        el = el.parentElement;
+      }
+      return null;
+    }
+
+    // ── Touch: dra skivan 1:1, släpp → fjädra ──
+    let t0 = null;
+    mainEl.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) { t0 = null; return; }
+      cancelAnimationFrame(raf); raf = 0; vel = 0;
+      const t = e.touches[0];
+      t0 = { y: t.clientY, x: t.clientX, base: offset, from: index, target: e.target,
+             own: false, decided: false, lastY: t.clientY, lastAt: performance.now(), v: 0 };
+    }, { passive: true });
+
+    mainEl.addEventListener('touchmove', (e) => {
+      if (!t0 || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dy = t.clientY - t0.y, dx = t.clientX - t0.x;
+      if (!t0.decided) {
+        if (Math.abs(dy) < 5 && Math.abs(dx) < 5) return;
+        t0.decided = true;
+        const dir = dy < 0 ? 1 : -1;
+        // Fält fick förut alltid gesten, och på Kontakt är formuläret nästan
+        // hela kortet — tummen landade mitt i det och skivan rörde sig inte.
+        // Nu lämnas fältet ifred bara när det FAKTISKT kan scrolla åt det
+        // hållet (ett meddelandefält med mer text än plats); annars är det
+        // sidan man drar i.
+        const field = t0.target.closest && t0.target.closest('input,textarea,select');
+        t0.own = Math.abs(dy) >= Math.abs(dx) &&
+                 !innerScroller(t0.target, dir) &&
+                 !(field && canScroll(field, dir));
+        if (t0.own) dragging = true;
+      }
+      if (!t0.own) return;
+      e.preventDefault();
+      const now = performance.now();
+      t0.v = (t.clientY - t0.lastY) / Math.max(1, now - t0.lastAt) * 1000;   // px/s
+      t0.lastY = t.clientY; t0.lastAt = now;
+      // Motstånd vid ändarna så att skivan inte kan dras ut i tomma intet.
+      let want = t0.base + dy;
+      const min = restFor(ORDER.length - 1), max = 0;
+      if (want > max) want = max + (want - max) * 0.35;
+      if (want < min) want = min + (want - min) * 0.35;
+      offset = want;
+      paint();
+    }, { passive: false });
+
+    function release() {
+      if (!t0) return;
+      const t = t0; t0 = null;
+      if (!t.own) return;
+      dragging = false;
+      const moved = offset - t.base;
+      const flick = Math.abs(t.v) > 420;                 // px/s
+      let i = t.from;
+      if (Math.abs(moved) > vh() * 0.16 || flick) i = t.from + ((flick ? t.v < 0 : moved < 0) ? 1 : -1);
+      goIndex(i, t.v);
+    }
+    mainEl.addEventListener('touchend', release, { passive: true });
+    mainEl.addEventListener('touchcancel', release, { passive: true });
+
+    // ── Hjul (desktop): en gest = en sida ──
+    let acc = 0, wheelAt = 0, wheelLock = 0;
+    document.addEventListener('wheel', (e) => {
+      const dir = e.deltaY > 0 ? 1 : -1;
+      if (innerScroller(e.target, dir)) return;
+      e.preventDefault();
+      const now = performance.now();
+      if (now - wheelAt > 300) acc = 0;
+      wheelAt = now;
+      if (now < wheelLock) return;
+      acc += e.deltaY;
+      if (Math.abs(acc) < 40) return;
+      acc = 0; wheelLock = now + 700;
+      goIndex(index + dir);
+    }, { passive: false });
+
+    document.addEventListener('keydown', (e) => {
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      const down = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ';
+      const up = e.key === 'ArrowUp' || e.key === 'PageUp';
+      if (!down && !up) return;
+      e.preventDefault();
+      goIndex(index + (down ? 1 : -1));
+    });
+
+    // ── Sektionsraden i headern: siffror, aktuell upplyst ──
+    const rail = document.createElement('nav');
+    rail.className = 'fnav-rail';
+    rail.setAttribute('aria-label', 'Sektioner');
+    ORDER.forEach((id, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'rail-btn';
+      b.dataset.page = id;
+      b.textContent = String(i + 1);
+      b.title = labels[id];
+      b.setAttribute('aria-label', labels[id]);
+      b.addEventListener('click', () => go(id));
+      rail.appendChild(b);
+    });
+    const headerEl = document.querySelector('header');
+    const langEl = document.querySelector('.lang-switcher');
+    if (headerEl && langEl) headerEl.insertBefore(rail, langEl);
+
+    // ── Scroll-ikonen ──
+    const chev = '<svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.6" ' +
+      'stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 3l8.5 8"/></svg>';
+    const cue = document.createElement('button');
+    cue.type = 'button';
+    cue.className = 'scroll-cue';
+    cue.setAttribute('aria-label', lang() === 'en' ? 'Scroll down' : 'Scrolla ner');
+    cue.innerHTML = '<span class="sw-cas">' + chev + chev + chev + '</span>';
+    // På sista sidan vänder pilen uppåt i stället för att slockna. En ikon
+    // som tonas ut och in igen är en ikon som kan bli hängande osynlig;
+    // den här finns alltid och pekar alltid dit man kan ta vägen.
+    const atLast = () => index === ORDER.length - 1;
+    cue.addEventListener('click', () => goIndex(index + (atLast() ? -1 : 1)));
+    document.body.appendChild(cue);
+
+    // Tillbaka till toppen: dyker upp så fort man lämnat första sidan och
+    // ligger i vänstra hörnet av samma remsa som ner-ikonen, så de aldrig
+    // konkurrerar om tumzonens mitt.
+    const top = document.createElement('button');
+    top.type = 'button';
+    top.className = 'scroll-top';
+    top.setAttribute('aria-label', lang() === 'en' ? 'Back to top' : 'Till toppen');
+    top.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
+      'stroke-linecap="round" stroke-linejoin="round"><path d="M5 14l7-7 7 7"/><path d="M5 20l7-7 7 7"/></svg>';
+    top.addEventListener('click', () => goIndex(0));
+    document.body.appendChild(top);
+
+    let current = ORDER[0];
+    function setCurrent(id) {
+      rail.querySelectorAll('.rail-btn').forEach(b => b.classList.toggle('is-current', b.dataset.page === id));
+      const last = id === ORDER[ORDER.length - 1];
+      cue.classList.toggle('is-up', last);
+      cue.setAttribute('aria-label', lang() === 'en' ? (last ? 'Scroll up' : 'Scroll down')
+                                                     : (last ? 'Scrolla upp' : 'Scrolla ner'));
+      top.classList.toggle('is-on', id !== ORDER[0]);
+      pages[id].classList.add('in-view');
+      if (id === current) return;
+      current = id;
+      history.replaceState(null, '', '#' + id);
+      window.dispatchEvent(new CustomEvent('skyland:page', { detail: { page: id } }));
+    }
+
+    window.SkylandNav = {
+      mode: 'scroll',
+      showPage: go, pageIds: PAGE_IDS, current: () => current,
+      directionTo: (id) => {
+        const a = ORDER.indexOf(id);
+        return a < 0 || a === index ? null : (a > index ? 'down' : 'up');
+      },
+    };
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-target]');
+      if (btn && PAGE_IDS.includes(btn.getAttribute('data-target'))) go(btn.getAttribute('data-target'));
+    }, true);
+
+    // Vyn ändrar höjd när adressfältet fälls in/ut och när skärmen vrids.
+    // Utan omräkning glider skivan ur läge.
+    let vhTimer = 0;
+    function remeasure() {
+      clearTimeout(vhTimer);
+      vhTimer = setTimeout(() => { if (!dragging && !raf) { offset = restFor(index); paint(); } }, 120);
+    }
+    window.addEventListener('resize', remeasure);
+    window.addEventListener('orientationchange', remeasure);
+
+    const hash = location.hash.replace('#', '');
+    const start = PAGE_IDS.includes(hash) ? Math.max(0, ORDER.indexOf(hash)) : 0;
+    index = start; offset = restFor(index); paint(); setCurrent(ORDER[index]);
+    try { sessionStorage.removeItem('skyland_guide_v1'); } catch (e) { /* ignore */ }
+
+    // Den som scrollar hela vägen ner utan att prata med Alex ska inte hamna
+    // i en återvändsgränd: bokningen från Kontakt följer med till Demo.
+    const book = document.querySelector('#void .kontakt-book');
+    const fluxInner = document.querySelector('#flux .flux-inner');
+    if (book && fluxInner) {
+      const c = book.cloneNode(true);
+      c.classList.add('flux-book');
+      fluxInner.appendChild(c);
+    }
+
+    // Kontakt: skicka och boka på samma rad, var sin sida. Raden byggs här
+    // så att markup:en förblir orörd; void.js hänger sin statusrad efter
+    // raden i stället för efter knappen.
+    const form = document.getElementById('contact-form');
+    const submit = form && form.querySelector('.transmit-btn');
+    if (form && submit && book) {
+      const row = document.createElement('div');
+      row.className = 'void-actions';
+      submit.parentNode.insertBefore(row, submit);
+      row.appendChild(submit);
+      row.appendChild(book);
+    }
+  }
+
+  function initShared() {
+    // ── Systemet > Agenter som dragspel ──
+    const agentCards = [...document.querySelectorAll('#dashboard .dash-agent')];
+    agentCards.forEach((card) => {
+      const head = card.querySelector('.dash-agent-head');
+      if (!head) return;
+      head.setAttribute('role', 'button');
+      head.setAttribute('tabindex', '0');
+      const toggle = () => {
+        const wasOpen = card.classList.contains('is-open');
+        agentCards.forEach(c => c.classList.remove('is-open'));
+        if (!wasOpen) card.classList.add('is-open');
+      };
+      head.addEventListener('click', toggle);
+      head.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+
+    // ── Smart Portal: live-spegling av formulärfälten ──
+    const form = document.getElementById('contact-form');
+    if (form) {
+      form.querySelectorAll('input, textarea').forEach(input => {
+        input.addEventListener('input', () => {
+          const field = input.getAttribute('data-field');
+          const mirror = document.getElementById('scan-' + field);
+          if (mirror) mirror.textContent = input.value || '—';
+        });
+      });
+    }
+  }
+
+  if (SCROLL_MODE) { initScrollMode(); initShared(); return; }
+
   // Bara mitten sparas i praktiken: grannarna följer av hjulen. Ett gammalt
   // sparat, roterat kors läses därför som "den sidan" och räknas om.
   function loadLayout() {
@@ -471,44 +795,11 @@ document.addEventListener('DOMContentLoaded', () => {
     navigate(dir);
   }, { passive: true });
 
-  // ── Systemet > Agenter som dragspel ──
-  // Fyra kort med brödtext blev högre än panelen och tvingade fram intern
-  // scroll. Intern scroll på en sida som samtidigt lyssnar efter svep är en
-  // dålig kombination — man byter sida av misstag och har svårt att hitta
-  // tillbaka. Ett öppet kort i taget ryms utan scroll.
-  const agentCards = [...document.querySelectorAll('#dashboard .dash-agent')];
-  agentCards.forEach((card, i) => {
-    const head = card.querySelector('.dash-agent-head');
-    if (!head) return;
-    head.setAttribute('role', 'button');
-    head.setAttribute('tabindex', '0');
-    const toggle = () => {
-      const wasOpen = card.classList.contains('is-open');
-      agentCards.forEach(c => c.classList.remove('is-open'));
-      if (!wasOpen) card.classList.add('is-open');
-    };
-    head.addEventListener('click', toggle);
-    head.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-    });
-  });
-
   // ── Start: hash-djuplänk vinner över sparat läge ──
   const hash = location.hash.replace('#', '');
   if (PAGE_IDS.includes(hash) && layout.center !== hash) layout = layoutFor(hash);
   applyLayout();
-
-  // ── Smart Portal: live-spegling av formulärfälten ──
-  const form = document.getElementById('contact-form');
-  if (form) {
-    form.querySelectorAll('input, textarea').forEach(input => {
-      input.addEventListener('input', () => {
-        const field = input.getAttribute('data-field');
-        const mirror = document.getElementById('scan-' + field);
-        if (mirror) mirror.textContent = input.value || '—';
-      });
-    });
-  }
+  initShared();
 });
 
 /* ── Swipehint vid första besöket (2026-09-01) ────────────────────────────
@@ -542,6 +833,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   setTimeout(function () {
+    if (window.SkylandNav && window.SkylandNav.mode === 'scroll') return;
     var lang = (document.documentElement.lang || 'sv').slice(0, 2);
     var txt = lang === 'en' ? 'Swipe to navigate' : 'Swipa för att navigera';
     // Tre chevroner som tänds i följd bygger en svepande rörelse i stället för

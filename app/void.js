@@ -28,7 +28,7 @@
       ai_title: 'AUTOMATISKT AI-SVAR',
       waiting: 'Väntar på ditt meddelande…',
       analyzing: 'Analyserar...',
-      step_profile: 'Skapar lead-profil',
+      step_profile: 'Skapar din profil',
       step_kb: 'Söker i kunskapsbas',
       step_answer: 'Genererar svar',
       registered: 'Ärendet är registrerat. Joakim återkommer personligen inom kort.',
@@ -50,7 +50,7 @@
       ai_title: 'AUTOMATED AI RESPONSE',
       waiting: 'Waiting for your message…',
       analyzing: 'Analysing...',
-      step_profile: 'Building lead profile',
+      step_profile: 'Building your profile',
       step_kb: 'Searching the knowledge base',
       step_answer: 'Writing the answer',
       registered: 'Your message is logged. Joakim will get back to you personally shortly.',
@@ -259,7 +259,9 @@
     el.innerHTML =
       '<div class="vs-bar"><span class="vs-fill"></span></div>' +
       '<div class="vs-row"><span class="vs-dot"></span><span class="vs-label"></span></div>';
-    submitBtn.insertAdjacentElement('afterend', el);
+    // Knappen kan ligga i en rad med bokningen (se app.js); raden är då
+    // ankaret, annars knappen själv.
+    (submitBtn.closest('.void-actions') || submitBtn).insertAdjacentElement('afterend', el);
     return el;
   }
 
@@ -384,7 +386,7 @@
             try { sessionStorage.setItem('skyland_show_answer', '1'); } catch (e) {}
             if (window.SkylandNav) window.SkylandNav.showPage('dashboard');
           });
-          submitBtn.insertAdjacentElement('afterend', gotoBtn);
+          (submitBtn.closest('.void-actions') || submitBtn).insertAdjacentElement('afterend', gotoBtn);
         }
         break;
 
