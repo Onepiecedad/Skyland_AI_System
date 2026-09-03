@@ -1,0 +1,9 @@
+[build]
+  publish = "app"
+
+# Netlify-subdomänen ska inte finnas kvar som egen kopia i sökindexen.
+[[redirects]]
+  from = "https://skyland-ai-os.netlify.app/*"
+  to = "https://skylandai.se/:splat"
+  status = 301
+  force = true
