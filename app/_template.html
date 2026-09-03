@@ -1,0 +1,65 @@
+<!--
+  REFERENSMALL — inte en riktig sida, inte länkad någonstans, inte i sitemap.xml.
+  SEO-5: alla undersidor (SEO-6 till SEO-17) ska följa exakt denna struktur.
+  Kopiera filen till app/[sida]/index.html och fyll i [PLACEHOLDERS].
+
+  Regler:
+  - Ladda ALDRIG: bg-shader.js, guide.js, voice.js, void.js, dashboard.js,
+    intro-video.js, app.js, i18n.js, lang.js eller ElevenLabs-klienten.
+  - tracker.js laddas bara om Joakim bekräftar att SCC ska mäta undersidor.
+  - URL-form: app/[sida]/index.html -> https://skylandai.se/[sida]/
+    (mapp med index.html, Netlify serverar utan .html-ändelse).
+  - Håll efterföljande snedstreck konsekvent i canonical, sitemap och interna länkar.
+  - Header är identisk med index.html men UTAN språkväxlaren, och logotypen
+    är en <a href="/"> i stället för en klickbar <div>.
+  - BreadcrumbList: synlig i <nav class="crumbs"> OCH som JSON-LD i <head>,
+    de två måste stämma överens.
+-->
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>[SIDANS TITLE]</title>
+  <meta name="description" content="[155–160 tecken]"/>
+  <link rel="canonical" href="https://skylandai.se/[SÖKVÄG]/"/>
+  <meta name="theme-color" content="#101414"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="Skyland AI Solutions"/>
+  <meta property="og:title" content="[SAMMA SOM TITLE]"/>
+  <meta property="og:description" content="[SAMMA SOM DESCRIPTION]"/>
+  <meta property="og:url" content="https://skylandai.se/[SÖKVÄG]/"/>
+  <meta property="og:locale" content="sv_SE"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Skyland AI Solutions", "item": "https://skylandai.se/" },
+      { "@type": "ListItem", "position": 2, "name": "[SIDANS NAMN]", "item": "https://skylandai.se/[SÖKVÄG]/" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">[SIDANS EGET SCHEMA — Organization/ContactPage/CollectionPage/Article, se SEO-6 till SEO-9]</script>
+  <link rel="stylesheet" href="/page.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@300;400;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <header>
+    <a class="logo" href="/">
+      <span class="logo-word">Skyland</span>
+      <span class="logo-sub">AI Solutions</span>
+    </a>
+  </header>
+  <main>
+    <nav class="crumbs" aria-label="Brödsmulor">
+      <a href="/">Skyland AI Solutions</a><span class="crumb-sep">/</span><span class="crumb-current">[SIDANS NAMN]</span>
+    </nav>
+    <h1>[H1]</h1>
+    [INNEHÅLL]
+  </main>
+  [FOOTER — se SEO-11, delad komponent, ännu inte byggd]
+</body>
+</html>
