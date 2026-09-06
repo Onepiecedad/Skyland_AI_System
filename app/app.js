@@ -111,8 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let index = 0;                       // vilken sida som står i vyn
     let offset = 0;                      // skivans läge i px (negativt = neråt)
     let dragging = false;
-    const vh = () => mainEl.clientHeight;
-    const restFor = i => -i * vh();
+    // clientHeight direkt efter att fem sidor flyttats in i skivan tvingar
+    // fram en synkron layout av hela dokumentet — PageSpeed mobil: 594 ms
+    // "forced reflow" på just den här raden. Layouten hade skett ändå i
+    // nästa bildruta, men då utan att blockera. Två saker: höjden cachas
+    // tills fönstret ändras (remeasure nollar), och för index 0, där nästan
+    // alla besök börjar, behövs den inte alls: 0 * höjd är 0.
+    let vhCache = 0;
+    const vh = () => vhCache || (vhCache = mainEl.clientHeight);
+    const restFor = i => (i === 0 ? 0 : -i * vh());
 
     function paint() { track.style.transform = 'translate3d(0,' + offset + 'px,0)'; }
 
@@ -334,6 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Utan omräkning glider skivan ur läge.
     let vhTimer = 0;
     function remeasure() {
+      vhCache = 0;
       clearTimeout(vhTimer);
       vhTimer = setTimeout(() => { if (!dragging && !raf) { offset = restFor(index); paint(); } }, 120);
     }
