@@ -12,6 +12,7 @@ Requires env vars: OPENAI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_KEY
 
 import os
 import sys
+import time
 import json
 import argparse
 import re
@@ -266,15 +267,21 @@ def verify_queries():
         # Embed the query
         query_embedding = embed_text(q["query"])
 
-        # Call Supabase RPC for similarity search
-        # Using the match_knowledge_base function or raw query
-        response = supabase.rpc("match_knowledge_base", {
-            "query_embedding": query_embedding,
-            "match_threshold": 0.0,
-            "match_count": 3,
-        }).execute()
-
-        top_matches = response.data if response.data else []
+        # Call Supabase RPC for similarity search.
+        # Direkt efter en omskrivning (upsert + radering) kan sökningen svara tomt
+        # en kort stund (6 sep 2026: alla tre frågor tomma, --verify strax efter
+        # gav 3/3). Försök därför några gånger med paus innan det räknas som fel.
+        top_matches = []
+        for attempt in range(4):
+            response = supabase.rpc("match_knowledge_base", {
+                "query_embedding": query_embedding,
+                "match_threshold": 0.0,
+                "match_count": 3,
+            }).execute()
+            top_matches = response.data if response.data else []
+            if top_matches:
+                break
+            time.sleep(3)
 
         # Check results
         passed = False
