@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- docs(kunskapsbas): KUNSKAPSBAS.md omskriven efter vad Skyland faktiskt erbjuder (sep 2026): sju tjänster (AI-telefonist, uppföljning/databasreaktivering, formulär-AI, CRM/Skyland-systemet, hemsidor, annonser & kampanjer, integrationer), betalmodeller i stället för fasta paketpriser (resultatbaserat med gratis test, fast pris per projekt, systemet som prenumeration, serviceavtal), annonser/SEO flyttade från "vad vi inte gör" till tjänst. Norra Hamnens Bilskola borttagen (aldrig kund). Dana → Alex, n8n/React/FastAPI-referenser borta. populate_knowledge_base.py raderar nu chunks som inte längre finns i källfilen och verifierar annonsfrågan i stället för bilskolefrågan. Kör `python3 scripts/populate_knowledge_base.py` efter merge.
 - fix(gdpr): den personliga röstöppningen efter formulär (voice.js) säger nu, precis som starterknapparnas varianter, att besökaren pratar med en AI och att samtalet sparas — integritetspolicyn lovade det, koden höll det inte i den vägen. (granskning 6 sep)
 - fix(copy): dashboardens Översikt-flik påstod att allt på sidan hänt i besökarens session; KPI-siffrorna (< 30 s, 24/7, 100 %, 0) är egenskaper hos systemet, inte sessionsutfall. Noten säger nu vad som är vad. (granskning 6 sep)
 - docs: AGENT.md omskriven efter verklig arkitektur (statisk `app/` på Netlify, SCC på Render, ElevenLabs via signerad URL; n8n/FastAPI/Retell/React är historik). docs/infrastructure.md märkt som historiskt. Rätta filnamn skyland-pod.md/skyland-pov.md. (granskning 6 sep)
