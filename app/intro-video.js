@@ -30,13 +30,36 @@
     var src = card.getAttribute('data-video');
     if (!video || !src) return;
 
-    // Preload the whole clip up front so playback starts instantly
-    // and audio/video stay in sync (no mid-play buffering).
-    video.preload = 'auto';
-    video.setAttribute('src', src);
-    video.load();
+    // Filmen hämtas INTE vid sidstart. Tidigare laddades båda klippen
+    // (3,3 + 4,8 MB) fullt ut för varje besökare i samma sekund som sidan
+    // öppnades, oavsett om någon någonsin klickade — 8,3 MB per besök och
+    // huvudtråd upptagen med att buffra video medan hero-sidan skulle måla.
+    // Nu laddas klippet när DESS sida blir aktiv (app.js skickar skyland:page),
+    // eller när någon rör kortet, vilket som kommer först. Den som scrollat
+    // dit och tittar en sekund har klippet cachat innan klicket, så
+    // "startar direkt"-egenskapen finns kvar för dem det gäller.
+    var loaded = false;
+    function ensureLoaded() {
+      if (loaded) return;
+      loaded = true;
+      video.preload = 'auto';
+      video.setAttribute('src', src);
+      video.load();
+    }
+    var ownPage = card.closest('.page');
+    var ownId = ownPage ? ownPage.id : null;
+    if (ownId) {
+      window.addEventListener('skyland:page', function (e) {
+        if (e.detail && e.detail.page === ownId) ensureLoaded();
+      });
+      // Sidan var redan aktiv när skriptet kördes (direktlänk med #hash).
+      if (window.SkylandNav && typeof window.SkylandNav.current === 'function' && window.SkylandNav.current() === ownId) ensureLoaded();
+    }
+    card.addEventListener('pointerenter', ensureLoaded, { once: true });
+    card.addEventListener('touchstart', ensureLoaded, { once: true, passive: true });
 
     function start() {
+      ensureLoaded();
       // One face talking at a time
       if (activeCard && activeCard !== card && activeCard.__reset) {
         activeCard.__reset();
