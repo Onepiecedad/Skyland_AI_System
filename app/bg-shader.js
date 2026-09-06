@@ -6,7 +6,7 @@
 // bildruta på processorn: 13 sekunder blockerad huvudtråd i Lighthouse,
 // prestandapoäng 48 medan allt annat låg på 100 (mätt 5 sep 2026).
 //
-// Därför tre grindar innan shadern startar, och ett stilla fallback i CSS
+// Därför fyra grindar innan shadern startar, och ett stilla fallback i CSS
 // (#bg-shader-container.bg-static) som ser ut som shaderns viloläge:
 //
 //   1. prefers-reduced-motion: reduce  → stilla. Användaren har bett om det,
@@ -43,6 +43,17 @@
   const motionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
   if (motionQuery && motionQuery.matches) {
     goStatic('reduced-motion');
+    exposeNoop();
+    return;
+  }
+
+  // ── Grind 1b: telefoner ─────────────────────────────────────────────────
+  // Pekskärm utan hover = telefon. Där kostar shadern ~1 s huvudtråd vid start
+  // (kompilering + första bildrutorna) och batteri hela besöket, och den syns
+  // knappt bakom korten. Stilla gradient i stället. Vill du ha den på mobil
+  // igen: ta bort de här fyra raderna.
+  if (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+    goStatic('touch-device');
     exposeNoop();
     return;
   }
