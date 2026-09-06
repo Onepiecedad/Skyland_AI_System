@@ -1,3 +1,7 @@
+> **HISTORISKT DOKUMENT (n8n/FastAPI/Fly-tiden, t.o.m. aug 2026).** Inget av det
+> nedan kör längre. Aktuell drift: sajten på Netlify (`app/`), backend SCC på
+> Render — se `AGENT.md` här och `docs/DRIFT.md` i `skyland-command-center`.
+
 # Infrastructure
 
 > **Configuration:** All deployment-specific URLs and credentials are read from environment variables defined in `.env` (local) or platform secrets (Fly.io, n8n). See `.env.example` for required variables. The Supabase project URL is stored as `SUPABASE_URL`.

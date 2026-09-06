@@ -3,11 +3,12 @@
  *
  * Flow:
  *   1. User clicks orb → POST /voice/signed-url with session UUID
- *   2. Proxy returns signed wss:// URL (API key stays server-side)
+ *   2. SCC (scc.skylandai.se, /api/v1/webhooks/site) returns a signed wss://
+ *      URL — the ElevenLabs API key stays server-side
  *   3. ElevenLabs SDK connects directly for audio
  *   4. SDK handles mic capture, audio playback, WebSocket lifecycle
  *
- * Backend contract: /proxy/README.md
+ * Backend contract: skyland-command-center/docs/SITE_FLOWS.md
  * SDK: @elevenlabs/client v1.4.0 (IIFE via CDN → window.ElevenLabsClient)
  */
 
@@ -376,9 +377,12 @@
             var first = (ctx.name || '').trim().split(/\s+/)[0];
             sessionConfig.overrides = sessionConfig.overrides || { agent: {} };
             sessionConfig.overrides.agent = sessionConfig.overrides.agent || {};
+            // Granskning 6 sep: AI-/inspelningsupplysningen måste ligga i första
+            // repliken även här (integritetspolicyn + AGENT.md regel 5). Samma
+            // formulering som Variant 1-svaren i lang.js.
             sessionConfig.overrides.agent.firstMessage = isEn
-              ? 'Hi' + (first ? ' ' + first : '') + '! I saw your message and the answer you got. Want to pick it up from there?'
-              : 'Hej' + (first ? ' ' + first : '') + '! Jag såg ditt meddelande och svaret du fick. Vill du fortsätta därifrån?';
+              ? 'Welcome to Skyland — you\'re talking to our AI assistant and this call is recorded. Hi' + (first ? ' ' + first : '') + '! I saw your message and the answer you got. Want to pick it up from there?'
+              : 'Välkommen till Skyland — du pratar med vår AI-assistent och samtalet sparas. Hej' + (first ? ' ' + first : '') + '! Jag såg ditt meddelande och svaret du fick. Vill du fortsätta därifrån?';
             console.log('[VOICE] Lead context attached for', ctx.name || '(namnlös)');
           }
         }
