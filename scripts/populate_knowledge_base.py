@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TICKET-V01: Populate Skyland knowledge_base with embedded chunks from Hemsida_3_0.txt
+TICKET-V01: Populate Skyland knowledge_base with embedded chunks from KUNSKAPSBAS.md
 
 Usage:
   python scripts/populate_knowledge_base.py          # Insert/upsert all chunks
@@ -217,9 +217,19 @@ def upsert_chunks(chunks: list[dict]):
 
         print(f"  Inserted {i + 1}/{total}: {chunk['category'].upper()} — {chunk['title']}")
 
+    # Rensa chunks som inte längre finns i källfilen (KUNSKAPSBAS.md är sanningen).
+    # Utan detta låg t.ex. "Case study: Norra Hamnens Bilskola" och gamla
+    # paketpriser kvar i databasen efter att de tagits bort ur filen (sep 2026).
+    keep = {c["title"] for c in chunks}
+    existing = supabase.table("knowledge_base").select("id, title").execute()
+    stale = [r for r in (existing.data or []) if r["title"] not in keep]
+    for r in stale:
+        supabase.table("knowledge_base").delete().eq("id", r["id"]).execute()
+        print(f"  Raderad (finns inte längre i källfilen): {r['title']}")
+
     # Verify count
     result = supabase.table("knowledge_base").select("id", count="exact").execute()
-    print(f"\n✅ Done. Total rows in knowledge_base: {result.count}")
+    print(f"\n✅ Done. Total rows in knowledge_base: {result.count} ({len(stale)} gamla raderade)")
 
 
 def verify_queries():
@@ -232,10 +242,10 @@ def verify_queries():
             "description": "Should return FAQ pricing chunk",
         },
         {
-            "query": "har ni jobbat med bilskolor",
-            "expected_category": "case_study",
-            "expected_keyword": "Bilskola",
-            "description": "Should return Norra Hamnens Bilskola case study",
+            "query": "kan ni hjälpa oss med annonser på Facebook och Instagram",
+            "expected_category": "service",
+            "expected_keyword": "Annonser",
+            "description": "Should return 'Tjänst: Annonser och kampanjer' (sep 2026: annonser är en tjänst, inte undantag)",
         },
         {
             "query": "I'm worried about ROI",

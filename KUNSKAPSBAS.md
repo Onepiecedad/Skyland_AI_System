@@ -1,10 +1,10 @@
 # KUNSKAPSBAS — Skyland AI Solutions
 
-**Källfil:** Detta dokument är källan till sanning för Skylands kunskapsbas i Supabase pgvector. När den uppdateras ska TICKET-V01-skriptet köras om så att kunskapsbasen synkas.
+**Källfil:** Detta dokument är källan till sanning för Skylands kunskapsbas i Supabase pgvector — det Alex (röstagenten) och formulär-AI:n på skylandai.se vet om Skyland. När den uppdateras: kör `python3 scripts/populate_knowledge_base.py` så att kunskapsbasen synkas.
 
 **Språk:** Svenska. Skyland säljer till svenska SMB:er. Engelska översättningar görs vid behov av RAG-systemet, inte i denna källa.
 
-**Senast uppdaterad:** 2026-05-04
+**Senast uppdaterad:** 2026-09-06 (omskriven efter vad Skyland faktiskt erbjuder; gamla paketpriser, Norra Hamnens Bilskola och n8n/React-referenser borttagna)
 **Format:** Markdown med tydliga sektioner. Varje H2-sektion blir en chunk. Vissa H3-underavdelningar blir egna chunks.
 **Författare:** Joakim Landqvist
 
@@ -36,126 +36,148 @@ Vi tror på fyra principer:
 
 **Människan kvar i loopen.** AI gör det repetitiva. Människan gör det relationella. Vi bygger inte system som ersätter ditt omdöme, vi bygger system som låter dig använda det där det betyder något.
 
-**Pragmatism före teknik.** Vi väljer den enklaste tekniken som löser problemet. n8n över custom kod. Supabase över egen databas. Det som funkar och är underhållbart vinner.
+**Pragmatism före teknik.** Vi väljer den enklaste tekniken som löser problemet. Färdiga tjänster där de räcker, egen kod där det behövs. Det som funkar och är underhållbart vinner.
 
 ---
 
 ## Vad vi gör — Översikt av tjänster
 
-Skyland erbjuder sex kärnområden. Alla kan kombineras eller köpas separat.
+Skyland löser fyra problem som ägarledda serviceföretag känner igen: missade kunder, för mycket admin, luckor i kalendern och förfrågningar som glöms bort. Det gör vi med sju saker som kan kombineras eller köpas separat:
 
-1. **CRM-system och kundhantering** — En plats där alla kunder, ärenden och kommunikation samlas. Bygger på Supabase, anpassat efter ditt sätt att jobba.
+1. **AI-telefonist och röstagent** — svarar i telefon och på sajten dygnet runt, på svenska, kvalificerar och bokar direkt i kalendern.
 
-2. **AI-agenter och chatbottar** — Agenter som svarar på frågor, kvalificerar leads, bokar möten. Tränade på din verksamhet, inte generiska modeller.
+2. **Automatiserad uppföljning och databasreaktivering** — varje förfrågan följs upp tills den har ett svar, och gamla kunder och leads som tystnat väcks till liv med personliga utskick. Ofta resultatbaserat.
 
-3. **Voiceflows och röstlösningar** — Telefoniagenter som svarar i kundtjänst, bokar tider, hanterar enkla ärenden. ElevenLabs Conversational AI.
+3. **AI-kundservice och smarta kontaktformulär** — besökaren får ett konkret svar inom sekunder i stället för "vi återkommer", och allt hamnar som ett kort i CRM:et.
 
-4. **Hemsidor och webbutveckling** — Konverteringsoptimerade sajter som faktiskt producerar leads. React, modern stack, snabb leverans.
+4. **CRM och Skyland-systemet** — ett ställe för kunder, ärenden, pipeline, bokningar och all kommunikation. Samma system som driver Skyland själva; går att få som egen instans.
 
-5. **Prompt engineering och AI-strategi** — Hjälp att förstå vad AI faktiskt kan göra för dig och vad som är hype. Konkret, branschspecifikt.
+5. **Hemsidor som producerar leads** — snabba, mobilanpassade sajter med formulär, bokning och AI-agent inbyggt, och en SEO-grund som gör att de hittas.
 
-6. **Automation och integrationer** — n8n-baserade arbetsflöden som kopplar ihop dina existerande system. WooCommerce, Fortnox, Mailchimp, kalendrar — det som finns kopplas ihop och börjar prata.
+6. **Annonser och kampanjer** — Meta-annonser och kampanjer som fyller kalendern, kopplade till uppföljningen så att inget lead tappas. Ofta på provision.
 
+7. **Automation och integrationer** — dina befintliga system (bokning, e-handel, ekonomi, kalender, mejl) börjar prata med varandra så att det manuella klippandet och klistrandet försvinner.
 ---
 
-## Tjänst: CRM-system och kundhantering
+## Tjänst: AI-telefonist och röstagent
 
-Vi bygger CRM som passar dig, inte tvärtom. De flesta off-the-shelf CRM tvingar dig att jobba enligt deras logik. Vi börjar med ditt sätt att jobba och bygger systemet runt det.
+En telefonist som aldrig är upptagen. Svarar i telefon och på sajten, dygnet runt, på svenska som låter mänsklig. Inte en knapptrycknings-IVR.
+
+Vad den gör:
+
+- Svarar direkt när kunder ringer eller trycker på mikrofonen på sajten
+- Ställer rätt följdfrågor och kvalificerar ärendet
+- Bokar tider direkt i din kalender och bekräftar
+- Svarar på vanliga frågor: priser, öppettider, vad som ingår
+- Lämnar över till en människa när det behövs, med hela sammanhanget
+- Loggar varje samtal som ett kort i CRM:et
+
+Du kan prova den nu: Alex på skylandai.se är exakt den här tjänsten, i drift, för Skyland själva.
+
+Tekniskt: ElevenLabs Conversational AI med svensk röst, kunskapsbas om din verksamhet, kopplad till kalender och CRM.
+---
+
+## Tjänst: Automatiserad uppföljning och databasreaktivering
+
+Det dyraste i ett serviceföretag är inte det som händer — det är det som inte händer. Förfrågan som ingen svarade på. Kunden som var nöjd för åtta månader sedan och sedan aldrig hörde av sig igen.
+
+Två delar:
+
+**Uppföljning.** Varje förfrågan — från formulär, telefon eller mejl — får en sekvens: svar, påminnelse, avslut. Sekvensen stoppar automatiskt när kunden svarar. Du ser allt i CRM:et och kan gripa in när som helst.
+
+**Databasreaktivering.** Vi tar ditt register av gamla kunder och leads som tystnat, skriver personliga meddelanden utifrån vad vi vet om varje person, skickar dem i lagom takt och följer upp. De som svarar bokas in hos dig. Du gör ingenting förrän det är dags att träffa kunden.
+
+Så tar vi betalt för reaktivering: vi börjar med ett gratis test på en avgränsad del av registret så att du ser att det fungerar. Fortsätter vi betalar du per bokad kund eller på provision — aldrig i förskott för något som inte levererat.
+
+Passar bäst där kunder återkommer: kliniker, salonger, verkstäder, tandvård, gym och massage, mäklare med gamla värderingsleads.
+
+Tekniskt: Skylands egen sekvensmotor med suppressionslista, arbetstidsfönster och svarsklassificering. Mejl via egen sändardomän med SPF/DKIM/DMARC.
+---
+
+## Tjänst: AI-kundservice och smarta kontaktformulär
+
+Ett kontaktformulär som svarar. Besökaren skriver sin fråga och får inom sekunder ett konkret svar: prisspann, hur det brukar gå till, vad nästa steg är. Inte "tack, vi återkommer inom två arbetsdagar".
 
 Vad det gör:
 
-- Samlar kunder, ärenden, offerter, kommunikation på ett ställe
-- Automatisk loggning av mejl, samtal, möten
+- Svarar på besökarens fråga direkt, med kunskap om just din verksamhet
+- Skapar ett kort i CRM:et med namn, företag, fråga och det svar som gavs
+- Poängsätter leadet så att du ringer rätt kund först
+- Startar uppföljningen automatiskt om kunden inte går vidare
+- Lämnar över till röstagenten om besökaren hellre pratar
+
+Du kan prova det nu: formuläret på skylandai.se är exakt det här, i drift.
+
+Tekniskt: språkmodell med kunskapsbas om din verksamhet, kopplad till CRM och uppföljning. Alla anrop går via servern — inga nycklar i webbläsaren.
+---
+
+## Tjänst: CRM och Skyland-systemet
+
+Ett ställe där kunder, ärenden, pipeline, bokningar och all kommunikation samlas — och där AI-agenterna, uppföljningen och kampanjerna hänger ihop i stället för att vara fem verktyg som inte pratar med varandra.
+
+Det finns två sätt att jobba med Skyland:
+
+**Som tjänstekund.** Vi bygger och driver det du behöver — röstagent, uppföljning, kampanj, sajt — i vårt system. Du ser resultatet i din kalender och i rapporter, och slipper tekniken helt.
+
+**Som systemkund.** Du får en egen instans av Skyland-systemet: CRM, pipeline, sekvensmotor, kalender, inkorg för mejl och WhatsApp, och en AI-assistent som jobbar i den. Samma system som driver Skyland själva. Du äger datan och kan exportera allt.
+
+Vad det gör:
+
+- Samlar kunder, ärenden, offerter och kommunikation på ett ställe
+- Loggar mejl, samtal och möten automatiskt
 - Pipeline som speglar din verkliga säljprocess
-- Integrationer mot bokningssystem, ekonomisystem, mejl
+- Kalender med Cal.com-bokningar och detaljkort
+- Kopplingar mot bokningssystem, ekonomisystem och mejl
 
-Tekniskt: Supabase som backend, React som frontend. Du äger databasen och kan exportera allt när du vill.
-
-Typisk leverans: 2-4 veckor från start till produktion.
-
+Tekniskt: Supabase som databas, modern webbfrontend, allt i EU.
 ---
 
-## Tjänst: AI-agenter och chatbottar
+## Tjänst: Hemsidor som producerar leads
 
-AI-agenter som faktiskt vet vad ditt företag gör. Tränade på dina tjänster, dina priser, dina vanliga frågor. Inte generiska ChatGPT-bottar.
-
-Vad de gör:
-
-- Svarar på besökarfrågor på hemsidan dygnet runt
-- Kvalificerar leads innan de når dig
-- Bokar möten direkt i din kalender
-- Skickar offerter när det passar
-- Loggar alla samtal i ditt CRM
-
-Tekniskt: Claude eller GPT som motor, n8n för logik, kunskapsbas i Supabase pgvector. Anpassningsbara verktygsanrop mot dina egna system.
-
-Typisk leverans: 1-3 veckor.
-
----
-
-## Tjänst: Voiceflows och röstlösningar
-
-Telefoniagenter som låter mänskliga, talar svenska flytande och hanterar verkliga kundärenden. Inte robot-IVR.
-
-Vad de gör:
-
-- Svarar i kundtjänst när du inte hinner
-- Bokar tider och bekräftar bokningar
-- Tar emot beställningar och frågar rätt följdfrågor
-- Eskalerar till människa när det behövs
-
-Tekniskt: ElevenLabs Conversational AI med svensk röstmodell. Integrerad mot kalender, CRM och ekonomisystem.
-
-Användningsfall vi byggt: bokningssystem för servicefirmor, kundservice för e-handel, enklare orderhantering.
-
----
-
-## Tjänst: Hemsidor och webbutveckling
-
-Hemsidor som producerar leads, inte bara ser snygga ut. Konverteringsfokuserade, snabba, mobil-first.
+Hemsidor som gör ett jobb, inte bara ser snygga ut. Snabba, mobil-först, byggda för att en besökare ska bli en förfrågan.
 
 Vad ingår:
 
-- Strategi och struktur baserat på din målgrupp
-- Design och utveckling i React
-- Integrerade formulär kopplade till CRM
-- AI-agent eller chattbott på sajten om det passar
-- SEO-grund som faktiskt funkar
+- Struktur och texter utifrån vad din målgrupp faktiskt söker efter
+- Design och utveckling utan tung plattform — snabb laddning på mobil
+- Formulär och bokning kopplade till CRM och uppföljning
+- AI-agent eller röstagent på sajten om det passar
+- SEO-grund som gör att sajten hittas: sidor per tjänst och ort, strukturerad data, sitemap, Google Business-profil
 
-Tekniskt: React, modern stack, Netlify-deploy. Snabb laddning, ingen WordPress-överfett.
+Exempel: skylandai.se, marinmekaniker.nu, en konstnärs portfoliosajt med serviceavtal, en flerspråkig bokningssajt för en turismaktör i Lappland.
 
-Typisk leverans: 3-6 veckor beroende på komplexitet.
-
+Tekniskt: statisk, snabb frontend på Netlify; formulär och röst mot vår backend.
 ---
 
-## Tjänst: Prompt engineering och AI-strategi
+## Tjänst: Annonser och kampanjer
 
-För dig som inte vill ha system byggt, men vill förstå vad AI kan göra för ditt företag. Konkret rådgivning, inte hype.
+Annonser som fyller kalendern, inte bara ger klick. Vi bygger Meta-kampanjer (Facebook/Instagram) från research och konkurrentanalys, producerar annonsmaterialet och kopplar allt till uppföljningen så att varje lead som kommer in faktiskt får ett svar.
 
-Vad du får:
+Vad vi gör:
 
-- Genomgång av dina arbetsflöden och var AI passar
-- Konkret prioritering av vad som är värt att automatisera först
-- Hands-on sessioner där vi bygger prompts och flöden tillsammans
-- Underlag för att fatta investeringsbeslut
+- Analyserar vad som fungerar i din bransch (annonsbibliotek, konkurrenter, säsong)
+- Producerar annonser: text, bild, video
+- Kör kampanjen och justerar löpande
+- Kopplar inkommande leads till uppföljning och bokning
+- Rapporterar det som betyder något: bokningar och intäkt, inte bara räckvidd
 
-Format: vanligen halvdags- eller heldagsworkshops, ibland följt av kortare uppföljningar.
+Så tar vi betalt: ofta på provision eller per resultat, ibland fast månadsavgift — beroende på om resultatet går att mäta hos dig.
+
+Exempel: en tatueringsstudio i Göteborg på provisionsmodell, en kampsportsklubb i Göteborg, säsongsmarknadsföring för en marinmekaniker.
 
 ---
 
 ## Tjänst: Automation och integrationer
 
-Får dina system att börja prata med varandra. WooCommerce till Fortnox. Bokningssystem till mejl. Formulär till CRM. Allt det manuella klippandet och klistrandet borta.
+Får dina system att börja prata med varandra. Webbshop till ekonomisystem. Bokningssystem till mejl. Formulär till CRM. Allt det manuella klippandet och klistrandet borta.
 
 Vad vi gör:
 
-- Kartlägger dina nuvarande verktyg och flöden
-- Bygger automationer i n8n som ersätter manuellt arbete
-- Hostar n8n hos oss eller hos dig
-- Underhåll och vidareutveckling enligt avtal
+- Kartlägger dina nuvarande verktyg och var tiden försvinner
+- Bygger automationer som ersätter manuellt arbete — som egen, underhållbar kod i vårt system, inte som sköra klickflöden
+- Underhåll och vidareutveckling enligt serviceavtal
 
-Vanliga integrationer: WooCommerce, Fortnox, Mailchimp, Google Workspace, Microsoft 365, kalendersystem, betalplattformar.
-
+Vanliga integrationer: WooCommerce, Fortnox, Google Workspace, Microsoft 365, Cal.com och andra kalendrar, Resend/mejl, WhatsApp Business, betalplattformar.
 ---
 
 ## Case study: Cold Experience
@@ -164,11 +186,11 @@ Cold Experience är en turismaktör i Norrland som driver upplevelsepaket med is
 
 Problem: Bokningar kom in på fyra språk (svenska, engelska, tyska, polska) men deras gamla sajt hanterade bara ett språk åt gången. Översättning skedde manuellt. Marknadsföringsinnehåll producerades sporadiskt.
 
-Vad vi byggde: Flerspråkig bokningssajt i React med automatisk översättning via headless CMS (Decap + Supabase + n8n). Digital broschyr som genereras dynamiskt. Bokningssystem integrerat mot deras kalender.
+Vad vi byggde: Flerspråkig bokningssajt med automatisk översättning via ett headless CMS. Digital broschyr som genereras dynamiskt. Bokningssystem integrerat mot deras kalender. Nu bygger vi nästa steg: ett WhatsApp-intag där förfrågningar från annonser kvalificeras av en AI-agent på fyra språk och landar som kort i CRM:et.
 
 Resultat: Bokningar på alla fyra språk hanteras automatiskt. Tid sparad per vecka uppskattas till 8-10 timmar. Konverteringsgrad ökade märkbart efter snabbare laddningstider och mobiloptimering.
 
-Tekniskt: React, Supabase, n8n, Decap CMS, auto-översättning via OpenAI.
+Tekniskt: modern webbfrontend, Supabase, headless CMS, auto-översättning via språkmodell, WhatsApp Business API.
 
 ---
 
@@ -178,11 +200,11 @@ MarinMekaniker.nu är en marinmekaniker i västra Sverige som servar båtmotorer
 
 Problem: Offerter och fakturor hanterades manuellt i e-post och pärmar. Återkommande kunder fick inte den uppföljning som skulle leda till mer arbete. Ingen samlad bild av vilka kunder som hade vilka båtar.
 
-Vad vi byggde: CRM-pilot med kundhantering, ärendehantering och offert-modul. React-frontend mot FastAPI-backend och MongoDB. Supabase för CRM-delen. Tvåspråkig (svenska/engelska) eftersom flera kunder är utländska båtägare.
+Vad vi byggde: Ny sajt (marinmekaniker.nu) med orderformulär som går direkt till CRM och mejl, kundhantering och ärendehantering, samt säsongsmarknadsföring inför vår och höst. Tvåspråkig (svenska/engelska) eftersom flera kunder är utländska båtägare.
 
 Resultat: Tider och offerter hanteras nu i ett system. Återkommande kunder får automatisk påminnelse om service. Tid sparad per vecka cirka 5 timmar.
 
-Tekniskt: React, Tailwind, FastAPI, MongoDB, Supabase, n8n för automatisering. Hostas på Render med kvartalsvis driftavtal.
+Tekniskt: snabb webbfrontend, Supabase, orderflöde i Skyland-systemet. Driftavtal.
 
 ---
 
@@ -196,21 +218,7 @@ Vad vi byggde: AI-driven bildautomation som söker upp, väljer och beskär prod
 
 Resultat: Produktupplägg som tog 30 minuter per produkt tar nu under 5. Bildkvalitet konsekvent. Tid sparad per vecka cirka 6 timmar.
 
-Tekniskt: React-baserad SPA, Google Custom Search för bildsökning, Gemini som fallback för beskrivningar, Cloudinary för bildhantering (1000×1000px standard). Allt integrerat mot WooCommerce.
-
----
-
-## Case study: Norra Hamnens Bilskola
-
-Bilskola i Göteborgsområdet som behövde modernisera bokning och kommunikation med elever.
-
-Problem: Elever bokade lektioner via telefon eller e-post. Manuell schemaläggning. Påminnelser skickades manuellt. Mycket no-shows på inbokade tider.
-
-Vad vi byggde: Bokningssystem direkt på sajten där elever själva väljer tid hos rätt lärare. Automatiska SMS-påminnelser 24 timmar innan lektion. Integrerat mot lärarnas kalendrar.
-
-Resultat: No-show-frekvens halverades. Administrativ tid för bokningshantering minskade med uppskattningsvis 70%. Eleverna uppskattar att kunna boka när som helst.
-
-Tekniskt: Cal.com-baserad bokning, n8n för SMS-flöden, Supabase för datalagring.
+Tekniskt: webbapp med bildsökning, språkmodell för beskrivningar och bildhantering, allt integrerat mot WooCommerce. Löpande serviceavtal.
 
 ---
 
@@ -233,7 +241,7 @@ Konkreta byggstenar:
 - Kalenderintegration så kunden kan boka platsbesök direkt
 - CRM som loggar alla förfrågningar och påminner om uppföljning
 
-Investeringen ligger typiskt mellan 30 000 och 60 000 kr. För ett företag som tappar ett par jobb i månaden på sen respons kan det vara inbetalt på första kvartalet.
+Vad det kostar beror på omfattning och på om resultatet går att mäta — då kan vi ofta jobba resultatbaserat med ett gratis test först. Du får en konkret offert efter ett kort samtal.
 
 ---
 
@@ -254,7 +262,7 @@ Konkreta byggstenar:
 - Integration mot er PMS (Mews, Cloudbeds, Sirvoy etc) eller bokningskalender
 - Review-management som påminner gäster att lämna omdöme
 
-Investeringen ligger typiskt mellan 25 000 och 50 000 kr. Återbetalningstid kan vara så kort som ett kvartal om ni får tillbaka ett par bokningar i månaden som annars hade tappats.
+Vad det kostar beror på omfattning och på om resultatet går att mäta — då kan vi ofta jobba resultatbaserat med ett gratis test först. Du får en konkret offert efter ett kort samtal.
 
 ---
 
@@ -274,7 +282,7 @@ Konkreta byggstenar:
 - Integration mot ert kassasystem för bordhantering
 - Schemaläggningsstöd som föreslår bemanning baserat på bokningsvolym kommande vecka
 
-Investeringen ligger mellan 20 000 och 45 000 kr. För en restaurang som tappar ett par bord i veckan kan det vara inbetalt på första kvartalet.
+Vad det kostar beror på omfattning och på om resultatet går att mäta — då kan vi ofta jobba resultatbaserat med ett gratis test först. Du får en konkret offert efter ett kort samtal.
 
 ---
 
@@ -294,7 +302,7 @@ Konkreta byggstenar:
 - AI som svarar på vanliga frågor (priser, behandlingstider, produkter)
 - Återkommande-bokningssystem som föreslår nästa tid baserat på behandlingstyp
 
-Investeringen ligger mellan 20 000 och 40 000 kr. Återbetalningstid kan vara under tre månader för en salong med 4+ anställda — bara minskningen av no-shows brukar kunna räcka.
+Vad det kostar beror på omfattning och på om resultatet går att mäta — då kan vi ofta jobba resultatbaserat med ett gratis test först. Du får en konkret offert efter ett kort samtal.
 
 ---
 
@@ -313,7 +321,7 @@ Konkreta byggstenar:
 - Automatiska fakturapåminnelser med eskaleringssteg, integrerat mot ert bokföringssystem
 - Onboarding-flöden för nya klienter (NDA, GDPR-godkännande, dokument)
 
-Investeringen ligger mellan 35 000 och 80 000 kr beroende på integrationer. För en byrå med 5+ konsulter är återbetalningstiden typiskt 3-6 månader, främst genom att 5-10% av faktureringstid kan frigöras.
+Vad det kostar beror på omfattning och på om resultatet går att mäta — då kan vi ofta jobba resultatbaserat med ett gratis test först. Du får en konkret offert efter ett kort samtal.
 
 ---
 
@@ -333,7 +341,7 @@ Konkreta byggstenar:
 - Integration mot Shopify, WooCommerce, Centra eller andra plattformar
 - Sentimentsanalys på kundfeedback för att fånga problem tidigt
 
-Investeringen ligger mellan 30 000 och 65 000 kr. För en e-handel med 50+ ordrar per dag kan återbetalningstiden vara under två månader om checkout-tappet minskar markant.
+Vad det kostar beror på omfattning och på om resultatet går att mäta — då kan vi ofta jobba resultatbaserat med ett gratis test först. Du får en konkret offert efter ett kort samtal.
 
 ---
 
@@ -351,7 +359,7 @@ Konkreta byggstenar:
 - Uppföljningssekvenser efter visningar (dagar 1, 7, 30 efter)
 - Värderingsförfrågningar via formulär med automatiserade första-svar
 
-Investeringen ligger mellan 40 000 och 75 000 kr. Återbetalningstid är ofta 4-8 månader, men huvudvärdet är att färre leads tappas. För en byrå som omsätter 5-15 miljoner i året kan ett par extra affärer per kvartal från bättre leadshantering motsvara hela investeringen.
+Vad det kostar beror på omfattning och på om resultatet går att mäta — då kan vi ofta jobba resultatbaserat med ett gratis test först. Du får en konkret offert efter ett kort samtal.
 
 ---
 
@@ -373,74 +381,63 @@ Konkreta byggstenar:
 
 Viktigt: Vi bygger inom ramen för Patientdatalagen (PDL) och vårdens dataskyddsregler. All hantering av personuppgifter sker EU-baserat och i enlighet med GDPR och dataskyddsförordningen för vårdsektorn. Journaldata hanteras bara om kunden redan har godkända system, avtal och dataskyddsstruktur på plats — vi tar inte ansvar för att etablera den infrastrukturen.
 
-Investeringen ligger mellan 35 000 och 70 000 kr. Återbetalningstid är ofta 3-6 månader, främst genom att receptionspersonal kan fokusera på besökande patienter istället för telefonsamtal, och no-show-frekvens som typiskt minskar markant.
+Vad det kostar beror på omfattning och på om resultatet går att mäta — då kan vi ofta jobba resultatbaserat med ett gratis test först. Du får en konkret offert efter ett kort samtal.
 
 ---
 
-## Paketet: Starterpaket
+## Paketet: Resultatbaserat samarbete
 
-För dig som vill börja smått och se vad AI kan göra för ditt företag innan du investerar i ett komplett system.
+För det som går att mäta — bokningar, återvunna kunder, leads från annonser — tar vi hellre betalt på resultat än i förskott.
 
-Pris: från 4 990 kr engångsbetalning.
+Så går det till:
+
+- Vi börjar med ett gratis, avgränsat test: en del av ditt register, en kanal, en bestämd period
+- Innan testet skriver vi ner vad som gäller om det fungerar: vad en bokad kund eller genomförd affär kostar, och hur det mäts
+- Mätningen sker via vår länk, vårt nummer eller din kalender — inte via uppskattningar
+- Fungerar det fortsätter vi på de villkoren. Fungerar det inte har det inte kostat dig något
+
+Passar för: databasreaktivering, annonskampanjer med bokning som mål, uppföljningssekvenser.
+
+Kräver: att resultatet går att koppla till oss. Går det inte att mäta erbjuder vi fast pris i stället.
+---
+
+## Paketet: Fast pris per projekt
+
+För det som byggs en gång: hemsida, röstagent, formulär-AI, integration, CRM-uppsättning.
+
+Så går det till:
+
+- Kort samtal och behovsanalys
+- Offert med fast pris och leveranstid — inga löpande timmar som drar iväg
+- Bygg i korta steg med avstämning varje vecka
+- Driftsättning, utbildning och dokumentation ingår
+- Du äger det som byggts
+
+Vill du ha det underhållet och vidareutvecklat efteråt tecknar du ett serviceavtal (se nedan). Vill du klara dig själv går det också bra.
+---
+
+## Paketet: Skyland-systemet som prenumeration
+
+För dig som vill ha hela systemet, inte bara en del: CRM, pipeline, uppföljningsmotor, kalender, inkorg för mejl och WhatsApp, och en AI-assistent som jobbar i det. Samma system som driver Skyland själva, som en egen instans för din verksamhet.
 
 Vad ingår:
 
-- 2-timmars genomgång av din verksamhet och dina arbetsflöden
-- En konkret AI-lösning byggd och driftsatt (vanligen en chattbot eller automation)
-- 30 dagars support efter leverans
-- Skriftligt underlag med rekommendationer för nästa steg
+- Egen instans med din data, i EU
+- Uppsättning anpassad efter din säljprocess och dina kanaler
+- Löpande drift, uppdateringar och support
+- Vidareutveckling i takt med att systemet växer
+- Export av all data när du vill — inget lock-in
 
-Lämpligt för: enmansföretag, mindre serviceföretag som vill testa innan de bygger större.
-
-Leveranstid: 1-2 veckor från beställning.
-
+Månadsavgift efter omfattning. Boka ett samtal så visar vi systemet live och räknar på vad det skulle innebära för dig.
 ---
 
-## Paketet: Hemsidor
+## Paketet: Drift- och serviceavtal
 
-Konverteringsoptimerade hemsidor med modern teknik och faktisk leadgenerering.
+Om något går sönder vill du veta hur snabbt du får hjälp. Det är precis det serviceavtalet handlar om — tydliga svarstider när systemet krånglar, och löpande underhåll så att det inte krånglar i onödan. Du slipper ligga vaken och undra vem som fixar en akut driftstörning en tisdagmorgon.
 
-Pris: från 14 990 kr engångsbetalning.
+Avtalet gäller system och sajter vi byggt eller tagit över. Det säkerställer att allt funkar, att säkerhetsuppdateringar sköts, och att systemet utvecklas vidare i takt med dina behov.
 
-Vad ingår:
-
-- Strategi och innehållsstruktur
-- Design och utveckling
-- Mobiloptimering och SEO-grund
-- Integration mot CRM eller mejl
-- 60 dagars garanti efter lansering
-
-Tillval: AI-chattbot, voice-agent, avancerad SEO, flerspråk.
-
-Leveranstid: 3-6 veckor.
-
----
-
-## Paketet: Custom builds
-
-För dig som behöver ett system byggt från grunden — CRM, automationsplattform, eller komplett AI-system.
-
-Pris: från 30 000 kr beroende på omfattning.
-
-Vad ingår:
-
-- Djupgående kartläggning av dina behov
-- Arkitekturförslag och prisuppskattning
-- Iterativ utveckling med löpande avstämningar
-- Driftsättning och utbildning av ditt team
-- Du äger systemet och koden
-
-Vanlig omfattning: 4-12 veckor från start till produktion.
-
----
-
-## Paketet: Drift- och säkerhetsavtal
-
-Om något går sönder vill du veta hur snabbt du får hjälp. Det är precis det driftavtalet handlar om — tydliga svarstider när systemet krånglar, och löpande underhåll så att det inte krånglar i onödan. Du slipper ligga vaken och undra vem som fixar en akut driftstörning en tisdagmorgon.
-
-Avtalet gäller system vi byggt eller tagit över. Det säkerställer att allt funkar, att säkerhetsuppdateringar sköts, och att systemet utvecklas vidare i takt med dina behov.
-
-Pris: från 990 kr per månad.
+Månadsavgift efter omfattning — en enkel sajt kostar en bråkdel av ett helt system.
 
 Vad ingår:
 
@@ -464,31 +461,32 @@ Bekräftelse inom 48 timmar. Schemaläggs i nästa utvecklings-sprint, vanligen 
 *Jourtid utanför kontorstid* är inte standard men kan tilläggas mot avgift för verksamheter som kräver det (t.ex. e-handel med dygnetruntorder).
 
 Avtalet har 2 månaders uppsägningstid och kan när som helst skalas upp eller ner beroende på dina behov.
-
 ---
 
 ## FAQ: Vad kostar det?
 
-Det beror helt på vad du behöver. En enkel chattbot kan komma in på 4 990 kr i Starterpaketet. En komplett hemsida börjar på 14 990 kr. Ett custom-byggt system börjar på 30 000 kr men kan landa betydligt högre beroende på omfattning.
+Det beror på vad du behöver, och på om resultatet går att mäta.
 
-Det vi alltid gör är att börja med ett förutsättningslöst samtal där vi kartlägger vad du behöver. Du får en konkret offert med fast pris innan vi börjar bygga. Inga timdebiteringar som drar iväg. Inga oklarheter.
+Går det att mäta — bokningar, återvunna kunder, leads från annonser — tar vi hellre betalt på resultat: ett gratis test först, sedan per bokad kund eller på provision. Då kostar det inget förrän det har levererat.
 
-Drift och underhåll efteråt börjar på 990 kr per månad.
+Byggs något en gång — en hemsida, en röstagent, en integration — får du en offert med fast pris efter ett kort samtal. Inga timdebiteringar som drar iväg.
 
+Vill du ha hela Skyland-systemet som egen instans, eller drift och vidareutveckling av det vi byggt, är det en månadsavgift efter omfattning.
+
+Vi säger inga siffror förrän vi vet vad du behöver, för då blir de fel. Boka ett samtal så räknar vi tillsammans, och du får en konkret siffra att ta ställning till.
 ---
 
 ## FAQ: Hur lång tid tar det?
 
 Beror på vad det gäller. Riktlinjer:
 
-- Starterpaket: 1-2 veckor
-- Hemsidor: 3-6 veckor
-- AI-agenter och chattbottar: 1-3 veckor
-- CRM-system: 2-4 veckor
-- Custom builds: 4-12 veckor
+- Röstagent eller formulär-AI på befintlig sajt: 1-2 veckor
+- Uppföljningssekvens eller reaktiveringstest: igång inom en vecka, testet löper 2-4 veckor
+- Annonskampanj: första annonserna live inom 1-2 veckor
+- Hemsida: 3-6 veckor
+- Eget Skyland-system: uppsatt och i drift inom 2-4 veckor
 
 Vi jobbar iterativt. Du ser resultat tidigt och kan styra under tiden. Inget byggs i tysthet i tre månader för att sedan presenteras.
-
 ---
 
 ## FAQ: Vad händer om vi inte vill fortsätta?
@@ -507,7 +505,7 @@ Räkna på vad det kostar dig idag att inte ha det. Hur mycket tid lägger du p�
 
 Vi gör räkneövningen tillsammans i första samtalet. Om siffrorna inte talar för en investering så säger vi det.
 
-Det vanligaste är att en automation som kostar 30 000 kr betalar tillbaka sig på 3-6 månader genom sparad tid. Men det varierar beroende på din verksamhet.
+Där resultatet går att mäta tar vi risken själva: gratis test först, betalt per resultat sedan. Där något byggs en gång räknar vi ut återbetalningstiden i sparad tid eller vunna affärer innan du bestämmer dig. Talar siffrorna inte för det säger vi det.
 
 ---
 
@@ -536,11 +534,11 @@ Vi bygger inte system som fattar beslut åt dig som du inte kan ångra eller gra
 
 ## FAQ: Måste vi vara tekniska för att jobba med er?
 
-Nej. De flesta av våra kunder är inte tekniska. De driver bilskolor, livsmedelshandlar, marinmekaniska företag, turismverksamheter. De vet sin bransch, vi vet tekniken.
+Nej. De flesta av våra kunder är inte tekniska. De driver livsmedelshandel, marinverkstad, turismverksamhet, tatueringsstudio, kampsportsklubb. De vet sin bransch, vi vet tekniken.
 
 Vi pratar svenska, inte teknisk jargong. Vi förklarar vad vi bygger och varför. Du behöver inte förstå koden — du behöver förstå vad systemet gör för ditt företag.
 
-Utbildning av ditt team ingår i alla custom builds.
+Utbildning av ditt team ingår när vi bygger något åt dig.
 
 ---
 
@@ -579,21 +577,20 @@ Skyland passar mindre bra för:
 
 ## Vad vi inte gör
 
-Vi får ofta frågan om vi bygger mobilappar, designar logotyper, eller fungerar som en marknadsföringsbyrå. Svaret är nej på alla tre. Vi bygger inte heller hårdvara, tar inte generella IT-supportuppdrag för datorer och nätverk, och vi utvecklar inte bokföringssystem från grunden — däremot integrerar vi mot de system som redan finns.
+Vi får ofta frågan om vi bygger mobilappar, designar logotyper eller sköter IT-support. Svaret är nej. Vi bygger inte heller hårdvara och vi utvecklar inte bokföringssystem från grunden — däremot integrerar vi mot de system som redan finns.
 
-Det handlar inte om att vi inte kan, utan om att vi valt att vara riktigt bra på det vi gör: AI-automation, webbsystem, och CRM-lösningar för småföretag. Allt annat lämnar vi till specialister som faktiskt är bäst på det.
+Det handlar inte om att vi inte kan, utan om att vi valt att vara riktigt bra på det vi gör: AI-agenter, uppföljning, kampanjer och system som ger ägarledda serviceföretag fler kunder och färre timmar admin. Allt annat lämnar vi till specialister som faktiskt är bäst på det.
 
 Konkret ligger följande utanför vår verksamhet:
 
 - Hårdvaruutveckling och fysiska enheter
 - Logotypdesign och varumärkesidentitet utanför webbprojekt
 - Större bokföringssystem från grunden — vi integrerar mot existerande
-- Marknadsföringsbyrå-tjänster (annonsproduktion, kampanjstrategi, SEO-byrå)
 - Generella IT-supportavtal för datorer och nätverk
 - Apputveckling för iOS och Android som primär leverans
+- Annonser eller SEO som fristående byråtjänst utan koppling till uppföljning och bokning — vi gör det som del av ett system som ska ge kunder, inte som räckviddsrapporter
 
 Vi rekommenderar gärna kunniga partners om ditt behov ligger utanför vår scope. Bättre att du får rätt hjälp än fel hjälp från oss.
-
 ---
 
 ## Hur vi jobbar — Process
@@ -602,13 +599,13 @@ Vi rekommenderar gärna kunniga partners om ditt behov ligger utanför vår scop
 
 **Steg 2: Behovsanalys (1-2 timmar).** Vi går igenom dina arbetsflöden mer i detalj. Identifierar vad som är värt att automatisera först. Du får en första bild av möjligheter.
 
-**Steg 3: Offert.** Konkret förslag med fast pris och leveranstid. Du tar beslutet på lugn och ro.
+**Steg 3: Förslag.** Antingen ett gratis, avgränsat test med villkoren för fortsättningen nedskrivna, eller en offert med fast pris och leveranstid. Du tar beslutet på lugn och ro.
 
 **Steg 4: Bygg.** Vi bygger iterativt. Du ser progressen och kan styra under tiden. Korta avstämningar varje vecka.
 
 **Steg 5: Driftsättning och utbildning.** Systemet går live. Ditt team utbildas. Du tar över ägandet.
 
-**Steg 6: Drift och vidareutveckling (valfritt).** Driftavtal om du vill ha löpande support och utveckling. Annars klarar du dig själv eller tar in någon annan.
+**Steg 6: Drift och vidareutveckling (valfritt).** Serviceavtal om du vill ha löpande support och utveckling. Annars klarar du dig själv eller tar in någon annan.
 
 ---
 
@@ -624,8 +621,8 @@ Om vi båda känner att det finns en fit, kommer vi närmare. Vi går igenom din
 
 Du behöver avsätta runt 2 timmar för det här mötet. Plus förmodligen en timme efter mötet för att samla ihop tillgångar vi behöver — inloggningar till era nuvarande system, exempel på hur ärenden hanteras idag, eventuella bilder eller texter ni vill återanvända.
 
-**Offert med fast pris**
-Inom en vecka efter behovsanalysen får du en konkret offert. Den är specifik: vad vi bygger, vad det kostar, när det levereras. Inga vaga uppskattningar. Du tar beslutet på lugn och ro.
+**Förslag**
+Inom en vecka efter behovsanalysen får du ett konkret förslag. Går resultatet att mäta föreslår vi ett gratis test med villkoren för fortsättningen nedskrivna. Byggs något en gång får du en offert med fast pris: vad vi bygger, vad det kostar, när det levereras. Inga vaga uppskattningar.
 
 **Bygg-fasen (varierar beroende på omfattning)**
 När du sagt ja kör vi igång. Du får löpande avstämningar — vanligen en kort video varje vecka där vi visar progressen. Du kan styra under tiden om något känns fel.
@@ -636,13 +633,14 @@ Din tidsåtgång under bygg-fasen är typiskt 30-60 minuter per vecka för avst�
 Systemet går live. Ditt team utbildas — vanligen en workshop på 1-2 timmar där vi går igenom hur systemet används i vardagen. Skriftlig dokumentation följer med så att nya medarbetare kan komma in i systemet senare utan att vi behöver vara med.
 
 **Efter lansering**
-Du äger systemet. Vill du ha löpande support och vidareutveckling tecknar vi ett driftavtal från 990 kr per månad. Vill du klara dig själv går det också bra — koden är din.
+Du äger systemet. Vill du ha löpande support och vidareutveckling tecknar vi ett serviceavtal med månadsavgift efter omfattning. Vill du klara dig själv går det också bra — koden är din.
 
 **Total tid från första samtal till live-system:**
 
-- Starterpaket: 1-2 veckor
+- Röstagent eller formulär-AI: 1-2 veckor
+- Reaktiveringstest: igång inom en vecka
 - Hemsida med automation: 4-8 veckor
-- Custom-byggt system: 6-16 veckor
+- Eget Skyland-system: 2-4 veckor
 
 Ingen kund har behövt avsätta mer än några timmar i veckan av sin egen tid under bygg-fasen. Det är vårt jobb att bygga, ditt jobb att driva din verksamhet.
 
@@ -652,7 +650,7 @@ Ingen kund har behövt avsätta mer än några timmar i veckan av sin egen tid u
 
 Vill du ha ett första samtal? Boka 15 minuter direkt i Joakims kalender.
 
-Det enklaste är att boka via vår sajt eller fråga AI-agenten Dana som finns där. Hon kan lägga in mötet direkt.
+Det enklaste är att boka via vår sajt (knappen Boka går till Joakims kalender) eller be Alex, röstagenten på sajten — hon kan lägga in mötet direkt.
 
 E-post: <joakim@skylandai.se>
 Bas: Mölndal/Göteborg
