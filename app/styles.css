@@ -641,6 +641,11 @@ body.is-swapping .page-glass{will-change:transform,opacity}
 main{position:relative;height:100dvh;overflow:clip;scroll-snap-type:none;scroll-behavior:auto}
 .page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;min-height:0;height:auto;overflow-y:auto;overflow-x:hidden;padding:96px 32px 32px;will-change:transform;scroll-snap-align:none;scroll-snap-stop:normal;scrollbar-width:thin;scrollbar-color:rgba(67,225,155,.35) transparent;visibility:hidden;pointer-events:none;transition:transform .55s cubic-bezier(.22,.9,.28,1),visibility 0s linear .55s}
 .page.active{visibility:visible;pointer-events:auto;z-index:2;transition:transform .55s cubic-bezier(.22,.9,.28,1),visibility 0s linear 0s}
+/* Första sidan syns INNAN app.js kört. Alla .page är dolda tills motorn sätter
+   .active, och motorn ligger sist i sidfoten — så första målningen väntade på
+   varenda skript, på mobil 8,4 s till första pixel. app.js sätter html.is-scroll
+   när den tar över; tills dess visar CSS:en hero-sidan själv. */
+html:not(.is-scroll) #core.page{visibility:visible;pointer-events:auto}
 .page-glass{opacity:1!important;transform:none!important}
 
 /* ── Kantpilar med grannens namn (desktop — mobilen har korset) ── */

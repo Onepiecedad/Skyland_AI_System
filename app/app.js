@@ -309,6 +309,11 @@ document.addEventListener('DOMContentLoaded', () => {
       current = id;
       history.replaceState(null, '', '#' + id);
       window.dispatchEvent(new CustomEvent('skyland:page', { detail: { page: id } }));
+      // Demosidan i bild: värm röst-SDK:t (120 kB) nu, så att mikrofonen
+      // svarar direkt. Det laddas inte längre vid sidstart — se voice.js.
+      if (id === 'flux' && window.SkylandVoice && typeof window.SkylandVoice.warm === 'function') {
+        window.SkylandVoice.warm();
+      }
     }
 
     window.SkylandNav = {

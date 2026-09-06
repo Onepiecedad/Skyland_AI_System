@@ -223,6 +223,39 @@
     if (starterPanel) starterPanel.classList.add('hidden');
   }
 
+  // --- SDK-laddning: först när någon faktiskt vill prata ---
+  //
+  // @elevenlabs/client är 120 kB gzippat och låg som ett synkront <script> i
+  // sidfoten, före app.js. Eftersom sidorna är dolda tills app.js kör (CSS
+  // .page{visibility:hidden}) väntade FÖRSTA MÅLNINGEN på att röst-SDK:t
+  // laddats — på mobil 8,4 s till första pixel, för ett bibliotek de flesta
+  // besökare aldrig använder. Nu laddas det när mikrofonen trycks (eller
+  // värms när demosidan blir aktiv, se app.js), och index.html prefetchar det
+  // så det ligger i cachen. Global: window.ElevenLabsClient.
+  var SDK_URL = 'https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.4.0/dist/lib.iife.min.js';
+  var sdkPromise = null;
+
+  function sdkLoaded() {
+    return !!(window.ElevenLabsClient && window.ElevenLabsClient.Conversation);
+  }
+
+  function ensureSdk() {
+    if (sdkLoaded()) return Promise.resolve();
+    if (sdkPromise) return sdkPromise;
+    sdkPromise = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = SDK_URL;
+      s.async = true;
+      s.onload = function () {
+        if (sdkLoaded()) resolve();
+        else { sdkPromise = null; reject(new Error('Röst-SDK:t laddades men saknar Conversation')); }
+      };
+      s.onerror = function () { sdkPromise = null; reject(new Error('Kunde inte ladda röst-SDK:t')); };
+      document.head.appendChild(s);
+    });
+    return sdkPromise;
+  }
+
   async function startVoice(starterText) {
     if (currentState === STATES.CONNECTING || currentState === STATES.LISTENING || currentState === STATES.SPEAKING) {
       return; // Already active
@@ -232,6 +265,9 @@
     setState(STATES.CONNECTING);
 
     try {
+      // 0. SDK och signed URL hämtas parallellt — ingen väntar på den andra.
+      var sdkReady = ensureSdk();
+
       // 1. Get signed URL from proxy
       var signedUrl = await fetchSignedUrl();
       transcriptBuffer = [];
@@ -349,6 +385,7 @@
       } catch (e) { /* kontexten är aldrig obligatorisk */ }
 
       // 4. Start ElevenLabs conversation via SDK
+      await sdkReady;
       var Conversation = window.ElevenLabsClient.Conversation;
       conversation = await Conversation.startSession(sessionConfig);
 
@@ -387,11 +424,7 @@
   // --- Initialization ---
 
   function init() {
-    // Verify SDK loaded
-    if (!window.ElevenLabsClient || !window.ElevenLabsClient.Conversation) {
-      console.error('[VOICE] @elevenlabs/client SDK not loaded');
-      return;
-    }
+    // SDK:t laddas lat (ensureSdk) — init får inte bero på att det finns.
 
     // Resolve DOM refs
     var fluxPage = document.getElementById('flux');
@@ -463,6 +496,7 @@
     init: init,
     start: startVoice,
     stop: stopVoice,
+    warm: function () { ensureSdk().catch(function () { /* laddas om vid tryck */ }); },
     getState: function () { return currentState; },
   };
 })();
