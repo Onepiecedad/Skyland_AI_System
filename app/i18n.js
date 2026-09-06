@@ -4,11 +4,16 @@
     en: {
       // Hero
       hero_static: "We're not a:",
-      hero_spin_1: "Web agency",
-      hero_spin_2: "Consulting firm",
-      hero_spin_3: "Software developer",
+      // Bredaste ordet FÖRST. Största målningen (LCP) är det här ordet, och
+      // varje gång ett bredare ord roterar in räknas det som en ny, senare
+      // målning — med "Software developer" på plats 3 landade LCP på 10 s.
+      // Kommer det bredaste först är inget senare ord större, och LCP stannar
+      // vid första målningen. Ord 5 = ord 1 för sömlös loop.
+      hero_spin_1: "Software developer",
+      hero_spin_2: "Web agency",
+      hero_spin_3: "Consulting firm",
       hero_spin_4: "Marketing agency",
-      hero_spin_5: "Web agency",
+      hero_spin_5: "Software developer",
       hero_desc: "We're all four — and we solve your problems:",
       hero_problems: "Missed customers. Too much admin. Gaps in the calendar. Enquiries that get forgotten.",
       hero_promise: "You get the result. We handle the rest.",
@@ -142,11 +147,12 @@
     sv: {
       // Hero
       hero_static: "Vi är inte en:",
-      hero_spin_1: "Webbyrå",
-      hero_spin_2: "Konsultfirma",
-      hero_spin_3: "Mjukvaruutvecklare",
-      hero_spin_4: "Marknadsföringsbyrå",
-      hero_spin_5: "Webbyrå",
+      // Bredaste ordet först — se den engelska listan för varför.
+      hero_spin_1: "Marknadsföringsbyrå",
+      hero_spin_2: "Webbyrå",
+      hero_spin_3: "Konsultfirma",
+      hero_spin_4: "Mjukvaruutvecklare",
+      hero_spin_5: "Marknadsföringsbyrå",
       hero_desc: "Vi är alla fyra — och vi löser dina problem:",
       hero_problems: "Missade kunder. För mycket admin. Luckor i kalendern. Förfrågningar som glöms bort.",
       hero_promise: "Du får resultatet. Vi sköter resten.",
